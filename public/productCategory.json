@@ -1,0 +1,14 @@
+[
+    { "id": 1, "image": "https://i.ibb.co/sdZYF1zY/pexels-pixabay-267202.jpg", "name": "Art & Design", "icon": "palette", "description": "Creative resources for artists and designers.", "price": 12.99, "inStock": true },
+    { "id": 2, "image": "https://i.ibb.co/PZdQytc9/pexels-geyonk-1152077.jpg", "name": "Photography", "icon": "camera", "description": "High-quality stock photos and photography resources.", "price": 25.49, "inStock": true },
+    { "id": 3, "image": "https://i.ibb.co/sdZYF1zY/pexels-pixabay-267202.jpg", "name": "Graphics & Clip Art", "icon": "image", "description": "Vector graphics, icons, and illustrations.", "price": 9.99, "inStock": true },
+    { "id": 4, "image": "https://i.ibb.co/sdZYF1zY/pexels-pixabay-267202.jpg", "name": "Tech & Gadget", "icon": "devices", "description": "Digital gadgets and tech accessories.", "price": 39.99, "inStock": true },
+    { "id": 5, "image": "https://i.ibb.co/CK02Fcwj/pexels-willoworld-3768005.jpg", "name": "Professional & Commercial", "icon": "briefcase", "description": "Resources for businesses and professionals.", "price": 49.99, "inStock": true },
+    { "id": 6, "image": "https://i.ibb.co/PZdQytc9/pexels-geyonk-1152077.jpg", "name": "Social Media Templates", "icon": "layout", "description": "Pre-designed templates for social media marketing.", "price": 17.89, "inStock": true },
+    { "id": 7, "image": "https://i.ibb.co/CK02Fcwj/pexels-willoworld-3768005.jpg", "name": "Invitations & Greetings", "icon": "envelope", "description": "Digital invitations and greeting card designs.", "price": 6.99, "inStock": true },
+    { "id": 8, "image": "https://i.ibb.co/sdZYF1zY/pexels-pixabay-267202.jpg", "name": "Planner & Organizer", "icon": "calendar", "description": "Digital planners and organization tools.", "price": 14.50, "inStock": true },
+    { "id": 9, "image": "https://i.ibb.co/CK02Fcwj/pexels-willoworld-3768005.jpg", "name": "E-Books", "icon": "book", "description": "A collection of e-books on various topics.", "price": 7.49, "inStock": true },
+    { "id": 10, "image": "https://i.ibb.co/PZdQytc9/pexels-geyonk-1152077.jpg", "name": "Developers", "icon": "code", "description": "Coding resources and development tools.", "price": 59.99, "inStock": true },
+    { "id": 11, "image": "https://i.ibb.co/PZdQytc9/pexels-geyonk-1152077.jpg", "name": "Developers", "icon": "code", "description": "Coding resources and development tools.", "price": 59.99, "inStock": true },
+    { "id": 12, "image": "https://i.ibb.co/PZdQytc9/pexels-geyonk-1152077.jpg", "name": "Developers", "icon": "code", "description": "Coding resources and development tools.", "price": 59.99, "inStock": true }
+]

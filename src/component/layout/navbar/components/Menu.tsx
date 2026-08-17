@@ -1,0 +1,342 @@
+import Image from "next/image";
+import { BiSearch } from "react-icons/bi";
+import { Link, useNavigate } from "react-router-dom";
+import { IoPersonCircleSharp } from "react-icons/io5";
+import { HiOutlineShoppingBag } from "react-icons/hi";
+import { useEffect, useState, useRef } from "react";
+import { useAtom, useSetAtom } from "jotai";
+import { wishlistCounterAtom } from "../../../../store/wishlist-store";
+import { cartCounterAtom } from "../../../../store/cart-store";
+import { FaRegHeart, FaRegUser, FaUser } from "react-icons/fa6";
+import { FiSearch } from "react-icons/fi";
+import { useAPI } from "../../../../hooks/useApi";
+import { productListQueryKey } from "../../../../config/query-key";
+import apiConfig from "../../../../config/api.json";
+import { useDebounce } from "../../../../hooks/useDebounce";
+import { headerFooterAtom } from "../../../../store/global-store";
+import { useAtomValue } from "jotai";
+import { userAtom, logoutUserAtom } from "../../../../store/user-store";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { RiLogoutCircleLine } from "react-icons/ri";
+
+interface SearchSuggestion {
+  name: string;
+  slug?: string;
+  featuredImage?: string;
+  price?: number;
+}
+
+const Menu = () => {
+  const user = useAtomValue(userAtom);
+  const [wishlistCount] = useAtom(wishlistCounterAtom);
+  const [cartItemCount] = useAtom(cartCounterAtom);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [searchText, setSearchText] = useState("");
+  const debouncedSearchText = useDebounce(searchText, 600);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<
+    SearchSuggestion[]
+  >([]);
+  const [headerFooterData] = useAtom(headerFooterAtom);
+
+  const dataLimit = 20;
+  const pageNumber = 1;
+  const { usePaginatedQuery } = useAPI();
+
+  const getProductListApiUrl = () => {
+    let url = `${apiConfig.site.productListUrl}?page=${pageNumber}&limit=${dataLimit}`;
+    if (debouncedSearchText.trim()) {
+      url += `&searchKeyword=${encodeURIComponent(debouncedSearchText.trim())}`;
+    }
+    return url;
+  };
+
+  const {
+    data: dataList,
+    refetch: fetchData,
+    isFetching,
+  } = usePaginatedQuery({
+    queryKey: [productListQueryKey, debouncedSearchText],
+    url: getProductListApiUrl(),
+  });
+
+  useEffect(() => {
+    if (debouncedSearchText.trim()) {
+      fetchData();
+    } else {
+      setFilteredSuggestions([]);
+    }
+  }, [debouncedSearchText]);
+
+  useEffect(() => {
+    if (dataList?.length > 0) {
+      setFilteredSuggestions(dataList as SearchSuggestion[]);
+    } else if (debouncedSearchText.trim()) {
+      setFilteredSuggestions([{ name: "No product found" }]);
+    }
+  }, [dataList]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const navigate = useNavigate();
+  const setLogout = useSetAtom(logoutUserAtom);
+  const handleLogout = () => {
+    setLogout(() => navigate("/login"));
+  };
+
+  return (
+    <nav className="py-4 max-w-screen-2xl mx-auto px-4 flex justify-between items-center gap-3 sm:gap-6">
+      <Link to={"/"} className="flex justify-center sm:justify-start">
+        <Image src={headerFooterData?.headerLogo} alt="Bazaarbound Logo" className="w-60 object-cover" width={240} height={60} />
+      </Link>
+
+      <div className="relative flex-1">
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="w-full px-4 py-2.5 rounded-full pl-12 pr-4 focus:outline-none focus:ring-1 border border-[var(--color-green-primary)] text-[var(--color-green-primary)] placeholder:text-[var(--color-green-primary)] text-sm font-semibold transition-colors duration-300"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+        <BiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-green-primary)] text-xl cursor-pointer" />
+
+        {searchText && (
+          <div
+            className={`absolute top-full mt-2 w-full bg-white border border-[var(--color-green-secondary)] shadow-md rounded-md z-[99999999] overflow-y-auto ${filteredSuggestions.length >= 4 ? "max-h-60" : "h-fit"
+              }`}
+          >
+            {isFetching ? (
+              <div className="px-4 py-6 text-sm text-gray-500 text-center flex flex-col items-center justify-center gap-2">
+                <FiSearch className="text-2xl bg-gray-100 w-10 h-10 rounded-full p-2 animate-spin" />
+                <span>Searching...</span>
+              </div>
+            ) : (
+              filteredSuggestions.map((item, index) =>
+                item.name === "No product found" ? (
+                  <div
+                    key={index}
+                    className="px-4 py-6 text-sm text-gray-500 text-center flex flex-col items-center justify-center gap-2"
+                  >
+                    <FiSearch className="text-2xl bg-gray-100 w-10 h-10 rounded-full p-2" />
+                    <span>No product found</span>
+                  </div>
+                ) : (
+                  <Link
+                    to={`/product/${item.slug}`}
+                    onClick={() => {
+                      setSearchText("");
+                      setFilteredSuggestions([]);
+                    }}
+                    key={index}
+                  >
+                    <div className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                      <Image src={item.featuredImage} alt={item.name} className="w-[15%] md:w-[70px] h-[50px] md:h-[70px] object-cover" width={500} height={500} />
+                      <div className="flex flex-col gap-2">
+                        <p className="font-semibold text-[var(--color-green-primary)] text-xs md:text-[15px]">
+                          {item.name}
+                        </p>
+                        <p className="font-bold text-[var(--color-green-primary)] text-[10px] md:text-[12px] mt-[-2px]">
+                          {`$${item.price}`}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              )
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-6 sm:gap-6 text-sm">
+        <Link to="/wishlist" className="group relative">
+          <div className="flex flex-col items-center gap-1 md:ml-16">
+            <FaRegHeart className="text-xl text-[var(--color-icon)]" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-2.5 -right-2.5 bg-[var(--color-green-primary)] text-white text-[10px] font-medium flex items-center justify-center h-4.5 w-4.5 rounded-full shadow-md">
+                {wishlistCount}
+              </span>
+            )}
+          </div>
+        </Link>
+
+        <Link to="/cart" className="group relative">
+          <div className="flex flex-col items-center gap-1">
+            <HiOutlineShoppingBag className="text-2xl text-[var(--color-icon)]" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-[var(--color-green-primary)] text-white text-[10px] font-medium flex items-center justify-center h-4.5 w-4.5 rounded-full shadow-md">
+                {cartItemCount}
+              </span>
+            )}
+          </div>
+        </Link>
+        {/* 
+				<div className="hidden sm:block">
+					<div className="flex items-center gap-2 text-[var(--color-icon)]">
+						<FaRegUser className="text-xl cursor-pointer" />
+						<div className="flex gap-1">
+							<Link to="/login">Login</Link>
+							<span>|</span>
+							<Link to="/signup">Register</Link>
+						</div>
+					</div>
+				</div> */}
+
+        <div className="hidden sm:block relative" ref={dropdownRef}>
+          <div
+            className="flex items-center gap-2 text-[var(--color-icon)] cursor-pointer"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            <FaRegUser className="text-xl" />
+            <div className="flex gap-1 items-center">
+              {user?.role === "customer" ||
+                user?.role === "vendor" ||
+                user?.role === "admin" ? (
+                <>
+                  <span className="font-medium text-sm text-[var(--color-green-primary)] flex items-center">
+                    {user.name}
+                    <MdOutlineKeyboardArrowDown
+                      className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                        }`}
+                    />
+                  </span>
+
+                  <div
+                    className={`absolute left-0 top-full mt-2 w-40 bg-white shadow-md rounded-md p-2 ${isDropdownOpen
+                        ? "opacity-100"
+                        : "opacity-0 pointer-events-none"
+                      } transition-opacity duration-300 z-60 border border-gray-300`}
+                  >
+                    {user.role === "customer" ? (
+                      <div>
+                        <Link
+                          to="/customer-dashboard"
+                          className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                        >
+                          <FaUser />
+                          User Profile
+                        </Link>
+                      </div>
+                    ) : user.role === "vendor" ? (
+                      <Link
+                        to="/vendor-dashboard"
+                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                      >
+                        <FaUser />
+                        Vendor Profile
+                      </Link>
+                    ) : (
+                      <Link
+                        to=""
+                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                      >
+                        Admin
+                      </Link>
+                    )}
+                    <button
+                      //@ts-ignore
+                      onClick={handleLogout}
+                      className=" w-full text-left px-2 py-2 text-sm text-red-500 hover:bg-gray-100 rounded mt-1 cursor-pointer flex items-center gap-2"
+                    >
+                      <RiLogoutCircleLine />
+                      Logout
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">Login</Link>
+                  <span>|</span>
+                  <Link to="/signup">Register</Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="block sm:hidden relative">
+          <button
+            onClick={() => setIsLoginOpen(!isLoginOpen)}
+            className="group focus:outline-none"
+          >
+            <IoPersonCircleSharp className="text-4xl p-1 cursor-pointer" />
+          </button>
+          {isLoginOpen && (
+            <div className="absolute right-0 mt-2 bg-white rounded shadow p-2 z-60 border border-gray-300 w-fit">
+              {user ? (
+                <>
+                  {user.role === "customer" ? (
+                    <Link
+                      to="/customer-dashboard"
+                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                    >
+                      <FaUser />
+                      User Profile
+                    </Link>
+                  ) : user.role === "vendor" ? (
+                    <Link
+                      to="/vendor-dashboard"
+                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                    >
+                      <FaUser />
+                      Vendor Profile
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/admin-dashboard"
+                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    //@ts-ignore
+                    onClick={handleLogout}
+                    className=" w-full text-left px-2 py-2 text-sm text-red-500 hover:bg-gray-100 rounded mt-1 cursor-pointer flex items-center gap-2"
+                  >
+                    <RiLogoutCircleLine />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsLoginOpen(false)}
+                    className="block px-4 py-2 text-sm hover:bg-gray-100 border-b border-gray-300"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsLoginOpen(false)}
+                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Menu;

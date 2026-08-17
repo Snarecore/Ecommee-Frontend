@@ -1,0 +1,34 @@
+Sitemap: https://bazaarbound.com/sitemap.xml
+
+# Default search engines (SEO OK)
+User-agent: *
+Allow: /
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /login/
+Disallow: /account/
+Disallow: /orders/
+Disallow: /wishlist/
+Disallow: /profile/
+Disallow: /vendor-signup/
+Disallow: /forgot-password/
+Disallow: /search/
+
+# --- AI Crawlers (explicitly allowed) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: CCBot
+Allow: /

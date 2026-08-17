@@ -1,0 +1,247 @@
+    [
+        {
+        "name": "Artwork",
+        "subcategories": [
+            {
+            "name": "Painting",
+            "child-subcategories": [
+                { "name": "Oil Painting", "link": "/artwork/painting/oil-painting" },
+                { "name": "Digital Painting", "link": "/artwork/painting/digital-painting" }
+            ]
+            },
+            {
+            "name": "Watercolor Painting",
+            "child-subcategories": [
+                { "name": "Abstract Watercolor", "link": "/artwork/watercolor-painting/abstract-watercolor" },
+                { "name": "Realistic Watercolor", "link": "/artwork/watercolor-painting/realistic-watercolor" }
+            ]
+            },
+            {
+            "name": "Acrylic Painting",
+            "child-subcategories": [
+                { "name": "Floral Acrylic", "link": "/artwork/acrylic-painting/floral-acrylic" },
+                { "name": "Abstract Acrylic", "link": "/artwork/acrylic-painting/abstract-acrylic" }
+            ]
+            },
+            {
+            "name": "Wall Art",
+            "child-subcategories": [
+                { "name": "Canvas Art", "link": "/artwork/wall-art/canvas-art" },
+                { "name": "Modern Art", "link": "/artwork/wall-art/modern-art" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Developers",
+        "subcategories": [
+            {
+            "name": "Script & Code",
+            "child-subcategories": [
+                { "name": "PHP Scripts", "link": "/developers/script-code/php-scripts" },
+                { "name": "Python Scripts", "link": "/developers/script-code/python-scripts" }
+            ]
+            },
+            {
+            "name": "Mobile Application",
+            "child-subcategories": [
+                { "name": "iOS Development", "link": "/developers/mobile-application/ios-development" },
+                { "name": "Cross-Platform Development", "link": "/developers/mobile-application/cross-platform-development" }
+            ]
+            },
+            {
+            "name": "Android Application",
+            "child-subcategories": [
+                { "name": "Native Android", "link": "/developers/android-application/native-android" },
+                { "name": "Flutter Apps", "link": "/developers/android-application/flutter-apps" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Audio & Visual",
+        "subcategories": [
+            {
+            "name": "Music Production",
+            "link": "/audio-visual/music-production",
+            "child-subcategories": [
+                { "name": "Beats", "link": "/audio-visual/music-production/beats" },
+                { "name": "Sound Effects", "link": "/audio-visual/music-production/sound-effects" }
+            ]
+            },
+            {
+            "name": "Video Production",
+            "child-subcategories": [
+                { "name": "Animations", "link": "/audio-visual/video-production/animations" },
+                { "name": "Stock Footage", "link": "/audio-visual/video-production/stock-footage" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Tech & Gadget",
+        "subcategories": [
+            {
+            "name": "Tech",
+            "link": "/tech-gadget/tech",
+            "child-subcategories": [
+                { "name": "Gadgets", "link": "/tech-gadget/tech/gadgets" },
+                { "name": "Wearable Tech", "link": "/tech-gadget/tech/wearable-tech" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Professional & Commercial",
+        "subcategories": [
+            {
+            "name": "Business Stationery",
+            "child-subcategories": [
+                { "name": "Business Cards", "link": "/professional-commercial/business-stationery/business-cards" },
+                { "name": "Letterheads", "link": "/professional-commercial/business-stationery/letterheads" }
+            ]
+            },
+            {
+            "name": "Marketing Materials",
+            "child-subcategories": [
+                { "name": "Flyers", "link": "/professional-commercial/marketing-materials/flyers" },
+                { "name": "Brochures", "link": "/professional-commercial/marketing-materials/brochures" }
+            ]
+            },
+            {
+            "name": "Branding",
+            "child-subcategories": [
+                { "name": "Logos", "link": "/professional-commercial/branding/logos" },
+                { "name": "Brand Guidelines", "link": "/professional-commercial/branding/brand-guidelines" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Photography & Digital Artist",
+        "subcategories": [
+            {
+            "name": "Stock Photos",
+            "child-subcategories": [
+                { "name": "Nature Photography", "link": "/photography-digital-artist/stock-photos/nature-photography" },
+                { "name": "Urban Photography", "link": "/photography-digital-artist/stock-photos/urban-photography" }
+            ]
+            },
+            {
+            "name": "Filters & Presets Effects",
+            "child-subcategories": [
+                { "name": "Lightroom Presets", "link": "/photography-digital-artist/filters-presets/lightroom-presets" },
+                { "name": "Photoshop Actions", "link": "/photography-digital-artist/filters-presets/photoshop-actions" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "E-Books",
+        "subcategories": [
+            {
+            "name": "Action & Adventure",
+            "child-subcategories": [
+                { "name": "Fantasy", "link": "/ebooks/action-adventure/fantasy" },
+                { "name": "Sci-Fi", "link": "/ebooks/action-adventure/sci-fi" }
+            ]
+            },
+            {
+            "name": "Art & Creativity",
+            "child-subcategories": [
+                { "name": "Digital Art", "link": "/ebooks/art-creativity/digital-art" },
+                { "name": "Illustration Guides", "link": "/ebooks/art-creativity/illustration-guides" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Social Media Templates",
+        "subcategories": [
+            {
+            "name": "Instagram Post Templates",
+            "child-subcategories": [
+                { "name": "Stories", "link": "/social-media-templates/instagram-post-templates/stories" },
+                { "name": "Carousels", "link": "/social-media-templates/instagram-post-templates/carousels" }
+            ]
+            },
+            {
+            "name": "Facebook Ad Templates",
+            "child-subcategories": [
+                { "name": "Static Ads", "link": "/social-media-templates/facebook-ad-templates/static-ads" },
+                { "name": "Animated Ads", "link": "/social-media-templates/facebook-ad-templates/animated-ads" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Invitations & Greetings",
+        "subcategories": [
+            {
+            "name": "Wedding Invitations",
+            "child-subcategories": [
+                { "name": "Traditional Wedding Cards", "link": "/invitations-greetings/wedding-invitations/traditional-wedding-cards" },
+                { "name": "Modern Wedding Cards", "link": "/invitations-greetings/wedding-invitations/modern-wedding-cards" }
+            ]
+            },
+            {
+            "name": "Birthday Invitations",
+            "child-subcategories": [
+                { "name": "Kids' Birthday", "link": "/invitations-greetings/birthday-invitations/kids-birthday" },
+                { "name": "Adult Birthday", "link": "/invitations-greetings/birthday-invitations/adult-birthday" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "Planner & Organizer",
+        "subcategories": [
+            {
+            "name": "Daily Planner",
+            "child-subcategories": [
+                { "name": "To-Do Lists", "link": "/planner-organizer/daily-planner/to-do-lists" },
+                { "name": "Journal Templates", "link": "/planner-organizer/daily-planner/journal-templates" }
+            ]
+            },
+            {
+            "name": "Goal Planner",
+            "child-subcategories": [
+                { "name": "Financial Goals", "link": "/planner-organizer/goal-planner/financial-goals" },
+                { "name": "Personal Development", "link": "/planner-organizer/goal-planner/personal-development" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "AI - Artificial Intelligence",
+        "subcategories": [
+            {
+            "name": "AI Music",
+            "child-subcategories": [
+                { "name": "AI-Generated Songs", "link": "/ai-artificial-intelligence/ai-music/ai-generated-songs" },
+                { "name": "AI Soundtracks", "link": "/ai-artificial-intelligence/ai-music/ai-soundtracks" }
+            ]
+            }
+        ]
+        },
+        {
+        "name": "New Main Name",
+        "subcategories": [
+            {
+            "name": "Name One",
+            "child-subcategories": [
+                { "name": "Sub Name One", "link": "/new-main-name/name-one/sub-name-one" },
+                { "name": "Sub Name Two", "link": "/new-main-name/name-one/sub-name-two" }
+            ]
+            },
+            {
+            "name": "Name Two",
+            "child-subcategories": [
+                { "name": "Sub Name A", "link": "/new-main-name/name-two/sub-name-a" },
+                { "name": "Sub Name B", "link": "/new-main-name/name-two/sub-name-b" }
+            ]
+            }
+        ]
+        }
+    ]
+    

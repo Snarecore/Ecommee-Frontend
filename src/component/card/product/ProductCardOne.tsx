@@ -1,0 +1,131 @@
+import Image from "next/image";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
+import useWishlist from '../../../hooks/useWishlist';
+import { Link } from 'react-router-dom';
+import { Product } from '../../../interface/product.interface';
+import useCart from '../../../hooks/useCart';
+import { useNavigate } from 'react-router-dom';
+import { finalPrice } from '../../../utils/product-utils';
+
+interface Props {
+    product: Product;
+    rating?: number;
+    handleAddToCart?: (e: React.MouseEvent, product: Product) => void;
+    handleBuyNow?: (e: React.MouseEvent) => void;
+}
+
+const ProductCardOne: React.FC<Props> = ({ product }) => {
+    const { name, mainCategoryName, price, featuredImage, rating, discountType, discountAmount } = product;
+    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+    const { addToCart } = useCart();
+    const navigate = useNavigate();
+
+    const renderStars = (rating: any) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<FaStar key={`star-${i}`} className="text-yellow-400" />);
+        }
+
+        if (hasHalfStar) {
+            stars.push(<FaStarHalfAlt key="half-star" className="text-yellow-400" />);
+        }
+
+        const emptyStars = 5 - Math.ceil(rating);
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push(<FaRegStar key={`empty-${i}`} className="text-yellow-400" />);
+        }
+
+        return stars;
+    };
+
+    const calculatedPrice = finalPrice({
+        price: Number(price) || 0,
+        discountType: discountType,
+        discountAmount: discountAmount ?? 0
+    });
+
+    const original = Number(price) || 0;
+    const hasDiscount = calculatedPrice < original;
+
+    return (
+        <div className="rounded-3xl border border-gray-300 transition-shadow duration-300 overflow-hidden w-full h-[460px] bg-white flex flex-col">
+            <figure className="relative h-[250px] w-full overflow-hidden group">
+                <Link to={`/product/${product.slug}`}>
+                    <Image src={featuredImage} alt={name} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" width={500} height={500} />
+                </Link>
+                <button className="absolute top-3 right-3 text-lg text-[var(--color-icon)] bg-[var(--color-white-primary)] backdrop-blur-sm rounded-full shadow-sm p-2.5 transition-all duration-300 cursor-pointer"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (isInWishlist(product)) {
+                            removeFromWishlist(product);
+                        } else {
+                            addToWishlist(product);
+                        }
+                    }}
+                >
+                    {isInWishlist(product) ? <FaHeart /> : <FaRegHeart />}
+                </button>
+            </figure>
+            <div className="flex-1 p-5 bg-gray-50 flex flex-col">
+                <div className='h-38'>
+                    <h2 className="text-lg font-semibold mb-2 line-clamp-2 text-[var(--color-green-primary)]">
+                        <Link to={`/product/${product.slug}`}>
+                            {name}
+                        </Link>
+                    </h2>
+                    <div className="text-sm text-[var(--color-green-primary)] line-clamp-2 mb-2">
+                        {mainCategoryName}
+                    </div>
+                    <p className="mb-3 text-base font-medium text-gray-700">
+                        {hasDiscount ? (
+                            <>
+                                <span className="mr-2 line-through text-gray-400">
+                                    ${original.toFixed(2)}
+                                </span>
+                                <span className="text-[var(--color-green-primary)] text-lg font-bold">
+                                    ${calculatedPrice.toFixed(2)}
+                                </span>
+                            </>
+                        ) : (
+                            <span className="text-[var(--color-green-primary)] text-lg font-bold">
+                                ${original.toFixed(2)}
+                            </span>
+                        )}
+                    </p>
+                    <div className="flex items-center gap-1 mb-4">
+                        {renderStars(rating)}
+                        <span className="text-sm text-[var(--color-green-primary)] ml-1">({rating})</span>
+                    </div>
+                </div>
+                <div className="pt-8 border-gray-200 flex flex-wrap lg:flex-nowrap items-center gap-4">
+                    <button className="w-full px-4 py-2 border border-[var(--color-green-primary)] bg-[var(--color-white-primary)] text-[var(--color-green-primary)] text-sm font-medium rounded-full cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addToCart(product);
+                        }}
+                    >
+                        Add to Cart
+                    </button>
+
+                    <button className="w-full px-4 py-2 text-[var(--color-white-primary)] bg-[var(--color-green-primary)] text-sm font-medium rounded-full cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addToCart(product);
+                            navigate('/cart');
+                        }}
+                    >
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ProductCardOne;

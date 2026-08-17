@@ -1,0 +1,87 @@
+{
+    "site": {
+        "homePageUrl": "site/home-page",
+        "cartPageUrl": "site/cart-page",
+        "shopPageUrl": "site/shop-page",
+        "commonDataUrl": "site/common-data",
+        "productUrl": "site/product/",
+        "productListUrl": "site/product",
+        "productListWithHardLimitUrl": "site/product-list-with-hard-limit",
+        "contactMessageUrl": "contact-us-message",
+        "contactPageCmsUrl": "contact-page-cms",
+        "exchangeReturnUrl": "return-policy-cms",
+        "privacyPolicyUrl": "privacy-policy-cms",
+        "termsConditionsUrl": "terms-and-conditions-cms",
+        "headerFooterUrl": "header-footer-cms",
+        "productRatingUrl": "product-review",
+        "productCommnetUrl": "product-review/comment",
+        "commentCreateApiUrl": "product-comment",
+        "getProductCommentsUrl": "product-comment/product",
+        "blogUrl": "site/blog",
+        "policyOneUrl": "policy-one-cms",
+        "policyTwoUrl": "policy-two-cms",
+        "policyThreeUrl": "policy-three-cms",
+        "policyFourUrl": "policy-four-cms",
+        "policyFiveUrl": "policy-five-cms",
+        "policySixUrl": "policy-six-cms",
+        "policySevenUrl": "policy-seven-cms",
+        "policyEightUrl": "policy-eight-cms",
+        "policyNineUrl": "policy-nine-cms",
+        "policyTenUrl": "policy-ten-cms",
+        "policyElevenUrl": "policy-eleven-cms",
+        "policyTwelveUrl": "policy-twelve-cms"
+    },
+    "vendor": {
+        "productUrl": "product",
+        "productListUrl": "product/vendor-products",
+        "mainCategoryUrl": "site/main-category",
+        "firstCategoryUrl": "site/first-categories",
+        "secondCategoryUrl": "site/second-categories",
+        "thirdCategoryUrl": "site/third-categories",
+        "productUniqueCodeUrl": "unique-code/product",
+        "orderListUrl": "orders/vendor-order",
+        "contactMessageUrl": "contact-us-message",
+        "vendorMessageUrl": "vendor-message",
+        "vendorProductReviewUrl": "product-review/update-approval-status"
+    },
+    "auth": {
+        "registrationUrl": "auth/register",
+        "vendorRegistrationUrl": "auth/vendor-register",
+        "loginUrl": "auth/login",
+        "forgetPasswordUrl": "auth/forgot-password",
+        "resetPasswordUrl": "auth/reset-password"
+    },
+    "dashboard": {
+        "adminDashboardUrl": "site/admin-dashboard",
+        "vendorDashboardUrl": "site/vendor-dashboard",
+        "vendorSalesDashboardUrl": "vendor/sales-dashboard",
+        "vendorPaymentRequestUrl": "vendor-payment-request",
+        "vendorPaymentHistoryUrl": "vendor-payment-request/payment-history",
+        "vendorStatsticsUrl": "vendor-payment-request/statistics"
+    },
+    "people": {
+        "user": "user/customer",
+        "vendor": "user/vendor",
+        "customerProfile": "user/customer-profile",
+        "vendorProfile": "user/vendor-profile",
+        "customerPasswordUpdate": "user/customer-password",
+        "vendorPasswordUpdate": "user/vendor-password",
+        "adminMessageUrl": "message",
+        "adminListUrl": "site/admin"
+    },
+    "customer": {
+        "orderListUrl": "orders/customer-order"
+    },
+    "contentCMS": {
+        "reviews": "reviews"
+    },
+    "messageLinks": {
+        "conversationUrl": "message/conversations",
+        "converstionThreadUrl": "message/thread"
+    },
+    "subcriptionLinks": {
+        "subcriptionUrl": "vendor/subscription",
+        "activeSubcriptionUrl": "vendor/subscription/active",
+        "activeSingleSubcriptionUrl": "vendor/subscription/single"
+    }
+}
