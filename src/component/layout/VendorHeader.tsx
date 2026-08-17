@@ -171,7 +171,7 @@ const VendorHeader = () => {
 					onClick={() => setShowSidebarMenu(!showSidebarMenu)}
 				/>
 
-				<Image src={companyLogo} alt="company logo" className="mx-auto" />
+				<Image src={companyLogo || null} alt="company logo" className="mx-auto" />
 
 				<BsThreeDotsVertical
 					size={20}

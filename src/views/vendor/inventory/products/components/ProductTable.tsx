@@ -214,7 +214,7 @@ const ProductsTable = ({ dataList, fetchProductList, pageCount, currentPageNumbe
 									</td>
 
 									<td className="px-6 py-4 flex items-center gap-2">
-										<Image src={data.featuredImage} alt={data.name} className="w-10 h-10 rounded-md shadow-sm border border-gray-200" width={40} height={40} />
+										<Image src={data.featuredImage || null} alt={data.name} className="w-10 h-10 rounded-md shadow-sm border border-gray-200" width={40} height={40} />
 										<span className="">
 											{data.name}
 										</span>

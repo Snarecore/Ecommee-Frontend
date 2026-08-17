@@ -84,7 +84,7 @@ const VendorRegistration = () => {
 			<div className="max-w-2xl w-full mx-auto space-y-8">
 				<div className="">
 					<Link href={"/"}>
-						<Image src={companyLogo} alt="company logo" className="mx-auto mb-4" />
+						<Image src={companyLogo || null} alt="company logo" className="mx-auto mb-4" />
 					</Link>
 					<h1 className="text-3xl text-center font-bold text-[var(--color-black-primary)] mb-2">Registration</h1>
 					<p className="text-[15px] text-center text-[var(--color-black-primary)]">

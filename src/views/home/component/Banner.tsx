@@ -68,7 +68,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                 <div className="relative w-full md:w-8/12 lg:w-9/12">
                     <div className="h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg shadow-lg relative">
                         {heroSliderList.length === 1 ? (
-                            <Image src={heroSliderList[0].image} alt="Slider image" className="w-full h-full object-cover" width={500} height={500} />
+                            <Image src={heroSliderList[0].image || null} alt="Slider image" className="w-full h-full object-cover" width={500} height={500} />
                         ) : (
                             <>
                                 <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${activeSlideIndex * 100}%)` }}>
@@ -76,7 +76,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                         return (
                                             <div key={slide.id} className="w-full h-full flex-shrink-0">
                                                 <Link href={slide.link} className="block w-full h-full">
-                                                    <Image src={slide.image} alt={`Slider image`} className="w-full h-full" width={500} height={500} />
+                                                    <Image src={slide.image || null} alt={`Slider image`}  width={500} height={500} />
                                                 </Link>
                                             </div>
                                         )
@@ -115,7 +115,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                 className="flex-1 relative overflow-hidden rounded-lg shadow-lg group"
                             >
                                 <Link href={promotion.link}>
-                                    <Image src={promotion.image} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
+                                    <Image src={promotion.image || null} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
                                 </Link>
                             </div>
                         ))
@@ -130,7 +130,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                         className="flex-1 relative overflow-hidden rounded-lg shadow-lg group "
                                     >
                                         <Link href={promotion.link}>
-                                            <Image src={promotion.image} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
+                                            <Image src={promotion.image || null} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
                                         </Link>
                                     </div>
                                 );

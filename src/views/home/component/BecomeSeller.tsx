@@ -14,7 +14,7 @@ const BecomeSeller: React.FC<BecomeSellerProps> = ({ contentData }) => {
       <div className="max-w-screen-2xl mx-auto">
         <Link href={contentData?.bannerImageLink || ""} target="_blank" rel="noopener noreferrer">
           {contentData?.bannerImage && (
-            <Image src={contentData.bannerImage} alt="Become a Seller" className="w-full h-60 rounded-[15px] object-cover" width={500} height={240} />
+            <Image src={contentData.bannerImage || null} alt="Become a Seller" className="w-full h-60 rounded-[15px] object-cover" width={500} height={240} />
           )}
         </Link>
       </div>

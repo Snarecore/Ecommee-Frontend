@@ -66,7 +66,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ value, onChange }) => {
 					const src = img instanceof File ? URL.createObjectURL(img) : img;
 					return (
 						<div key={index} className="relative w-[120px] h-[120px]">
-							<Image src={src} alt={`Product image ${index + 1} className="w-full h-full object-cover rounded-lg border border-gray-300" width={500} height={500} `} aria-label={`Product image preview ${index + 1}`} onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }} />
+							<Image src={src || null} alt={`Product image ${index + 1} className="w-full h-full object-cover rounded-lg border border-gray-300" width={500} height={500} `} aria-label={`Product image preview ${index + 1}`} onError={(e) => { e.currentTarget.src = "/images/fallback.png"; }} />
 							<button
 								onClick={() => removeImage(index)}
 								className="absolute top-1 right-1 bg-red-500 text-white rounded-md cursor-pointer hover:bg-red-600 hover:text-white transition-all duration-300"

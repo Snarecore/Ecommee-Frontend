@@ -6,7 +6,7 @@ const Logo = () => {
     return (
         <div>
             <Link href='/'>
-                <Image src={BazarBondLogo} alt="BazarBond" className="w-10 h-10 md:w-[55px] md:h-[55px] md:mr-16" />
+                <Image src={BazarBondLogo || null} alt="BazarBond" className="w-10 h-10 md:w-[55px] md:h-[55px] md:mr-16" />
             </Link>
         </div>
     );

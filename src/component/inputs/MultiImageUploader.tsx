@@ -79,7 +79,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           key={index}
           className="w-[120px] h-[120px] rounded-md border border-gray-200 overflow-hidden relative"
         >
-          <Image src={getPreviewUrl(item.path)} alt="Uploaded" className="w-full h-full object-cover rounded-md" width={500} height={500} />
+          <Image src={getPreviewUrl(item.path) || null} alt="Uploaded" className="w-full h-full object-cover rounded-md" width={500} height={500} />
           <button
             onClick={() => handleRemove(index)}
             className="absolute top-1 right-1 text-red-500 cursor-pointer bg-white rounded-full p-1"

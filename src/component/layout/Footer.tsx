@@ -37,7 +37,7 @@ const Footer = () => {
                 <div className="flex flex-wrap lg:flex-nowrap gap-10 lg:gap-20">
                     <div className="w-full lg:w-1/4">
                         <div className="flex items-center mb-6">
-                            <Image src={headerFooterData?.footerLogo} alt="BazarBound" className="w-64 object-contain" width={256} height={64} />
+                            <Image src={headerFooterData?.footerLogo || null} alt="BazarBound" className="w-64 object-contain" width={256} height={64} />
                         </div>
                         <p className="mb-6 leading-relaxed text-justify">
                             {headerFooterData?.footerDescription}
@@ -46,7 +46,7 @@ const Footer = () => {
                             {
                                 Array.isArray(socialLinksData) && socialLinksData?.map((social: Social) => (
                                     <Link key={social.link} href={social.link} target="_blank">
-                                        <Image src={social.icon} alt={social.link} width={30} height={500} />
+                                        <Image src={social.icon || null} alt={social.link} width={30} height={500} />
                                     </Link>
                                 ))
                             }

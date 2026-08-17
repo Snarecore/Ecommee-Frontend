@@ -265,7 +265,7 @@ const ReviewTable = ({
                             {/* Images */}
                             <div className="flex gap-2 flex-wrap justify-end">
                                 {viewReview?.product?.featuredImage && (
-                                    <Image src={viewReview.product.featuredImage} alt={viewReview?.product?.name ?? "Product image"} className="rounded-md" width={100} height={500} />
+                                    <Image src={viewReview.product.featuredImage || null} alt={viewReview?.product?.name ?? "Product image"} className="rounded-md" width={100} height={500} />
                                 )}
                             </div>
                         </div>

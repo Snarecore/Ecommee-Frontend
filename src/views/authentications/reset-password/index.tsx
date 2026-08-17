@@ -81,7 +81,7 @@ const ResetPassword = () => {
                 <div className="w-2xl mx-auto">
                     <div>
                         <Link href={`/`}>
-                            <Image src={companyLogo} alt="company logo" className="mx-auto mb-8" />
+                            <Image src={companyLogo || null} alt="company logo" className="mx-auto mb-8" />
                         </Link>
                         <p className="text-xl md:text-3xl font-bold text-[var(--color-black-primary)] mb-2">
                             Reset Password

@@ -41,7 +41,7 @@ const RecentProduct = ({
 								</td>
 
 								<td className="p-3 flex items-center gap-3">
-									<Image src={row.image} alt={row.name} className="w-10 h-10 rounded-md" width={40} height={40} />
+									<Image src={row.image || null} alt={row.name} className="w-10 h-10 rounded-md" width={40} height={40} />
 									<span>{row.name}</span>
 								</td>
 

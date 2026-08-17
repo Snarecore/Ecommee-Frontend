@@ -18,7 +18,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
         <div className="border border-gray-200 p-4 rounded-lg mt-3 flex items-center flex-wrap justify-between">
             <div className="flex items-start gap-4">
                 <div className="w-24">
-                    <Image src={imageSrc} alt={title} className="object-cover w-full" width={500} height={500} />
+                    <Image src={imageSrc || null} alt={title} className="object-cover w-full" width={500} height={500} />
                 </div>
                 <div>
                     <p className="font-semibold text-[var(--color-green-primary)]">{title}</p>

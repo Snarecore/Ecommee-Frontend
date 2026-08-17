@@ -140,7 +140,7 @@ const VendorProfile = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                             <div className="flex-shrink-0">
                                 {vendorData?.profile?.profileImage ? (
-                                    <Image src={vendorData.profile.profileImage} alt={vendorData.name} className="rounded-full w-24 h-24 sm:w-32 sm:h-32 object-cover border-4 border-[var(--color-green-secondary)] shadow-lg" width={96} height={96} />
+                                    <Image src={vendorData.profile.profileImage || null} alt={vendorData.name} className="rounded-full w-24 h-24 sm:w-32 sm:h-32 object-cover border-4 border-[var(--color-green-secondary)] shadow-lg" width={96} height={96} />
                                 ) : (
                                     <div className="rounded-full w-24 h-24 sm:w-32 sm:h-32 bg-white/20 flex items-center justify-center border-4 border-white shadow-lg">
                                         <FiUser className="w-12 h-12 text-white" />
@@ -211,7 +211,7 @@ const VendorProfile = () => {
                                     <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
                                         <p className="text-sm font-medium text-gray-600 mb-3">Shop Image</p>
                                         {vendorData?.profile?.shopImage ? (
-                                            <Image src={vendorData.profile.shopImage} alt={vendorData.profile.shopName} className="w-32 h-32 object-cover rounded-xl border-2 border-[var(--color-green-primary)] shadow-md" width={128} height={128} />
+                                            <Image src={vendorData.profile.shopImage || null} alt={vendorData.profile.shopName} className="w-32 h-32 object-cover rounded-xl border-2 border-[var(--color-green-primary)] shadow-md" width={128} height={128} />
                                         ) : (
                                             <div className="w-32 h-32 bg-gray-200 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
                                                 <FiHome className="w-8 h-8 text-gray-400" />
@@ -288,7 +288,7 @@ const VendorProfile = () => {
                                         />
                                         {shopPreview && (
                                             <div className="relative w-[120px] h-[120px] mt-2">
-                                                <Image src={shopPreview} alt="Shop Preview" className="w-full h-full object-cover rounded-md border border-gray-300" width={500} height={500} />
+                                                <Image src={shopPreview || null} alt="Shop Preview" className="w-full h-full object-cover rounded-md border border-gray-300" width={500} height={500} />
                                                 <button
                                                     onClick={removeShopImage}
                                                     className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-all duration-300"
