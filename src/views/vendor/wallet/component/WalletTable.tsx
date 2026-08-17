@@ -8,7 +8,7 @@ import { formatPrettyDateWithTime } from "../../../../utils/date-utils";
 import { FiDownload } from "react-icons/fi";
 import { useAPI } from "../../../../hooks/useApi";
 import apiConfig from "../../../../config/api.json";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 
 interface WalletDataProps {
     vendorId: string;
@@ -107,7 +107,7 @@ const WalletTable = ({
                                 <span>
                                     Please&nbsp;
                                     <Link
-                                        to="/vendor-bank-information"
+                                        href="/vendor-bank-information"
                                         className="underline text-yellow-700 hover:text-yellow-900 font-semibold transition-colors"
                                     >
                                         add your bank information

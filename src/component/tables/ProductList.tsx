@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FiEye } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import EmptyComponent from "../empty-component";
 
@@ -18,7 +18,7 @@ const ProductListTable = ({
 		<div className="bg-white p-4 rounded-lg shadow-md">
 			<div className="flex justify-between p-2">
 				<p className="text-lg font-semibold mb-4">{title}</p>
-				<Link to={"/products"} className="underline text-[#212B36] text-[13px] hover:text-[var(--color-green-primary)] transition-all ease-in duration-300">
+				<Link href={"/products"} className="underline text-[#212B36] text-[13px] hover:text-[var(--color-green-primary)] transition-all ease-in duration-300">
 					View All
 				</Link>
 			</div>
@@ -52,7 +52,7 @@ const ProductListTable = ({
 									<td className="p-3">{`$${row.price}`}</td>
 									<td className="p-3">{formatPrettyDateWithTime(row.createdAt)}</td>
 									<td className="p-3 flex items-center gap-3">
-										<Link to={`/product-details/${row.id}`}
+										<Link href={`/product-details/${row.id}`}
 											className="inline-flex items-center justify-center hover:bg-gray-200 border border-[#e6eaed] hover:text-[var(--color-primary)] p-2 rounded-md cursor-pointer">
 											<FiEye />
 										</Link>

@@ -1,5 +1,6 @@
 import { RiArrowDropDownLine, RiArrowRightSLine } from "react-icons/ri";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import Link from "next/link";;
 import { useEffect, useState, useRef } from "react";
 import { useAtom } from "jotai";
 import { nestedCategoriesAtom } from "../../../../store/global-store";
@@ -85,7 +86,7 @@ const NavBar = () => {
                                     {menuCategories.map((category, idx) => (
                                         <Link
                                             key={`category-${idx}`}
-                                            to={category.link || "#"}
+                                            href={category.link || "#"}
                                             className="flex justify-between items-center px-5 py-3 text-[12px] hover:bg-[var(--color-green-primary)] hover:text-white transition-all duration-200"
                                             onClick={() => setIsMenuOpen(false)}
                                         >

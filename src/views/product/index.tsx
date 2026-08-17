@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import Link from "next/link";;
 import { useAPI } from "../../hooks/useApi";
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 import ProductImageZoom from "../../component/product-image-zoom";
@@ -619,7 +620,7 @@ const Product = () => {
                                     You must be logged in to add your review.
                                 </p>
                                 <Link
-                                    to="/login"
+                                    href="/login"
                                     className="inline-block bg-[var(--color-green-primary)] text-white px-6 py-2 rounded-full font-semibold"
                                 >
                                     Go to Login

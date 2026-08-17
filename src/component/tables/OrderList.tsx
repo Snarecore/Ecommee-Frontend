@@ -1,5 +1,6 @@
 import { FiEye } from "react-icons/fi";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Link from "next/link";;
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import EmptyComponent from "../empty-component";
 
@@ -31,7 +32,7 @@ const OrderListTable = ({
         <div className="bg-white p-4 rounded-lg shadow-md">
             <div className="flex justify-between p-2">
                 <h2 className="text-lg font-semibold mb-4">{title}</h2>
-                <Link to={"/orders"} className="underline text-[#212B36] text-[13px] hover:text-[var(--color-green-primary)] transition-all ease-in duration-300">
+                <Link href={"/orders"} className="underline text-[#212B36] text-[13px] hover:text-[var(--color-green-primary)] transition-all ease-in duration-300">
                     View All
                 </Link>
             </div>

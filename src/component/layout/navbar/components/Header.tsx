@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import Marquee from 'react-fast-marquee';
 import { headerFooterAtom } from "../../../../store/global-store";
 import { useAtom } from "jotai";
@@ -25,14 +25,14 @@ const Header = () => {
 
                     <div className="hidden sm:flex sm:flex-row pl-4 items-center justify-center md:justify-end gap-6 text-sm w-auto">
                         <Link
-                            to={"/vendor-signup"}
+                            href={"/vendor-signup"}
                             className="transition-all duration-300 text-[var(--color-green-primary)] hover:text-[var(--color-green-primary)]/80 hover:underline"
                         >
                             Become a Seller!
                         </Link>
                         <span className="text-[var(--color-green-primary)]/50">|</span>
                         <Link
-                            to="/login" 
+                            href="/login" 
                             className="transition-all duration-300 text-[var(--color-green-primary)] hover:text-[var(--color-green-primary)]/80 hover:underline"
                         >
                             Login to Sell

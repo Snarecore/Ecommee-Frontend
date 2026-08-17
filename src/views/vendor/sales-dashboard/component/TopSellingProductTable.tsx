@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { FiTag } from "react-icons/fi";
 import EmptyComponent from "../../../../component/empty-component";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 
 type TopSellingProduct = {
     productId: string;
@@ -35,11 +35,11 @@ const TopProductListTable = ({ title, topSellingProducts }: TopProductListDataPr
                             <div className="p-3">
                                 <div className="flex flex-col">
                                     <div className="flex gap-4">
-                                        <Link to={`/product-details/${row.productId}`}>
+                                        <Link href={`/product-details/${row.productId}`}>
                                             <Image src={row.productImage} alt={row.productName} className="w-12 h-12 rounded-md" width={48} height={48} />
                                         </Link>
                                         <div>
-                                            <Link to={`/product-details/${row.productId}`}>
+                                            <Link href={`/product-details/${row.productId}`}>
                                                 <p className="font-semibold">{row.productName}</p>
                                             </Link>
                                             <p className="text-gray-700">{`$${row.price}`}</p>

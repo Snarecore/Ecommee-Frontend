@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { deleteCookie } from "../utils/cookie-utils";
 
 export interface User {
     id: string;
@@ -13,6 +14,7 @@ export const userLoadedAtom = atom(false);
 
 //@ts-ignore
 export const logoutUserAtom = atom(null, (get :any, set: any, navigate: () => void) => {
+    deleteCookie("user");
     sessionStorage.removeItem("user");
     set(userAtom, null);
     set(userLoadedAtom, true);

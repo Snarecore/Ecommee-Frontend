@@ -1,6 +1,7 @@
 import Image from "next/image";
 import useCart from "../../hooks/useCart";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Link from "next/link";;
 import { TbArrowBackUp } from "react-icons/tb";
 import { useAPI } from "../../hooks/useApi";
 import { useEffect, useState } from "react";
@@ -99,7 +100,7 @@ const MyCart = () => {
               </p>
               <div className="mt-6">
                 <Link
-                  to={"/shop"}
+                  href={"/shop"}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] text-sm font-medium rounded-full hover:bg-gray-100 active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md"
                 >
                   <span>Go to Shop</span>
@@ -237,7 +238,7 @@ const MyCart = () => {
 
                   <div className="py-4 hidden lg:inline-flex">
                     <Link
-                      to={"/shop"}
+                      href={"/shop"}
                       className="bg-[var(--color-green-primary)] px-4 py-3 text-white cursor-pointer"
                     >
                       <div className="flex items-center gap-2 font-semibold">
@@ -286,7 +287,7 @@ const MyCart = () => {
 
               <div className="py-4 inline-flex lg:hidden">
                 <Link
-                  to={"/shop"}
+                  href={"/shop"}
                   className="bg-[var(--color-green-primary)] px-4 py-3 text-white cursor-pointer"
                 >
                   <div className="flex items-center gap-2 font-semibold">
@@ -323,7 +324,7 @@ const MyCart = () => {
                     You must be logged in to proceed to checkout.
                   </p>
                   <Link
-                    to="/login"
+                    href="/login"
                     className="inline-block bg-[var(--color-green-primary)] text-white px-6 py-2 rounded-full font-semibold"
                   >
                     Go to Login

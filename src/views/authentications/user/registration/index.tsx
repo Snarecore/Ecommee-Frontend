@@ -3,7 +3,8 @@ import { FiPhone, FiUser } from "react-icons/fi";
 import { LuMail } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 import companyLogo from "../../../../assets/BazaarBound Logo.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Link from "next/link";;
 import { ChangeEvent, useState } from "react";
 import { useAPI } from "../../../../hooks/useApi";
 import apiConfig from "../../../../config/api.json";
@@ -70,7 +71,7 @@ const UserRegistration = () => {
 		<div className="p-8 lg:p-12 flex h-screen w-screen items-center justify-center">
 			<div className="w-2xl mx-auto space-y-8">
 				<div className="">
-					<Link to={"/"}>
+					<Link href={"/"}>
 						<Image src={companyLogo} alt="company logo" className="mx-auto mb-4" />
 					</Link>
 					<h1 className="text-3xl text-center font-bold text-[var(--color-black-primary)] mb-2">Registration</h1>
@@ -205,7 +206,7 @@ const UserRegistration = () => {
 					</button>
 					<p className="text-center text-[15px] text-[var(--color-green-primary)]">
 						Already have an account?{" "}
-						<Link to={"/login"} className="font-semibold hover:text-[var(--color-green-primary)] hover:border-b-2 border-[var(--color-green-primary)] transition-colors duration-200">
+						<Link href={"/login"} className="font-semibold hover:text-[var(--color-green-primary)] hover:border-b-2 border-[var(--color-green-primary)] transition-colors duration-200">
 							Sign In
 						</Link>
 					</p>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { LuMail } from "react-icons/lu";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json"
 import { ChangeEvent, useMemo, useState } from "react";
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
       <div className="w-full lg:w-1/2 px-4 flex items-center">
         <div className="w-2xl mx-auto">
           <div>
-            <Link to={`/`}>
+            <Link href={`/`}>
               <Image src={companyLogo} alt="company logo" className="mx-auto mb-8" />
             </Link>
             <p className="text-xl md:text-3xl font-bold text-[var(--color-black-primary)] mb-2">Forgot Password?</p>
@@ -109,7 +109,7 @@ const ForgotPassword = () => {
 
             <p className="text-center text-[15px] text-[var(--color-black-primary)]">
               Return to {" "}
-              <Link to={"/login"}
+              <Link href={"/login"}
                 className="font-semibold hover:text-[var(--color-green-primary)] hover:border-b-2 border-[var(--color-green-primary)] transition-colors duration-200"
               >
                 login

@@ -5,7 +5,7 @@ import { FaHeart } from "react-icons/fa";
 import Pagination from "../../component/pagination";
 import ProductCardTwo from "../../component/card/product/ProductCardTwo";
 import { FaAngleRight } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { metaDataAtom } from "../../store/global-store";
 import { useAtomValue } from "jotai";
 import { Helmet } from "react-helmet-async";
@@ -58,7 +58,7 @@ const Wishlist = () => {
                                 Explore our products and add your favorites to the wishlist.
                             </p>
                             <div className="mt-6">
-                                <Link to={'/shop'} className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] text-sm font-medium rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm hover:shadow-md">
+                                <Link href={'/shop'} className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] text-sm font-medium rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm hover:shadow-md">
                                     <span>Go to Shop</span>
                                     <FaAngleRight />
                                 </Link>

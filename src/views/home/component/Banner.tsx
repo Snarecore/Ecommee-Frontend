@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface HeroSliderItem {
     id: string;
@@ -75,7 +75,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                     {heroSliderList.map((slide) => {
                                         return (
                                             <div key={slide.id} className="w-full h-full flex-shrink-0">
-                                                <Link to={slide.link} className="block w-full h-full">
+                                                <Link href={slide.link} className="block w-full h-full">
                                                     <Image src={slide.image} alt={`Slider image`} className="w-full h-full" width={500} height={500} />
                                                 </Link>
                                             </div>
@@ -114,7 +114,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                 key={promotion.id}
                                 className="flex-1 relative overflow-hidden rounded-lg shadow-lg group"
                             >
-                                <Link to={promotion.link}>
+                                <Link href={promotion.link}>
                                     <Image src={promotion.image} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
                                 </Link>
                             </div>
@@ -129,7 +129,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                         key={promotion.id}
                                         className="flex-1 relative overflow-hidden rounded-lg shadow-lg group "
                                     >
-                                        <Link to={promotion.link}>
+                                        <Link href={promotion.link}>
                                             <Image src={promotion.image} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
                                         </Link>
                                     </div>

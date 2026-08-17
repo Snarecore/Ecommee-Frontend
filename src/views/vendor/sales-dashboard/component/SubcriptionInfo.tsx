@@ -1,6 +1,6 @@
 import { FaCrown, FaCalendarAlt, FaMoneyBillWave, FaPercent } from "react-icons/fa";
 import { formatPrettyDate } from "../../../../utils/date-utils";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import EmptyComponent from "../../../../component/empty-component";
 
 const SubcriptionInfo = ({ subscriptionData }: any) => {
@@ -85,7 +85,7 @@ const SubcriptionInfo = ({ subscriptionData }: any) => {
 
             <div className="mt-2">
               <Link
-                to={`/subcriptions`}
+                href={`/subcriptions`}
                 className="block text-center w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 transition text-white px-4 py-2 rounded-lg font-semibold shadow-md cursor-pointer text-base tracking-wide"
               >
                 Upgrade Tier

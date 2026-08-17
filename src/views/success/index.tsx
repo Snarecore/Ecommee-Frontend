@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from "next/link";;
 import { FaCheckCircle } from 'react-icons/fa';
 
 const Success = () => {
@@ -12,12 +12,12 @@ const Success = () => {
 				</p>
 				<div className="flex flex-col sm:flex-row gap-4 justify-center">
 					<Link
-						to="/customer-dashboard"
+						href="/customer-dashboard"
 						className="px-6 py-3 bg-[var(--color-green-primary)] text-white rounded-full transition-colors">
 						Go to Dashboard
 					</Link>
 					<Link
-						to="/shop"
+						href="/shop"
 						className="px-6 py-3 border border-[var(--color-green-primary)] text-[var(--color-green-primary)] rounded-full transition-colors">
 						Continue Shopping
 					</Link>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { FaRegHeart, FaStar, FaStarHalfAlt, FaRegStar, FaHeart } from "react-icons/fa";
 import useWishlist from "../../../hooks/useWishlist";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { Product } from "../../../interface/product.interface";
 import useCart from "../../../hooks/useCart";
 import { useNavigate } from 'react-router-dom';
@@ -53,7 +53,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     return (
         <div className="rounded-3xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden w-full h-[460px] bg-white flex flex-col">
             <figure className="relative h-[250px] w-full overflow-hidden group">
-                <Link to={`/product/${product.slug}`}>
+                <Link href={`/product/${product.slug}`}>
                     <Image src={featuredImage} alt={name} className="w-full h-full transform group-hover:scale-110 transition-transform duration-500" width={500} height={500} />
                 </Link>
                 <button className="absolute top-3 right-3 text-lg text-[var(--color-icon)] bg-[var(--color-white-primary)] backdrop-blur-sm rounded-full shadow-sm p-2.5 transition-all duration-300 cursor-pointer"
@@ -73,7 +73,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
             <div className="flex-1 p-5 bg-gray-50 relative -mt-6 rounded-t-[32px] flex flex-col">
                 <div className="h-38">
                     <h2 className="text-lg font-semibold mb-2 line-clamp-2 text-[var(--color-green-primary)]">
-                        <Link to={`/product/${product.slug}`}>
+                        <Link href={`/product/${product.slug}`}>
                             {name}
                         </Link>
                     </h2>

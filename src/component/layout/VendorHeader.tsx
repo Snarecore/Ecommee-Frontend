@@ -13,7 +13,8 @@ import { FaTags, FaUniversity } from "react-icons/fa";
 //@ts-ignore
 import user from "../../assets/avatar.png";
 import companyLogo from "../../assets/BazaarBound_Landscap_Logo.svg";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import Link from "next/link";;
 import { BiCube } from "react-icons/bi";
 import { TfiLayoutSlider } from "react-icons/tfi";
 import { GoDotFill } from "react-icons/go";
@@ -310,13 +311,13 @@ const VendorHeader = () => {
 									<p className="text-[12px] text-gray-500 capitalize">{userData?.role}</p>
 								</div>
 							</div>
-							<Link to={'/vendor-profile'}>
+							<Link href={'/vendor-profile'}>
 								<MenuItem icon={<FiUser />} text="My Profile" />
 							</Link>
-							<Link to={'/vendor-bank-information'}>
+							<Link href={'/vendor-bank-information'}>
 								<MenuItem icon={<FaUniversity />} text="Bank Information" />
 							</Link>
-							<Link to={'/change-vendor-password'}>
+							<Link href={'/change-vendor-password'}>
 								<MenuItem icon={<FaKey />} text="Change Password" />
 							</Link>
 							<button onClick={handleLogout} className="flex items-center gap-2 px-2 py-2 hover:bg-gray-100 w-full cursor-pointer rounded-md">

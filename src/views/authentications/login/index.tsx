@@ -2,10 +2,12 @@ import Image from "next/image";
 import { LuMail } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import Link from "next/link";;
 import { ChangeEvent, useState } from "react";
 import { useSetAtom } from "jotai";
 import { userAtom } from "../../../store/user-store";
+import { setCookie } from "../../../utils/cookie-utils";
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json";
 import { loginQueryKey } from "../../../config/query-key";
@@ -58,6 +60,7 @@ const Login = () => {
         if (result?.success && result.data?.data?.user) {
             // @ts-ignore
             const { user } = result.data.data;
+            setCookie("user", JSON.stringify(user), 7);
             sessionStorage.setItem("user", JSON.stringify(user));
             setUser(user);
             JSON.parse(sessionStorage.getItem("user") || "{}");
@@ -75,7 +78,7 @@ const Login = () => {
         <div className="p-8 lg:p-12 flex h-screen w-screen items-center justify-center">
             <div className="w-2xl mx-auto space-y-8">
                 <div className="">
-                    <Link to={"/"}>
+                    <Link href={"/"}>
                         <Image src={companyLogo} alt="company logo" className="w-72 mx-auto mb-4" />
                     </Link>
                     <h1 className="text-3xl text-center font-bold text-[var(--color-black-primary)] mb-2">Log in to your account</h1>
@@ -153,7 +156,7 @@ const Login = () => {
                             </div> */}
 
                             <div>
-                                <Link to={"/forgot-password"}
+                                <Link href={"/forgot-password"}
                                     className="text-[var(--color-black-primary)] font-semibold text-[15px]"
                                 >
                                     Forgot Password?
@@ -173,13 +176,13 @@ const Login = () => {
                         Don't have an account? <span className="text-[var(--color-green-primary)] font-semibold">Sign Up</span>
                     </p>
                     <div className="flex items-center justify-center gap-4">
-                        <Link to={"/vendor-signup"}
+                        <Link href={"/vendor-signup"}
                             className="bg-white text-[var(--color-green-primary)] font-bold px-4 py-2 rounded-md border"
                         >
                             Vendor Registration
                         </Link>
 
-                        <Link to={"/signup"}
+                        <Link href={"/signup"}
                             className="bg-[var(--color-green-secondary)] font-bold px-4 py-2 rounded-md"
                         >
                             Customer Registration

@@ -2,7 +2,8 @@ import Image from "next/image";
 import { useState, ChangeEvent } from "react";
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import Link from "next/link";;
 import toast from "react-hot-toast";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";
 
@@ -79,7 +80,7 @@ const ResetPassword = () => {
             <div className="w-full lg:w-1/2 px-4 flex items-center">
                 <div className="w-2xl mx-auto">
                     <div>
-                        <Link to={`/`}>
+                        <Link href={`/`}>
                             <Image src={companyLogo} alt="company logo" className="mx-auto mb-8" />
                         </Link>
                         <p className="text-xl md:text-3xl font-bold text-[var(--color-black-primary)] mb-2">

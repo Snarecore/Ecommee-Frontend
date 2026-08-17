@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { AiOutlineHome } from "react-icons/ai";
 
 const ErrorPage = () => {
@@ -11,7 +11,7 @@ const ErrorPage = () => {
                     Sorry, we can’t find the page you’re looking for.
                 </p>
                 <Link
-                    to="/"
+                    href="/"
                     className="inline-flex items-center bg-white text-[var(--color-green-primary)] font-bold px-8 py-3 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-300"
                 >
                     <AiOutlineHome className="mr-2 text-2xl" />

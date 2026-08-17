@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface MenuItem {
@@ -254,7 +254,7 @@ const CardModal = () => {
             </div>
             <nav className="mt-2">
                 <div className="pb-8">
-                    <Link to={"/all-categories"} className="p-2">
+                    <Link href={"/all-categories"} className="p-2">
                         All Categories
                     </Link>
                 </div>

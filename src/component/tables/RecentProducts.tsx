@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 
 const RecentProduct = ({
 	title,
@@ -15,7 +15,7 @@ const RecentProduct = ({
 		<div className="bg-white p-4 rounded-lg shadow-md overflow-x-scroll cursor-pointer">
 			<div className="flex justify-between p-2">
 				<h2 className="text-lg font-semibold mb-4">{title}</h2>
-				<Link to={"/"} className="underline text-[#212B36] text-[13px] hover:text-[var(--color-green-primary)] transition-all ease-in duration-300">View All</Link>
+				<Link href={"/"} className="underline text-[#212B36] text-[13px] hover:text-[var(--color-green-primary)] transition-all ease-in duration-300">View All</Link>
 			</div>
 
 			<div className="overflow-x-auto">

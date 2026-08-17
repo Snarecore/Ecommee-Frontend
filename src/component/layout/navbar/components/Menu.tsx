@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { BiSearch } from "react-icons/bi";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Link from "next/link";;
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { useEffect, useState, useRef } from "react";
@@ -101,7 +102,7 @@ const Menu = () => {
 
   return (
     <nav className="py-4 max-w-screen-2xl mx-auto px-4 flex justify-between items-center gap-3 sm:gap-6">
-      <Link to={"/"} className="flex justify-center sm:justify-start">
+      <Link href={"/"} className="flex justify-center sm:justify-start">
         <Image src={headerFooterData?.headerLogo} alt="Bazaarbound Logo" className="w-60 object-cover" width={240} height={60} />
       </Link>
 
@@ -137,7 +138,7 @@ const Menu = () => {
                   </div>
                 ) : (
                   <Link
-                    to={`/product/${item.slug}`}
+                    href={`/product/${item.slug}`}
                     onClick={() => {
                       setSearchText("");
                       setFilteredSuggestions([]);
@@ -164,7 +165,7 @@ const Menu = () => {
       </div>
 
       <div className="flex items-center gap-6 sm:gap-6 text-sm">
-        <Link to="/wishlist" className="group relative">
+        <Link href="/wishlist" className="group relative">
           <div className="flex flex-col items-center gap-1 md:ml-16">
             <FaRegHeart className="text-xl text-[var(--color-icon)]" />
             {wishlistCount > 0 && (
@@ -175,7 +176,7 @@ const Menu = () => {
           </div>
         </Link>
 
-        <Link to="/cart" className="group relative">
+        <Link href="/cart" className="group relative">
           <div className="flex flex-col items-center gap-1">
             <HiOutlineShoppingBag className="text-2xl text-[var(--color-icon)]" />
             {cartItemCount > 0 && (
@@ -190,9 +191,9 @@ const Menu = () => {
 					<div className="flex items-center gap-2 text-[var(--color-icon)]">
 						<FaRegUser className="text-xl cursor-pointer" />
 						<div className="flex gap-1">
-							<Link to="/login">Login</Link>
+							<Link href="/login">Login</Link>
 							<span>|</span>
-							<Link to="/signup">Register</Link>
+							<Link href="/signup">Register</Link>
 						</div>
 					</div>
 				</div> */}
@@ -225,7 +226,7 @@ const Menu = () => {
                     {user.role === "customer" ? (
                       <div>
                         <Link
-                          to="/customer-dashboard"
+                          href="/customer-dashboard"
                           className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
                         >
                           <FaUser />
@@ -234,7 +235,7 @@ const Menu = () => {
                       </div>
                     ) : user.role === "vendor" ? (
                       <Link
-                        to="/vendor-dashboard"
+                        href="/vendor-dashboard"
                         className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
                       >
                         <FaUser />
@@ -242,7 +243,7 @@ const Menu = () => {
                       </Link>
                     ) : (
                       <Link
-                        to=""
+                        href=""
                         className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
                       >
                         Admin
@@ -260,9 +261,9 @@ const Menu = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login">Login</Link>
+                  <Link href="/login">Login</Link>
                   <span>|</span>
-                  <Link to="/signup">Register</Link>
+                  <Link href="/signup">Register</Link>
                 </>
               )}
             </div>
@@ -282,7 +283,7 @@ const Menu = () => {
                 <>
                   {user.role === "customer" ? (
                     <Link
-                      to="/customer-dashboard"
+                      href="/customer-dashboard"
                       className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
                     >
                       <FaUser />
@@ -290,7 +291,7 @@ const Menu = () => {
                     </Link>
                   ) : user.role === "vendor" ? (
                     <Link
-                      to="/vendor-dashboard"
+                      href="/vendor-dashboard"
                       className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
                     >
                       <FaUser />
@@ -298,7 +299,7 @@ const Menu = () => {
                     </Link>
                   ) : (
                     <Link
-                      to="/admin-dashboard"
+                      href="/admin-dashboard"
                       className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
                     >
                       Admin Dashboard
@@ -316,14 +317,14 @@ const Menu = () => {
               ) : (
                 <>
                   <Link
-                    to="/login"
+                    href="/login"
                     onClick={() => setIsLoginOpen(false)}
                     className="block px-4 py-2 text-sm hover:bg-gray-100 border-b border-gray-300"
                   >
                     Login
                   </Link>
                   <Link
-                    to="/signup"
+                    href="/signup"
                     onClick={() => setIsLoginOpen(false)}
                     className="block px-4 py-2 text-sm hover:bg-gray-100"
                   >

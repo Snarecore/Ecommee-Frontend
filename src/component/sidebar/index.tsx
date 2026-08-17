@@ -1,6 +1,7 @@
 // import { useAtom } from "jotai";
 // import { useState, useEffect } from "react";
-// import { Link, useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
+import Link from "next/link";;
 // import { isLoadingAtom, nestedCategoriesAtom } from "../../store/global-store";
 // import ProductCategorySkeleton from "../skeleton/ProductCategorySkeleton";
 // import { MainCategory, FirstCategory, SecondCategory, ThirdCategory } from "../../interface/nested-category.interface";
@@ -152,7 +153,7 @@
 // 									}`}
 // 							/>
 // 							<Link
-// 								to={"/all-categories"}
+// 								href={"/all-categories"}
 // 								className={`text-sm font-semibold`}
 // 							>
 // 								All Categories
@@ -184,7 +185,8 @@
 
 // import { useAtom } from "jotai";
 // import { useMemo, useState } from "react";
-// import { Link, useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
+// import Link from "next/link";
 // import { isLoadingAtom, nestedCategoriesAtom } from "../../store/global-store";
 // import ProductCategorySkeleton from "../skeleton/ProductCategorySkeleton";
 // import {
@@ -363,7 +365,7 @@
 //                     : "bg-[#EAEAEB]"
 //                 }`}
 //               />
-//               <Link to={"/all-categories"} className="text-sm font-semibold">
+//               <Link href={"/all-categories"} className="text-sm font-semibold">
 //                 All Categories
 //               </Link>
 //             </div>
@@ -394,7 +396,8 @@
 
 // import { useAtom } from "jotai";
 // import { useEffect, useMemo, useState } from "react";
-// import { Link, useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
+// import Link from "next/link";
 // import { isLoadingAtom, nestedCategoriesAtom } from "../../store/global-store";
 // import ProductCategorySkeleton from "../skeleton/ProductCategorySkeleton";
 // import {
@@ -594,7 +597,7 @@
 //                     : "bg-[#EAEAEB]"
 //                 }`}
 //               />
-//               <Link to={"/all-categories"} className="text-sm font-semibold">
+//               <Link href={"/all-categories"} className="text-sm font-semibold">
 //                 All Categories
 //               </Link>
 //             </div>
@@ -624,7 +627,8 @@
 
 import { useAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+// import Link from "next/link";
 import { isLoadingAtom, nestedCategoriesAtom } from "../../store/global-store";
 import ProductCategorySkeleton from "../skeleton/ProductCategorySkeleton";
 import {
@@ -978,7 +982,7 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
                 }`}
               />
               <Link
-                to={"/all-categories"}
+                href={"/all-categories"}
                 className={`text-sm transition-colors duration-200 ${
                   selectedCategoryId === null
                     ? "text-[var(--color-green-primary)] font-semibold"

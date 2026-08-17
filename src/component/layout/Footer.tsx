@@ -8,7 +8,7 @@ import discoveLog from "../../assets/discover-logo.png";
 import paypal from "../../assets/paypal-svgrepo-com.svg";
 import { useAtom } from "jotai";
 import { headerFooterAtom, socialLinksAtom } from "../../store/global-store";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 
 type Social = {
     icon: string;
@@ -45,7 +45,7 @@ const Footer = () => {
                         <div className="flex gap-5">
                             {
                                 Array.isArray(socialLinksData) && socialLinksData?.map((social: Social) => (
-                                    <Link key={social.link} to={social.link} target="_blank">
+                                    <Link key={social.link} href={social.link} target="_blank">
                                         <Image src={social.icon} alt={social.link} width={30} height={500} />
                                     </Link>
                                 ))
@@ -59,7 +59,7 @@ const Footer = () => {
                             <div className="flex flex-col gap-3">
                                 {
                                     footerSectionTwo.map((sec: any) => (
-                                        <Link key={sec.link} to={`${sec.link}`}>
+                                        <Link key={sec.link} href={`${sec.link}`}>
                                             <ul>
                                                 <li>
                                                     {sec.value}
@@ -76,7 +76,7 @@ const Footer = () => {
                             <div className="flex flex-col gap-3">
                                 {
                                     footerSectionThree?.map((sec :any) => (
-                                        <Link key={sec.link} to={`${sec.link}`}>
+                                        <Link key={sec.link} href={`${sec.link}`}>
                                             <ul>
                                                 <li>
                                                     {sec.value}

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FiEye } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import apiConfig from "../../../../../config/api.json";
 import { useAPI } from "../../../../../hooks/useApi";
 import TableSkeleton from "../../../../../component/skeleton/TableSkeleton";
@@ -245,12 +245,12 @@ const ProductsTable = ({ dataList, fetchProductList, pageCount, currentPageNumbe
 
 									<td className="px-6 py-4">
 										<div className="flex items-center gap-2">
-											<Link to={`/product-details/${data.id}`}
+											<Link href={`/product-details/${data.id}`}
 												className="inline-flex items-center justify-center hover:bg-gray-200 border border-[#e6eaed] hover:text-[var(--color-primary)] p-2 rounded-md cursor-pointer">
 												<FiEye />
 											</Link>
 											<Link
-												to="/edit-product"
+												href="/edit-product"
 												state={{ editData: data }}
 												className="inline-flex items-center justify-center hover:bg-gray-200 border border-[#e6eaed] hover:text-[var(--color-primary)] p-2 rounded-md cursor-pointer"
 											>

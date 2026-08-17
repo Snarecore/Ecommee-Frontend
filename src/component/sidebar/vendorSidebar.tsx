@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { TbTablePlus, TbLayoutGrid, TbMessageFilled } from "react-icons/tb";
 import { BiBarChart, BiCube } from "react-icons/bi";
 import { RiArrowDropRightLine, RiArrowDropDownLine } from "react-icons/ri";
-import { Link, useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink } from "react-router-dom";
+import Link from "next/link";;
 import { GoDotFill } from "react-icons/go";
 import { MdSubscriptions } from "react-icons/md";
 import logo from "../../assets/BazaarBound_Landscap_Logo.svg"
@@ -162,7 +163,7 @@ const VendorSidebar = () => {
 
 	return (
 		<div className="hidden lg:block w-63 min-h-screen bg-white shadow-md p-2 transition-all ease-in duration-300 border-r border-gray-200">
-			<Link to={"/"}>
+			<Link href={"/"}>
 				<Image src={logo} alt="company logo" className="w-58 fixed" />
 			</Link>
 

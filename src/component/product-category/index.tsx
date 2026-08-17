@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Link } from "react-router-dom";
+import Link from "next/link";;
 import { mainCategoriesAtom, isLoadingAtom } from '../../store/global-store';
 import { useAtom } from 'jotai';
 import EmptyComponent from "../empty-component";
@@ -26,7 +26,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData }) => {
                 <div className="flex items-center justify-center flex-wrap gap-6">
                     {mainCategories.map((category) => (
                         <Link
-                            to={`/shop?mainCategoryId=${category?.id}&pageNumber=1`}
+                            href={`/shop?mainCategoryId=${category?.id}&pageNumber=1`}
                             key={category?.id}
                             className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
                         >
