@@ -9,7 +9,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { wishlistCounterAtom } from "../../../../store/wishlist-store";
 import { cartCounterAtom } from "../../../../store/cart-store";
 import { FaRegHeart, FaRegUser, FaUser } from "react-icons/fa6";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiSun, FiMoon } from "react-icons/fi";
 import { useAPI } from "../../../../hooks/useApi";
 import { productListQueryKey } from "../../../../config/query-key";
 import apiConfig from "../../../../config/api.json";
@@ -40,6 +40,27 @@ const Menu = () => {
     SearchSuggestion[]
   >([]);
   const [headerFooterData] = useAtom(headerFooterAtom);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   const dataLimit = 20;
   const pageNumber = 1;
@@ -110,7 +131,7 @@ const Menu = () => {
         <input
           type="text"
           placeholder="Search products..."
-          className="w-full px-4 py-2.5 rounded-full pl-12 pr-4 focus:outline-none focus:ring-1 border border-[var(--color-green-primary)] text-[var(--color-green-primary)] placeholder:text-[var(--color-green-primary)] text-sm font-semibold transition-colors duration-300"
+          className="w-full px-4 py-2.5 rounded-full pl-12 pr-4 focus:outline-none focus:ring-1 border border-[var(--color-green-primary)] text-[var(--color-green-primary)] placeholder:text-[var(--color-green-primary)] text-sm font-semibold transition-colors duration-300 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
@@ -118,7 +139,7 @@ const Menu = () => {
 
         {searchText && (
           <div
-            className={`absolute top-full mt-2 w-full bg-white border border-[var(--color-green-secondary)] shadow-md rounded-md z-[99999999] overflow-y-auto ${filteredSuggestions.length >= 4 ? "max-h-60" : "h-fit"
+            className={`absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-[var(--color-green-secondary)] dark:border-gray-700 shadow-md rounded-md z-[99999999] overflow-y-auto ${filteredSuggestions.length >= 4 ? "max-h-60" : "h-fit"
               }`}
           >
             {isFetching ? (
@@ -145,7 +166,7 @@ const Menu = () => {
                     }}
                     key={index}
                   >
-                    <div className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <div className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                       <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-[15%] md:w-[70px] h-[50px] md:h-[70px] object-cover" width={500} height={500} />
                       <div className="flex flex-col gap-2">
                         <p className="font-semibold text-[var(--color-green-primary)] text-xs md:text-[15px]">
@@ -186,6 +207,18 @@ const Menu = () => {
             )}
           </div>
         </Link>
+
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--color-icon)] dark:text-gray-300 transition-colors duration-200 focus:outline-none"
+          title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+        >
+          {theme === "light" ? (
+            <FiMoon className="text-xl" />
+          ) : (
+            <FiSun className="text-xl" />
+          )}
+        </button>
         {/* 
 				<div className="hidden sm:block">
 					<div className="flex items-center gap-2 text-[var(--color-icon)]">
@@ -218,16 +251,16 @@ const Menu = () => {
                   </span>
 
                   <div
-                    className={`absolute left-0 top-full mt-2 w-40 bg-white shadow-md rounded-md p-2 ${isDropdownOpen
+                    className={`absolute left-0 top-full mt-2 w-40 bg-white dark:bg-gray-800 shadow-md rounded-md p-2 ${isDropdownOpen
                         ? "opacity-100"
                         : "opacity-0 pointer-events-none"
-                      } transition-opacity duration-300 z-60 border border-gray-300`}
+                      } transition-opacity duration-300 z-60 border border-gray-300 dark:border-gray-700 dark:text-gray-200`}
                   >
                     {user.role === "customer" ? (
                       <div>
                         <Link
                           href="/customer-dashboard"
-                          className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                          className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           <FaUser />
                           User Profile
@@ -236,7 +269,7 @@ const Menu = () => {
                     ) : user.role === "vendor" ? (
                       <Link
                         href="/vendor-dashboard"
-                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <FaUser />
                         Vendor Profile
@@ -244,7 +277,7 @@ const Menu = () => {
                     ) : (
                       <Link
                         href=""
-                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         Admin
                       </Link>
@@ -252,7 +285,7 @@ const Menu = () => {
                     <button
                       //@ts-ignore
                       onClick={handleLogout}
-                      className=" w-full text-left px-2 py-2 text-sm text-red-500 hover:bg-gray-100 rounded mt-1 cursor-pointer flex items-center gap-2"
+                      className=" w-full text-left px-2 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded mt-1 cursor-pointer flex items-center gap-2"
                     >
                       <RiLogoutCircleLine />
                       Logout

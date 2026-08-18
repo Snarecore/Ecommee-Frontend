@@ -1,9 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
     font-family: 'Public Sans', sans-serif;
     background-color: #FBF9F5;
+    color: #2b2b2b;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dark body {
+    background-color: #111827;
+    color: #f3f4f6;
 }
 
 @theme{

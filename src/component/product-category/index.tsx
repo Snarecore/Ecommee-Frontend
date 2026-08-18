@@ -19,7 +19,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
     return (
         <div className="max-w-screen-2xl mx-auto px-4 py-4 my-4">
             <div className="text-center mb-6">
-                <h2 className="text-4xl font-bold mb-4 text-[var(--color-green-primary)]">
+                <h2 className="text-4xl font-bold mb-4 text-[var(--color-green-primary)] dark:text-green-400">
                     {contentData?.categorySectionTitle}
                 </h2>
             </div>
@@ -38,12 +38,12 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
                             <Link
                                 href={linkHref}
                                 key={category?.id}
-                                className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
+                                className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
                             >
                                 <div className="pb-2 rounded-xl group-hover:from-[var(--color-primary)]/10 group-hover:to-transparent transition-all duration-300">
                                     <Image src={imgSource || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={category?.name} className="w-18 h-18 object-contain group-hover:scale-110 transition-transform duration-300" width={72} height={72} />
                                 </div>
-                                <h2 className="text-base sm:text-md font-medium text-[var(--color-green-primary)] transition-colors duration-300 text-center">
+                                <h2 className="text-base sm:text-md font-medium text-[var(--color-green-primary)] dark:text-green-400 transition-colors duration-300 text-center">
                                     {category?.name}
                                 </h2>
                             </Link>

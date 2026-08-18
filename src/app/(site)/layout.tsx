@@ -8,7 +8,7 @@ import { InitialStateService } from "@/services/initial-state-service";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-[var(--color-white-primary)]">
+    <div className="bg-[var(--color-white-primary)] dark:bg-gray-900 transition-colors duration-300">
       <InitialStateService />
       <NavBar />
       <Toaster position="top-right" reverseOrder={false} />
