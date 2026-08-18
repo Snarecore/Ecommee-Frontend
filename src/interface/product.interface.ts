@@ -20,6 +20,7 @@ export interface Product {
     vendor?: {
         profile?: {
             shopName?: string;
+            shopImage?: string;
         };
     };
     productReview?: {

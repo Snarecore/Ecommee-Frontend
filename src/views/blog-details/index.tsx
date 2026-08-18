@@ -40,11 +40,11 @@ const BlogDetails = () => {
       </Helmet>
       <div className="max-w-screen-2xl mx-auto px-4 py-4 my-4">
         <div>
-          <Image src={response?.image || null} alt={response?.imageAltText} className="w-full h-[550px]" width={500} height={500} />
+          <Image src={response?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={response?.imageAltText} className="w-full h-[550px]" width={500} height={500} />
           <p className="text-2xl font-bold mt-8">{response?.title}</p>
 
           <div className="flex items-center gap-2 mt-3">
-            <Image src={response?.image || null} alt="Author" className="w-8 h-8 rounded-full" width={32} height={32} />
+            <Image src={response?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Author" className="w-8 h-8 rounded-full" width={32} height={32} />
             <p className="text-sm text-gray-500">
               <span className="text-gray-400">by</span>
               <span className="font-medium text-gray-700">{response?.author}</span>

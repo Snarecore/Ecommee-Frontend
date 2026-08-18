@@ -24,7 +24,7 @@ const ProductImageSlider = ({ images }: { images: string[] }) => {
 	return (
 		<div className="w-full">
 			<div className="relative h-96">
-				<Image src={images[current] || null} alt={`Slide ${current} className="w-full h-full rounded transition-all duration-300" width={500} height={500} `} />
+				<Image src={images[current] || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={`Slide ${current} className="w-full h-full rounded transition-all duration-300" width={500} height={500} `} />
 
 				<button
 					onClick={prevSlide}

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { useState, ChangeEvent } from "react";
 import { IoCloseSharp, IoCloudUploadOutline } from "react-icons/io5";
 import { MdClose } from "react-icons/md";
@@ -39,7 +39,7 @@ const requiredFields = [
 const Profile = ({ userData, fetchUserData }: ProfileDataProps) => {
 	const [fieldValues, setFieldValues] = useState(initialFieldValues);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [preview, setPreview] = useState(defaultImage || null);
+	const [preview, setPreview] = useState<string | StaticImageData | null>(defaultImage || null);
 	const { patchFormMutation, handleApiMutation } = useAPI();
 
 	const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +99,7 @@ const Profile = ({ userData, fetchUserData }: ProfileDataProps) => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                             <div className="flex-shrink-0">
                                 {userData.profile?.profileImage ? (
-                                    <Image src={userData.profile.profileImage || null} alt={userData.name} className="rounded-full w-24 h-24 sm:w-32 sm:h-32 object-cover border-4 border-[var(--color-green-secondary)] shadow-lg" width={96} height={96} />
+                                    <Image src={userData.profile.profileImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={userData.name} className="rounded-full w-24 h-24 sm:w-32 sm:h-32 object-cover border-4 border-[var(--color-green-secondary)] shadow-lg" width={96} height={96} />
                                 ) : (
                                     <div className="rounded-full w-24 h-24 sm:w-32 sm:h-32 bg-white/20 flex items-center justify-center border-4 border-white shadow-lg">
                                         <FiUser className="w-12 h-12 text-white" />

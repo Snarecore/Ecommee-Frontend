@@ -54,7 +54,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
         <div className="rounded-3xl border border-gray-300 transition-shadow duration-300 overflow-hidden w-full h-[460px] bg-white flex flex-col">
             <figure className="relative h-[250px] w-full overflow-hidden group">
                 <Link href={`/product/${product.slug}`}>
-                    <Image src={featuredImage || null} alt={name} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" width={500} height={500} />
+                    <Image src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={name} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" width={500} height={500} />
                 </Link>
                 <button className="absolute top-3 right-3 text-lg text-[var(--color-icon)] bg-[var(--color-white-primary)] backdrop-blur-sm rounded-full shadow-sm p-2.5 transition-all duration-300 cursor-pointer"
                     onClick={(e) => {

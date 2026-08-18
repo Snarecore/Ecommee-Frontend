@@ -90,7 +90,7 @@ const InvoiceView = () => {
 									<tr key={item.id} className="border-b border-gray-200 text-sm">
 										<td className="px-4 py-3">
 											<div className="flex items-center gap-3">
-												<Image src={item.productImage || null} alt={item.productName} className="w-12 h-12 object-cover rounded" width={48} height={48} />
+												<Image src={item.productImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.productName} className="w-12 h-12 object-cover rounded" width={48} height={48} />
 												<span className="font-semibold">{item.productName}</span>
 											</div>
 										</td>

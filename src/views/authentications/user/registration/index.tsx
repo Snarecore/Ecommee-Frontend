@@ -72,7 +72,7 @@ const UserRegistration = () => {
 			<div className="w-2xl mx-auto space-y-8">
 				<div className="">
 					<Link href={"/"}>
-						<Image src={companyLogo || null} alt="company logo" className="mx-auto mb-4" />
+						<Image src={companyLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="company logo" className="mx-auto mb-4" />
 					</Link>
 					<h1 className="text-3xl text-center font-bold text-[var(--color-black-primary)] mb-2">Registration</h1>
 					<p className="text-[15px] text-center text-[var(--color-black-primary)]">

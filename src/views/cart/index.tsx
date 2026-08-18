@@ -141,7 +141,7 @@ const MyCart = () => {
                         >
                           {/* Product & unit price */}
                           <div className="w-full md:col-span-8 flex flex-row gap-4 sm:gap-8 p-4">
-                            <Image src={item.featuredImage || null} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
+                            <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
                             <div>
                               <p className="font-bold text-[var(--color-green-primary)]">
                                 {item.name}

@@ -14,7 +14,7 @@ const BlogCard = ({ image, title, author, date, link }: BlogCardProps) => {
   return (
     <div className="max-w-sm rounded-2xl overflow-hidden transition-shadow duration-300">
       <Link href={link}>
-      <Image src={image || null} alt={title} className="h-[250px] w-full object-cover rounded-t-2xl" width={500} height={500} />
+      <Image src={image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={title} className="h-[250px] w-full object-cover rounded-t-2xl" width={500} height={500} />
       </Link>
 
       <div className="py-5">

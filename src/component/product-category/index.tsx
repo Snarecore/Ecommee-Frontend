@@ -31,7 +31,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData }) => {
                             className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
                         >
                             <div className="pb-2 rounded-xl group-hover:from-[var(--color-primary)]/10 group-hover:to-transparent transition-all duration-300">
-                                <Image src={category?.image || null} alt={category?.name} className="w-18 group-hover:scale-110 transition-transform duration-300" width={72} height={72} />
+                                <Image src={category?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={category?.name} className="w-18 group-hover:scale-110 transition-transform duration-300" width={72} height={72} />
                             </div>
                             <h2 className="text-base sm:text-md font-medium text-[var(--color-green-primary)] transition-colors duration-300 text-center">
                                 {category?.name}

@@ -103,7 +103,7 @@ const Menu = () => {
   return (
     <nav className="py-4 max-w-screen-2xl mx-auto px-4 flex justify-between items-center gap-3 sm:gap-6">
       <Link href={"/"} className="flex justify-center sm:justify-start">
-        <Image src={headerFooterData?.headerLogo || null} alt="Bazaarbound Logo" className="w-60 object-cover" width={240} height={60} />
+        <Image src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Bazaarbound Logo" className="w-60 object-cover" width={240} height={60} />
       </Link>
 
       <div className="relative flex-1">
@@ -146,7 +146,7 @@ const Menu = () => {
                     key={index}
                   >
                     <div className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      <Image src={item.featuredImage || null} alt={item.name} className="w-[15%] md:w-[70px] h-[50px] md:h-[70px] object-cover" width={500} height={500} />
+                      <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-[15%] md:w-[70px] h-[50px] md:h-[70px] object-cover" width={500} height={500} />
                       <div className="flex flex-col gap-2">
                         <p className="font-semibold text-[var(--color-green-primary)] text-xs md:text-[15px]">
                           {item.name}

@@ -56,7 +56,7 @@ export default function CommentItem({
   return (
     <div className="rounded-xl bg-white p-4 sm:p-5">
       <div className="flex items-start gap-4">
-        <Image src={comment?.user?.profileImage || userPlaceholderImg} alt={comment?.user?.name} className="w-10 h-10 p-1 rounded-full border border-[var(--color-green-primary)] object-cover" width={40} height={40} />
+        <Image src={comment?.user?.profileImage || userPlaceholderImg} alt={comment?.user?.name || ""} className="w-10 h-10 p-1 rounded-full border border-[var(--color-green-primary)] object-cover" width={40} height={40} />
 
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
@@ -114,7 +114,7 @@ export default function CommentItem({
                   <span className="absolute -left-4 top-3 h-4 w-4 border-l-2 border-b-2 border-gray-300 rounded-bl-sm"></span>
 
                   <div className="flex items-start gap-3">
-                    <Image src={r?.user?.profileImage || userPlaceholderImg} alt={r?.user?.name} className="w-8 h-8 rounded-full border object-cover p-1" width={32} height={32} />
+                    <Image src={r?.user?.profileImage || userPlaceholderImg} alt={r?.user?.name || ""} className="w-8 h-8 rounded-full border object-cover p-1" width={32} height={32} />
 
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">

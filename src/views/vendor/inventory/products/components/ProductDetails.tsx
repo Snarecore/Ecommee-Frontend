@@ -166,7 +166,7 @@ const ProductDetails = () => {
 
                     <div className="lg:col-span-4 flex flex-col gap-6">
                         <div className="rounded-xl border border-gray-200 shadow-sm overflow-hidden h-1/3">
-                            <Image src={product?.featuredImage} alt={product?.name} className="w-full h-full rounded-md hover:scale-110 transition duration-300" width={500} height={500} />
+                            <Image src={product?.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={product?.name || ""} className="w-full h-full rounded-md hover:scale-110 transition duration-300" width={500} height={500} />
                         </div>
                         <div className="rounded-xl overflow-hidden">
                             <ProductImageSlider images={product?.productImages?.map(img => img.imageUrl) || []} />

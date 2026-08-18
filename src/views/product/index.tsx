@@ -345,7 +345,7 @@ const Product = () => {
                                     onClick={() => handleImageClick(product?.featuredImage ?? '')}
                                     className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border-2 transition ${selectedImage === product?.featuredImage ? "border-[var(--color-green-primary)]" : "border-gray-300"}`}
                                 >
-                                    <Image src={product?.featuredImage} alt={product?.name} className="w-full h-full object-cover" width={500} height={500} />
+                                    <Image src={product?.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={product?.name || ""} className="w-full h-full object-cover" width={500} height={500} />
                                 </button>
                                 {product?.productImages.map((image, index) => (
                                     <button
@@ -353,7 +353,7 @@ const Product = () => {
                                         onClick={() => handleImageClick(image.imageUrl)}
                                         className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border-2 transition cursor-pointer ${selectedImage === image.imageUrl ? "border-[var(--color-green-primary)]" : "border-gray-300"}`}
                                     >
-                                        <Image src={image.imageUrl || null} alt={`${product.name} className="w-full h-full object-cover" width={500} height={500} - ${index + 1}`} />
+                                        <Image src={image.imageUrl || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={`${product.name} className="w-full h-full object-cover" width={500} height={500} - ${index + 1}`} />
                                     </button>
                                 ))}
                             </div>
@@ -499,7 +499,7 @@ const Product = () => {
 
                                             <div className="flex flex-col items-center gap-2">
 
-                                                <Image src={product?.vendor?.profile?.shopImage || null} alt="Seller" className="w-24 h-24 rounded-full object-cover" width={96} height={96} />
+                                                <Image src={product?.vendor?.profile?.shopImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Seller" className="w-24 h-24 rounded-full object-cover" width={96} height={96} />
 
                                                 <p className="text-lg font-semibold text-[var(--color-black-primary)]">
                                                     {product?.vendor?.profile?.shopName || 'Shop Name Not Available'}
@@ -716,7 +716,7 @@ const Product = () => {
                             handleApiMutation={handleApiMutation}
                             postMutation={postMutation}
                             user={user}
-                            userPlaceholderImg={userImage}
+                            userPlaceholderImg={userImage.src}
                             formatDate={formatPrettyDateWithTime}
                             initialLimit={3}
                             vendorId={vendorId}

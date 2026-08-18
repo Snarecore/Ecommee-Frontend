@@ -63,7 +63,7 @@ const ForgotPassword = () => {
         <div className="w-2xl mx-auto">
           <div>
             <Link href={`/`}>
-              <Image src={companyLogo || null} alt="company logo" className="mx-auto mb-8" />
+              <Image src={companyLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="company logo" className="mx-auto mb-8" />
             </Link>
             <p className="text-xl md:text-3xl font-bold text-[var(--color-black-primary)] mb-2">Forgot Password?</p>
             <p className="text-sm md:text-[15px] text-[var(--color-black-primary)]">

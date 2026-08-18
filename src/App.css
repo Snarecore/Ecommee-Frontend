@@ -3,6 +3,7 @@
 
 body {
     font-family: 'Public Sans', sans-serif;
+    background-color: #FBF9F5;
 }
 
 @theme{
@@ -16,7 +17,7 @@ body {
     --color-black-hover: #3b444b;
     --color-active: #eef6ff;
     
-    --color-white-primary: #ffffff;
+    --color-white-primary: #FBF9F5;
     --color-green-primary: #519755;
     --color-black-primary: #2b2b2b;
     --color-icon: #428546;

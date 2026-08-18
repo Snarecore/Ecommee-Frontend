@@ -13,7 +13,7 @@ const EmptyComponent: React.FC<EmptyComponentProps> = ({
 }) => {
     return (
         <div className="flex flex-col items-center justify-center">
-            <Image src={image || null} alt="" className="w-40 h-40" width={160} height={160} />
+            <Image src={image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="" className="w-40 h-40" width={160} height={160} />
             <p className="text-gray-500 text-lg">{message}</p>
         </div>
     );

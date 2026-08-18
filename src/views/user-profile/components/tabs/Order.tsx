@@ -185,7 +185,7 @@ const Order = () => {
 											key={product.id}
 											className="sm:flex sm:items-start gap-4 p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
 										>
-											<Image src={product.productImage || null} alt={product.productName} className="w-20 h-20 object-cover rounded-lg" width={80} height={80} />
+											<Image src={product.productImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={product.productName} className="w-20 h-20 object-cover rounded-lg" width={80} height={80} />
 											<div className="flex-1 flex flex-col">
 												<h3 className="font-semibold text-gray-800">
 													{product.productName}

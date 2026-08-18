@@ -36,7 +36,7 @@ const TopProductListTable = ({ title, topSellingProducts }: TopProductListDataPr
                                 <div className="flex flex-col">
                                     <div className="flex gap-4">
                                         <Link href={`/product-details/${row.productId}`}>
-                                            <Image src={row.productImage || null} alt={row.productName} className="w-12 h-12 rounded-md" width={48} height={48} />
+                                            <Image src={row.productImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={row.productName} className="w-12 h-12 rounded-md" width={48} height={48} />
                                         </Link>
                                         <div>
                                             <Link href={`/product-details/${row.productId}`}>

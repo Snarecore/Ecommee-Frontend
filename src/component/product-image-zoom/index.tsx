@@ -47,7 +47,7 @@ const ProductImageZoom: React.FC<ProductImageZoomProps> = ({
 			className={`relative overflow-hidden w-full h-full ${containerClassName}`}
 			// style={{ cursor: "zoom-in" }}
 		>
-			<Image src={imageSrc || null} alt={imageAlt} className="transition-transform duration-200 ease-out object-cover w-full h-full" width={500} height={500} style={{ transformOrigin: "top left", transform: isZoomed ? imageTransform : "scale(1)" }} />
+			<Image src={imageSrc || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={imageAlt} className="transition-transform duration-200 ease-out object-cover w-full h-full" width={500} height={500} style={{ transformOrigin: "top left", transform: isZoomed ? imageTransform : "scale(1)" }} />
 		</div>
 	);
 };
