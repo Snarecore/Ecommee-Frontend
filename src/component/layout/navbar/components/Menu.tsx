@@ -103,7 +103,7 @@ const Menu = () => {
   return (
     <nav className="py-4 max-w-screen-2xl mx-auto px-4 flex justify-between items-center gap-3 sm:gap-6">
       <Link href={"/"} className="flex justify-center sm:justify-start">
-        <Image src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Bazaarbound Logo" className="w-60 object-cover" width={240} height={60} />
+        <Image src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Bazaarbound Logo" className="w-28 sm:w-36 h-8 sm:h-10 object-contain" width={240} height={60} />
       </Link>
 
       <div className="relative flex-1">

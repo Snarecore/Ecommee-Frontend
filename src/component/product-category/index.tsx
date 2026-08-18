@@ -7,11 +7,14 @@ import MainCategorySkeleton from "../skeleton/MainCategorySkeleton";
 
 interface ProductCategoryProps {
     contentData: any;
+    featuredCategories?: any[];
 }
 
-const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData }) => {
+const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featuredCategories }) => {
     const [mainCategories] = useAtom(mainCategoriesAtom);
     const [isLoading] = useAtom(isLoadingAtom);
+
+    const categoriesToRender = featuredCategories && featuredCategories.length > 0 ? featuredCategories : mainCategories;
 
     return (
         <div className="max-w-screen-2xl mx-auto px-4 py-4 my-4">
@@ -22,22 +25,30 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData }) => {
             </div>
             {isLoading ? (
                 <MainCategorySkeleton />
-            ) : mainCategories?.length > 0 ? (
+            ) : categoriesToRender?.length > 0 ? (
                 <div className="flex items-center justify-center flex-wrap gap-6">
-                    {mainCategories.map((category) => (
-                        <Link
-                            href={`/shop?mainCategoryId=${category?.id}&pageNumber=1`}
-                            key={category?.id}
-                            className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
-                        >
-                            <div className="pb-2 rounded-xl group-hover:from-[var(--color-primary)]/10 group-hover:to-transparent transition-all duration-300">
-                                <Image src={category?.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={category?.name} className="w-18 group-hover:scale-110 transition-transform duration-300" width={72} height={72} />
-                            </div>
-                            <h2 className="text-base sm:text-md font-medium text-[var(--color-green-primary)] transition-colors duration-300 text-center">
-                                {category?.name}
-                            </h2>
-                        </Link>
-                    ))}
+                    {categoriesToRender.map((category) => {
+                        const isSubCategory = !!category?.mainCategoryId;
+                        const linkHref = isSubCategory 
+                            ? `/shop?firstCategoryId=${category.id}&pageNumber=1`
+                            : `/shop?mainCategoryId=${category.id}&pageNumber=1`;
+                        const imgSource = category?.image || category?.bannerImage;
+
+                        return (
+                            <Link
+                                href={linkHref}
+                                key={category?.id}
+                                className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
+                            >
+                                <div className="pb-2 rounded-xl group-hover:from-[var(--color-primary)]/10 group-hover:to-transparent transition-all duration-300">
+                                    <Image src={imgSource || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={category?.name} className="w-18 h-18 object-contain group-hover:scale-110 transition-transform duration-300" width={72} height={72} />
+                                </div>
+                                <h2 className="text-base sm:text-md font-medium text-[var(--color-green-primary)] transition-colors duration-300 text-center">
+                                    {category?.name}
+                                </h2>
+                            </Link>
+                        );
+                    })}
                 </div>
             ) : (
                 <div className='col-span-2 md:col-span-3 xl:col-span-4 2xl:col-span-5 flex justify-center items-center'>

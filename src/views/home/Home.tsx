@@ -42,7 +42,7 @@ const Home = () => {
 			</Helmet>
 			<div>
 				<Banner heroSliderList={response?.heroSlider} promotionList={response?.promotions} />
-				<ProductCategory contentData={response?.contentData} />
+				<ProductCategory contentData={response?.contentData} featuredCategories={response?.featuredCategories} />
 				<ProductSectionOne productList={response?.sectionOneProducts} contentData={response?.contentData} />
 				<ProductSectionTwo productList={response?.sectionTwoProducts} contentData={response?.contentData} />
 				<ProductSectionThree productList={response?.sectionThreeProducts} contentData={response?.contentData} />
