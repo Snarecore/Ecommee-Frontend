@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";;
+import Link from "next/link";
 import { mainCategoriesAtom, isLoadingAtom } from '../../store/global-store';
 import { useAtom } from 'jotai';
 import EmptyComponent from "../empty-component";
@@ -17,16 +17,17 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
     const categoriesToRender = featuredCategories && featuredCategories.length > 0 ? featuredCategories : mainCategories;
 
     return (
-        <div className="max-w-screen-2xl mx-auto px-4 py-4 my-4">
-            <div className="text-center mb-6">
-                <h2 className="text-4xl font-bold mb-4 text-[var(--color-green-primary)] dark:text-green-400">
+        <div className="max-w-screen-2xl mx-auto px-4 py-8 my-4">
+            <div className="text-center mb-8 relative">
+                <h2 className="text-3xl md:text-4xl font-bold mb-3 text-[var(--color-green-primary)] dark:text-green-400">
                     {contentData?.categorySectionTitle}
                 </h2>
+                <div className="w-16 h-1 bg-[var(--color-green-primary)] dark:bg-green-400 mx-auto rounded-full"></div>
             </div>
             {isLoading ? (
                 <MainCategorySkeleton />
             ) : categoriesToRender?.length > 0 ? (
-                <div className="flex items-center justify-center flex-wrap gap-6">
+                <div className="flex items-center justify-center flex-wrap gap-6 md:gap-8">
                     {categoriesToRender.map((category) => {
                         const isSubCategory = !!category?.mainCategoryId;
                         const linkHref = isSubCategory 
@@ -38,14 +39,24 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
                             <Link
                                 href={linkHref}
                                 key={category?.id}
-                                className="group h-[150px] w-[220px] p-1.5 md:p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm transform transition-all duration-300 cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-[var(--color-primary)]/20 flex flex-col items-center justify-center"
+                                className="group relative w-[200px] sm:w-[220px] md:w-[240px] h-[260px] sm:h-[290px] md:h-[320px] rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 transform transition-all duration-500 ease-out cursor-pointer flex flex-col justify-end hover:-translate-y-1.5"
                             >
-                                <div className="pb-2 rounded-xl group-hover:from-[var(--color-primary)]/10 group-hover:to-transparent transition-all duration-300">
-                                    <Image src={imgSource || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={category?.name} className="w-18 h-18 object-contain group-hover:scale-110 transition-transform duration-300" width={72} height={72} />
+                                <div className="absolute inset-0 w-full h-full">
+                                    <Image 
+                                        src={imgSource || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} 
+                                        alt={category?.name} 
+                                        className="w-full h-full object-cover transform  transition-transform duration-700 ease-out" 
+                                        width={300} 
+                                        height={400} 
+                                        priority={true}
+                                    />
                                 </div>
-                                <h2 className="text-base sm:text-md font-medium text-[var(--color-green-primary)] dark:text-green-400 transition-colors duration-300 text-center">
-                                    {category?.name}
-                                </h2>
+
+                                <div className="relative z-10 p-5 text-center w-full">
+                                    <h2 className="text-white font-semibold text-base sm:text-lg md:text-md tracking-wide group-hover:scale-102 transition-transform duration-300 drop-shadow-md">
+                                        {category?.name}
+                                    </h2>
+                                </div>
                             </Link>
                         );
                     })}
