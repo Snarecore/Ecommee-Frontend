@@ -76,6 +76,9 @@
         "reviews": "reviews"
     },
     "messageLinks": {
+        "sendMessageUrl": "message/send",
+        "myConversationUrl": "message/my-conversation",
+        "threadUrl": "message/thread",
         "conversationUrl": "message/conversations",
         "converstionThreadUrl": "message/thread"
     },

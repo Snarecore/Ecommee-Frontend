@@ -11,7 +11,19 @@ import { Provider as JotaiProvider } from "jotai";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "");
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 0, // Always consider query data stale so fresh data is fetched on navigation
+            refetchOnWindowFocus: true, // Auto refetch when user focuses back on the tab
+            refetchOnMount: true, // Auto refetch when component mounts
+            refetchOnReconnect: true,
+          },
+        },
+      })
+  );
 
   return (
     <JotaiProvider>

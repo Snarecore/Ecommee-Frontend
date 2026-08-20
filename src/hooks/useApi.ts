@@ -1,6 +1,7 @@
 import { useMutation, UseMutationResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteData, getData, patchData, postData, postFormData, patchFormData } from "../services/api-service";
 import { showErrorToast, showSuccessToast } from "../utils/toast-utils";
+import { getCookie } from "../utils/cookie-utils";
 
 interface ApiResponse<T> {
     data: T;
@@ -84,29 +85,35 @@ const handleErrorMessage = (error: unknown) => {
     }
 };
 
+export const getUserToken = (): string => {
+    if (typeof window === 'undefined') return '';
+    try {
+        const stored = sessionStorage.getItem("user") || getCookie("user") || localStorage.getItem("user");
+        if (stored) {
+            const user = typeof stored === 'string' ? JSON.parse(stored) : stored;
+            return user?.token || '';
+        }
+    } catch {}
+    return '';
+};
+
 export const useAPI = () => {
-    const user = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem("user") || "{}") : {};
-    const token = user?.token || '';
     const queryClient = useQueryClient();
 
     const getMutation = useMutation({
-        mutationFn: ({ url }: MutationProps) => getData({ url, token })
+        mutationFn: ({ url }: MutationProps) => getData({ url, token: getUserToken() })
     });
 
     const deleteMutation = useMutation({
-        mutationFn: ({ url }: MutationProps) => deleteData({ url, token })
+        mutationFn: ({ url }: MutationProps) => deleteData({ url, token: getUserToken() })
     });
 
-    // const postMutation = useMutation({
-    //     mutationFn: ({ url, body }: MutationProps) => postData({ url, body: (body as Record<string, unknown>), token })
-    // });
-
     const postMutation = useMutation<unknown, ErrorResponse, { url: string; body: Record<string, unknown> }>({
-        mutationFn: ({ url, body }) => postData({ url, body, token })
+        mutationFn: ({ url, body }) => postData({ url, body, token: getUserToken() })
     });
 
     const patchMutation = useMutation({
-        mutationFn: ({ url, body }: MutationProps) => patchData({ url, body: (body as Record<string, unknown>), token })
+        mutationFn: ({ url, body }: MutationProps) => patchData({ url, body: (body as Record<string, unknown>), token: getUserToken() })
     });
 
     const postFormMutation = useMutation({
@@ -124,7 +131,7 @@ export const useAPI = () => {
                     formData.append(key, value as any);
                 }
             } 
-            return postFormData({ url, token, body: formData })
+            return postFormData({ url, token: getUserToken(), body: formData })
         }
     });
 
@@ -143,14 +150,14 @@ export const useAPI = () => {
                     formData.append(key, value as any);
                 }
             }
-            return patchFormData({ url, token, body: formData }); 
+            return patchFormData({ url, token: getUserToken(), body: formData }); 
         }
     });
 
     const fetchData = async ({ apiUrl }: FetchDataProps) => {
         try {
             const response = await getMutation.mutateAsync({ url: apiUrl }) as ApiResponse<any>;
-            return response.data;
+            return response?.data;
         } catch (e: any) {
             showErrorToast(e?.response?.data?.message || e?.data?.message || e?.message);
         }
@@ -160,8 +167,8 @@ export const useAPI = () => {
         queryKey,
         url,
         enabled = true,
-        refetchOnWindowFocus = false,
-        refetchOnMount = false,
+        refetchOnWindowFocus = true,
+        refetchOnMount = true,
         refetchInterval,
         showToast = true,
         staleTime = 0
@@ -174,7 +181,7 @@ export const useAPI = () => {
             ...queryProps
         } = useQuery<PaginateApiResponse<T> | ErrorResponse, Error, PaginateApiResponse<T>>({
             queryKey,
-            queryFn: () => getData({ url, token }),
+            queryFn: () => getData({ url, token: getUserToken() }),
             refetchOnWindowFocus,
             refetchOnMount,
             staleTime,
@@ -236,8 +243,12 @@ export const useAPI = () => {
                 const response = await mutation.mutateAsync({ url, body }) as ApiResponse<T>;
                 if (isSuccessfulResponse(response)) {
                     if (showSuccessMessage) showSuccessToast(response?.message);
-                    if (invalidateQueryKey) {
-                        await queryClient.invalidateQueries({ queryKey: invalidateQueryKey });
+                    if (invalidateQueryKey && invalidateQueryKey.length > 0) {
+                        await queryClient.invalidateQueries({
+                            queryKey: invalidateQueryKey,
+                            exact: false,
+                            refetchType: 'all'
+                        });
                     }
                     return { success: true, data: response };
                 } else if (response?.message && showErrorMessage) {
@@ -261,8 +272,12 @@ export const useAPI = () => {
                 if (showSuccessMessage) {
                     showSuccessToast(response.message);
                 }
-                if (invalidateQueryKey) {
-                    await queryClient.invalidateQueries({ queryKey: invalidateQueryKey });
+                if (invalidateQueryKey && invalidateQueryKey.length > 0) {
+                    await queryClient.invalidateQueries({
+                        queryKey: invalidateQueryKey,
+                        exact: false,
+                        refetchType: 'all'
+                    });
                 }
                 return response;
             } else {

@@ -4,7 +4,17 @@ const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { error: boolean; message: string }> {
     try {
-        const response = await fetch(`${apiUrl}${url}`, options);
+        const response = await fetch(`${apiUrl}${url}`, {
+            ...options,
+            cache: "no-store",
+            headers: {
+                "Pragma": "no-cache",
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                ...options.headers,
+            },
+            // @ts-ignore
+            next: { revalidate: 0 }
+        });
 
         if (!response.ok) {
             console.error(`Error: ${response.status} - ${response.statusText}`);
@@ -22,7 +32,7 @@ export async function getData<T>({ url, token }: GetDataProps): Promise<T | { er
     const headers: HeadersInit = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    return apiRequest<T>(url, { headers, method: "GET", cache: "no-cache" });
+    return apiRequest<T>(url, { headers, method: "GET" });
 }
 
 export async function postData<T>({ url, token, body }: PostDataProps): Promise<T | { error: boolean; message: string }> {
