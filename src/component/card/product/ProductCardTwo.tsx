@@ -20,7 +20,7 @@ interface Props {
 const ProductCardTwo: React.FC<Props> = ({ product }) => {
     const { name, mainCategoryName, price, featuredImage, rating, discountType, discountAmount } = product;
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-    const { addToCart } = useCart();
+    const { addToCart, isInCart } = useCart();
     const navigate = useNavigate();
     const [modalOpen, setModalOpen] = useState(false);
     const [actionType, setActionType] = useState<"addToCart" | "buyNow">("addToCart");
@@ -65,6 +65,10 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     const openModal = (e: React.MouseEvent, type: "addToCart" | "buyNow") => {
         e.preventDefault();
         e.stopPropagation();
+        if (type === "buyNow" && isInCart(product)) {
+            navigate("/cart");
+            return;
+        }
         setActionType(type);
         setModalOpen(true);
     };

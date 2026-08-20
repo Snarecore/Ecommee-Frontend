@@ -17,7 +17,7 @@ interface Props {
 const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
     const { name, mainCategoryName, price, featuredImage, rating, discountType, discountAmount } = product;
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-    const { addToCart } = useCart();
+    const { addToCart, isInCart } = useCart();
     const navigate = useNavigate();
 
     const renderStars = (rating: any) => {
@@ -115,8 +115,12 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            addToCart(product);
-                            navigate('/cart');
+                            if (isInCart(product)) {
+                                navigate('/cart');
+                            } else {
+                                addToCart(product);
+                                navigate('/cart');
+                            }
                         }}
                     >
                         Buy Now

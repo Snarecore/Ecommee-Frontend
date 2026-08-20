@@ -33,7 +33,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
         removeFromWishlist,
     } = useWishlist();
 
-    const { addToCart } = useCart();
+    const { addToCart, isInCart } = useCart();
     const navigate = useNavigate();
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -63,6 +63,11 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
     ) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (type === "buyNow" && isInCart(product)) {
+            navigate("/cart");
+            return;
+        }
 
         setActionType(type);
         setModalOpen(true);

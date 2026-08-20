@@ -74,7 +74,7 @@ const Product = () => {
     const { fetchData, postMutation, handleApiMutation, usePaginatedQuery } = useAPI();
     const apiUrl = apiConfig.vendor.vendorMessageUrl;
     const ratingApiUrl = apiConfig.site.productRatingUrl;
-    const { addToCart } = useCart();
+    const { addToCart, isInCart } = useCart();
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const navigate = useNavigate();
     const [product, setProduct] = useState<ProductItem | null>(null);
@@ -484,8 +484,12 @@ const Product = () => {
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        handleAddToCart();
-                                        navigate('/cart');
+                                        if (product && isInCart(product)) {
+                                            navigate('/cart');
+                                        } else {
+                                            handleAddToCart();
+                                            navigate('/cart');
+                                        }
                                     }}
                                 >
                                     Buy Now
