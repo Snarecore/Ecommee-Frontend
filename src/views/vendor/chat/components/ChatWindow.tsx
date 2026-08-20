@@ -159,12 +159,22 @@ const ChatWindow = ({ selectedUser }: { selectedUser: SelectedUser }) => {
                                 )}
 
                                 <div className="flex flex-col">
-                                    <div className={`px-4 py-2 rounded-2xl ${msg.isMe
-                                        ? 'bg-blue-500 text-white rounded-br-md'
-                                        : 'bg-white text-gray-900 rounded-bl-md border border-gray-200'
-                                        }`}>
-                                        <p className="text-sm whitespace-pre-line">{msg.content}</p>
-                                    </div>
+                                    {/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?.*)?$/i.test(msg.content?.trim()) ? (
+                                        <a href={msg.content} target="_blank" rel="noopener noreferrer">
+                                            <img
+                                                src={msg.content}
+                                                alt="Shared image"
+                                                className="max-w-[220px] max-h-[200px] rounded-2xl object-cover cursor-pointer hover:opacity-90 transition-opacity border border-gray-200"
+                                            />
+                                        </a>
+                                    ) : (
+                                        <div className={`px-4 py-2 rounded-2xl ${msg.isMe
+                                            ? 'bg-blue-500 text-white rounded-br-md'
+                                            : 'bg-white text-gray-900 rounded-bl-md border border-gray-200'
+                                            }`}>
+                                            <p className="text-sm whitespace-pre-line">{msg.content}</p>
+                                        </div>
+                                    )}
                                     <div className={`flex items-center mt-1 space-x-1 ${msg.isMe ? 'justify-end' : 'justify-start ml-1'}`}>
                                         <span className="text-xs text-gray-500">{formatDate(msg.createdAt)}</span>
                                         {msg.isMe && <span className="text-xs text-gray-500">You</span>}

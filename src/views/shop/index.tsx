@@ -14,7 +14,7 @@ import { Product } from "../../interface/product.interface";
 import { FaSlidersH } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { Helmet } from "react-helmet-async";
-import ProductCategoryCardTwo from "../product/component/ProductCategoryCard";
+import ProductCardOne from "../../component/card/product/ProductCardOne";
 
 export interface ShopPageCmsData {
     id: string;
@@ -162,7 +162,7 @@ const Shop = () => {
                                     <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 px-4`}>
                                         {dataList.map((product) => (
                                             <div key={product.id} className="w-full">
-                                                <ProductCategoryCardTwo product={product} />
+                                                <ProductCardOne product={product} />
                                             </div>
                                         ))}
                                     </div>

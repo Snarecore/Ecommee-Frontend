@@ -85,12 +85,12 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     return (
         <>
             <div className="group rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden w-full h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
-                <figure className="relative h-[300px] w-full overflow-hidden bg-neutral-50">
-                    <Link href={`/product/${product.slug}`} className="block w-full h-full">
+                <figure className="relative h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
+                    <Link href={`/product/${product.slug}`} className="block w-full h-full rounded-t-2xl">
                         <Image
                             src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
                             alt={name}
-                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 ${secondImage ? "opacity-100 group-hover:opacity-0" : ""}`}
+                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-2xl ${secondImage ? "opacity-100 group-hover:opacity-0" : ""}`}
                             width={500}
                             height={500}
                         />
@@ -98,7 +98,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                             <Image
                                 src={secondImage}
                                 alt={`${name} hover`}
-                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105"
+                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-2xl"
                                 width={500}
                                 height={500}
                             />

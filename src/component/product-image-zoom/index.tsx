@@ -12,30 +12,30 @@ const ProductImageZoom: React.FC<ProductImageZoomProps> = ({
 	imageSrc,
 	imageAlt = "",
 	containerClassName = "",
-	// zoomScale = 0
+	zoomScale = 1.8
 }) => {
 	const imageContainerRef = useRef<HTMLDivElement>(null);
-	// @ts-ignore
-	const [imageTransform, setImageTransform] = useState("translate(0px, 0px) scale(1)");
+	const [imageTransformOrigin, setImageTransformOrigin] = useState("center center");
 	const [isZoomed, setIsZoomed] = useState(false);
 	
-	// @ts-ignore
+	const scaleValue = zoomScale > 0 ? zoomScale : 1.8;
+
 	const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		// const rect = imageContainerRef.current?.getBoundingClientRect();
-		// if (!rect) return;
+		const rect = imageContainerRef.current?.getBoundingClientRect();
+		if (!rect) return;
 
-		// const x = event.clientX - rect.left;
-		// const y = event.clientY - rect.top;
+		const x = event.clientX - rect.left;
+		const y = event.clientY - rect.top;
 
-		// const offsetX = ((x / rect.width) * 100).toFixed(2);
-		// const offsetY = ((y / rect.height) * 100).toFixed(2);
+		const xPercent = (x / rect.width) * 100;
+		const yPercent = (y / rect.height) * 100;
 
-		// setImageTransform(`translate(-${offsetX}%, -${offsetY}%) scale(${zoomScale})`);
+		setImageTransformOrigin(`${xPercent}% ${yPercent}%`);
 	};
 
 	const resetZoom = () => {
-		// setIsZoomed(false);
-		// setImageTransform("translate(0px, 0px) scale(1)");
+		setIsZoomed(false);
+		setImageTransformOrigin("center center");
 	};
 
 	return (
@@ -44,10 +44,20 @@ const ProductImageZoom: React.FC<ProductImageZoomProps> = ({
 			onMouseEnter={() => setIsZoomed(true)}
 			onMouseLeave={resetZoom}
 			onMouseMove={handleMouseMove}
-			className={`relative overflow-hidden w-full h-full ${containerClassName}`}
-			// style={{ cursor: "zoom-in" }}
+			className={`relative overflow-hidden ${containerClassName}`}
+			style={{ cursor: "zoom-in" }}
 		>
-			<Image src={imageSrc || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={imageAlt} className="transition-transform duration-200 ease-out object-cover w-full h-full" width={500} height={500} style={{ transformOrigin: "top left", transform: isZoomed ? imageTransform : "scale(1)" }} />
+			<Image 
+				src={imageSrc || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} 
+				alt={imageAlt} 
+				className="transition-transform duration-100 ease-out object-cover w-full h-full" 
+				width={800} 
+				height={800} 
+				style={{ 
+					transformOrigin: imageTransformOrigin, 
+					transform: isZoomed ? `scale(${scaleValue})` : "scale(1)" 
+				}} 
+			/>
 		</div>
 	);
 };

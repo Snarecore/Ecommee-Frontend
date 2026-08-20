@@ -320,13 +320,13 @@ const Product = () => {
 
                 <div className="flex flex-col space-y-8">
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-6 lg:gap-12">
-                        <div className="w-full lg:w-1/2">
+                        <div className="w-full lg:w-[40%]">
                             <div className="mb-4 relative">
                                 <ProductImageZoom
                                     imageSrc={(selectedImage || product?.featuredImage) ?? ''}
                                     imageAlt={product?.name}
-                                    containerClassName="rounded-lg shadow-md w-full"
-                                    zoomScale={0}
+                                    containerClassName="rounded-lg shadow-md w-full h-[400px] sm:h-[500px] lg:h-[600px]"
+                                    zoomScale={1.8}
                                 />
                                 <button
                                     onClick={handlePrevImage}
@@ -361,7 +361,7 @@ const Product = () => {
                                 ))}
                             </div>
                         </div>
-                        <div className="w-full lg:w-1/2 text-left sm:text-left">
+                        <div className="w-full lg:w-[56%] text-left sm:text-left">
                             <p className="text-[var(--color-black-primary)]">{product?.mainCategoryName}</p>
                             <p className="text-2xl sm:text-3xl font-bold text-[var(--color-black-primary)] mb-4">{product?.name}</p>
                             <div className="flex items-center gap-8 mb-4">
@@ -516,92 +516,6 @@ const Product = () => {
                                         ))}
                                 </ul>
 
-                            </div>
-
-                            <div>
-                                <div
-                                    onClick={() => setIsModalOpen(true)}
-                                    className="flex items-center gap-2 cursor-pointer">
-                                    <FaRegMessage className="text-[var(--color-black-primary)]" />
-                                    <p className="text-xl font-bold flex items-center gap-2 text-[var(--color-black-primary)] hover:border-b transition-all ease-in-out duration-300">
-                                        Meet your Seller
-                                    </p>
-                                    <IoIosArrowDown className="text-[var(--color-black-primary)]" />
-                                </div>
-
-                                {isModalOpen && (
-                                    <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-[#000000b6] z-50 p-2">
-                                        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
-                                            <button
-                                                onClick={() => {
-                                                    setIsModalOpen(false);
-                                                    setShowMessageForm(false);
-                                                }}
-                                                className="absolute top-2 right-2 text-2xl text-[var(--color-black-primary)] cursor-pointer">
-                                                <RxCross2 />
-                                            </button>
-
-                                            <p className="text-xl font-bold mb-4 text-[var(--color-black-primary)] border-b">
-                                                Seller Information
-                                            </p>
-
-                                            <div className="flex flex-col items-center gap-2">
-
-                                                <Image src={product?.vendor?.profile?.shopImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Seller" className="w-24 h-24 rounded-full object-cover" width={96} height={96} />
-
-                                                <p className="text-lg font-semibold text-[var(--color-black-primary)]">
-                                                    {product?.vendor?.profile?.shopName || 'Shop Name Not Available'}
-                                                </p>
-
-                                                <button
-                                                    onClick={() => setShowMessageForm(true)}
-                                                    className="bg-[var(--color-green-primary)] mt-2 text-white px-4 py-2 rounded-full cursor-pointer">
-                                                    Send a Message
-                                                </button>
-
-                                                {showMessageForm && (
-                                                    <form className="w-full mt-4 flex flex-col gap-3" onSubmit={(e) => {
-                                                        e.preventDefault();
-                                                        handleSubmitForm();
-                                                    }}>
-                                                        <input
-                                                            type="text"
-                                                            name="name"
-                                                            value={fieldValues.name}
-                                                            onChange={handleChange}
-                                                            placeholder="Your Name"
-                                                            className="border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-green-primary)]"
-
-                                                        />
-                                                        <input
-                                                            type="email"
-                                                            name="email"
-                                                            value={fieldValues.email}
-                                                            onChange={handleChange}
-                                                            placeholder="Your Email"
-                                                            className="border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-green-primary)]"
-
-                                                        />
-                                                        <textarea
-                                                            rows={4}
-                                                            name="message"
-                                                            value={fieldValues.message}
-                                                            onChange={handleChange}
-                                                            placeholder="Your Message"
-                                                            className="border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-green-primary)] resize-none"
-
-                                                        />
-                                                        <button
-                                                            type="submit"
-                                                            className="text-[var(--color-green-primary)] font-semibold border border-[var(--color-green-primary)] py-2 rounded-full mt-1 transition cursor-pointer">
-                                                            Send
-                                                        </button>
-                                                    </form>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
 

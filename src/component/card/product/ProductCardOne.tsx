@@ -87,10 +87,10 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
             <div className="group rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:shadow-xl hover:shadow-neutral-100 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[460px]">
 
                 {/* Product Image */}
-                <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50">
+                <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
                     <Link
                         href={`/product/${product.slug}`}
-                        className="block w-full h-full"
+                        className="block w-full h-full rounded-t-2xl"
                     >
                         <Image
                             src={
@@ -98,7 +98,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                                 "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                             }
                             alt={name}
-                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 ${
+                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-2xl ${
                                 secondImage
                                     ? "opacity-100 group-hover:opacity-0"
                                     : ""
@@ -111,7 +111,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                             <Image
                                 src={secondImage}
                                 alt={`${name} hover`}
-                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105"
+                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-2xl"
                                 width={500}
                                 height={500}
                             />
