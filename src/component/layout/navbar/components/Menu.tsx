@@ -41,6 +41,11 @@ const Menu = () => {
   >([]);
   const [headerFooterData] = useAtom(headerFooterAtom);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
@@ -238,9 +243,9 @@ const Menu = () => {
           >
             <FaRegUser className="text-xl" />
             <div className="flex gap-1 items-center">
-              {user?.role === "customer" ||
+              {isMounted && (user?.role === "customer" ||
                 user?.role === "vendor" ||
-                user?.role === "admin" ? (
+                user?.role === "admin") ? (
                 <>
                   <span className="font-medium text-sm text-[var(--color-green-primary)] flex items-center">
                     {user.name}

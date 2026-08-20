@@ -1,11 +1,14 @@
 import Image from "next/image";
-import { FaStar, FaStarHalfAlt, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
-import useWishlist from '../../../hooks/useWishlist';
-import Link from "next/link";;
-import { Product } from '../../../interface/product.interface';
-import useCart from '../../../hooks/useCart';
-import { useNavigate } from 'react-router-dom';
-import { finalPrice } from '../../../utils/product-utils';
+import { useState } from "react";
+import { FaHeart } from "react-icons/fa";
+import { FiHeart, FiShoppingCart, FiArrowRight } from "react-icons/fi";
+import useWishlist from "../../../hooks/useWishlist";
+import Link from "next/link";
+import { Product } from "../../../interface/product.interface";
+import useCart from "../../../hooks/useCart";
+import { useNavigate } from "react-router-dom";
+import { finalPrice } from "../../../utils/product-utils";
+import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
 
 interface Props {
     product: Product;
@@ -15,116 +18,202 @@ interface Props {
 }
 
 const ProductCardOne: React.FC<Props> = ({ product }) => {
-    const { name, mainCategoryName, price, featuredImage, rating, discountType, discountAmount } = product;
-    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+    const {
+        name,
+        mainCategoryName,
+        price,
+        featuredImage,
+        discountType,
+        discountAmount,
+    } = product;
+
+    const {
+        isInWishlist,
+        addToWishlist,
+        removeFromWishlist,
+    } = useWishlist();
+
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
-    const renderStars = (rating: any) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
-
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<FaStar key={`star-${i}`} className="text-yellow-400" />);
-        }
-
-        if (hasHalfStar) {
-            stars.push(<FaStarHalfAlt key="half-star" className="text-yellow-400" />);
-        }
-
-        const emptyStars = 5 - Math.ceil(rating);
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<FaRegStar key={`empty-${i}`} className="text-yellow-400" />);
-        }
-
-        return stars;
-    };
+    const [modalOpen, setModalOpen] = useState(false);
+    const [actionType, setActionType] = useState<"addToCart" | "buyNow">(
+        "addToCart"
+    );
 
     const calculatedPrice = finalPrice({
         price: Number(price) || 0,
         discountType: discountType,
-        discountAmount: discountAmount ?? 0
+        discountAmount: discountAmount ?? 0,
     });
 
     const original = Number(price) || 0;
     const hasDiscount = calculatedPrice < original;
 
+    const secondImage =
+        product.productImages && product.productImages.length > 0
+            ? product.productImages[0].imageUrl !== featuredImage
+                ? product.productImages[0].imageUrl
+                : product.productImages[1]?.imageUrl
+            : null;
+
+    const openModal = (
+        e: React.MouseEvent,
+        type: "addToCart" | "buyNow"
+    ) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        setActionType(type);
+        setModalOpen(true);
+    };
+
+    const handleModalConfirm = (p: Product) => {
+        if (actionType === "addToCart") {
+            addToCart(p);
+        } else {
+            addToCart(p);
+            navigate("/cart");
+        }
+    };
+
     return (
-        <div className="rounded-3xl border border-gray-300 transition-shadow duration-300 overflow-hidden w-full h-[460px] bg-white flex flex-col">
-            <figure className="relative h-[250px] w-full overflow-hidden group">
-                <Link href={`/product/${product.slug}`}>
-                    <Image src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={name} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" width={500} height={500} />
-                </Link>
-                <button className="absolute top-3 right-3 text-lg text-[var(--color-icon)] bg-[var(--color-white-primary)] backdrop-blur-sm rounded-full shadow-sm p-2.5 transition-all duration-300 cursor-pointer"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (isInWishlist(product)) {
-                            removeFromWishlist(product);
-                        } else {
-                            addToWishlist(product);
-                        }
-                    }}
-                >
-                    {isInWishlist(product) ? <FaHeart /> : <FaRegHeart />}
-                </button>
-            </figure>
-            <div className="flex-1 p-5 bg-gray-50 flex flex-col">
-                <div className='h-38'>
-                    <h2 className="text-lg font-semibold mb-2 line-clamp-2 text-[var(--color-green-primary)]">
+        <>
+            <div className="group rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:shadow-xl hover:shadow-neutral-100 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[460px]">
+
+                {/* Product Image */}
+                <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50">
+                    <Link
+                        href={`/product/${product.slug}`}
+                        className="block w-full h-full"
+                    >
+                        <Image
+                            src={
+                                featuredImage ||
+                                "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                            }
+                            alt={name}
+                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 ${
+                                secondImage
+                                    ? "opacity-100 group-hover:opacity-0"
+                                    : ""
+                            }`}
+                            width={500}
+                            height={500}
+                        />
+
+                        {secondImage && (
+                            <Image
+                                src={secondImage}
+                                alt={`${name} hover`}
+                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105"
+                                width={500}
+                                height={500}
+                            />
+                        )}
+                    </Link>
+
+                    {/* Discount Badge */}
+                    {hasDiscount && (
+                        <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
+                            {discountType === "PERCENT"
+                                ? `${discountAmount}% OFF`
+                                : `-$${discountAmount}`}
+                        </div>
+                    )}
+
+                    {/* Wishlist */}
+                    <button
+                        className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 backdrop-blur-sm text-neutral-600 shadow-sm transition-all duration-300 hover:bg-white hover:text-red-500 hover:scale-110 cursor-pointer"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            if (isInWishlist(product)) {
+                                removeFromWishlist(product);
+                            } else {
+                                addToWishlist(product);
+                            }
+                        }}
+                    >
+                        {isInWishlist(product) ? (
+                            <FaHeart className="text-red-500 fill-current" />
+                        ) : (
+                            <FiHeart
+                                className="text-neutral-700"
+                                size={16}
+                            />
+                        )}
+                    </button>
+                </figure>
+
+                {/* Product Information */}
+                <div className="flex-1 p-4 bg-white flex flex-col">
+
+                    {/* Category */}
+                    <div className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
+                        {mainCategoryName || "Clothing"}
+                    </div>
+
+                    {/* Product Name */}
+                    <h2 className="text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 mb-1 leading-snug">
                         <Link href={`/product/${product.slug}`}>
                             {name}
                         </Link>
                     </h2>
-                    <div className="text-sm text-[var(--color-green-primary)] line-clamp-2 mb-2">
-                        {mainCategoryName}
-                    </div>
-                    <p className="mb-3 text-base font-medium text-gray-700">
+
+                    {/* Price */}
+                    <div className="flex items-baseline gap-2 mb-1">
                         {hasDiscount ? (
                             <>
-                                <span className="mr-2 line-through text-gray-400">
-                                    ${original.toFixed(2)}
-                                </span>
-                                <span className="text-[var(--color-green-primary)] text-lg font-bold">
+                                <span className="text-base font-bold text-neutral-900">
                                     ${calculatedPrice.toFixed(2)}
+                                </span>
+
+                                <span className="text-xs text-neutral-400 line-through">
+                                    ${original.toFixed(2)}
                                 </span>
                             </>
                         ) : (
-                            <span className="text-[var(--color-green-primary)] text-lg font-bold">
+                            <span className="text-base font-bold text-neutral-900">
                                 ${original.toFixed(2)}
                             </span>
                         )}
-                    </p>
-                    <div className="flex items-center gap-1 mb-4">
-                        {renderStars(rating)}
-                        <span className="text-sm text-[var(--color-green-primary)] ml-1">({rating})</span>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-1 pt-2 border-t border-neutral-100 flex items-center gap-2">
+
+                        {/* Add to Cart */}
+                        <button
+                            className="w-1/2 py-2 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                            onClick={(e) => openModal(e, "addToCart")}
+                        >
+                            <FiShoppingCart className="w-3.5 h-3.5" />
+                            Add
+                        </button>
+
+                        {/* Buy Now */}
+                        <button
+                            className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
+                            onClick={(e) => openModal(e, "buyNow")}
+                        >
+                            Buy Now
+                            <FiArrowRight className="w-3.5 h-3.5" />
+                        </button>
                     </div>
                 </div>
-                <div className="pt-8 border-gray-200 flex flex-wrap lg:flex-nowrap items-center gap-4">
-                    <button className="w-full px-4 py-2 border border-[var(--color-green-primary)] bg-[var(--color-white-primary)] text-[var(--color-green-primary)] text-sm font-medium rounded-full cursor-pointer flex items-center justify-center gap-2 shadow-sm"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            addToCart(product);
-                        }}
-                    >
-                        Add to Cart
-                    </button>
-
-                    <button className="w-full px-4 py-2 text-[var(--color-white-primary)] bg-[var(--color-green-primary)] text-sm font-medium rounded-full cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            addToCart(product);
-                            navigate('/cart');
-                        }}
-                    >
-                        Buy Now
-                    </button>
-                </div>
             </div>
-        </div>
+
+            {/* Size Picker Modal */}
+            <ProductSizePickerModal
+                isOpen={modalOpen}
+                product={product}
+                actionType={actionType}
+                onClose={() => setModalOpen(false)}
+                onConfirm={handleModalConfirm}
+            />
+        </>
     );
 };
 

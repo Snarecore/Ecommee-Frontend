@@ -63,6 +63,8 @@ export interface ProductItem extends ProductInterface {
         metaDescription: string;
         metaKeywords: string;
     };
+    sizes?: string[];
+    sizesString?: string;
 }
 
 const Product = () => {
@@ -95,6 +97,7 @@ const Product = () => {
     const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
 
     const [quantity, setQuantity] = useState(1);
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -353,7 +356,7 @@ const Product = () => {
                                         onClick={() => handleImageClick(image.imageUrl)}
                                         className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border-2 transition cursor-pointer ${selectedImage === image.imageUrl ? "border-[var(--color-green-primary)]" : "border-gray-300"}`}
                                     >
-                                        <Image src={image.imageUrl || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={`${product.name} className="w-full h-full object-cover" width={500} height={500} - ${index + 1}`} />
+                                        <Image src={image.imageUrl || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" width={500} height={500} />
                                     </button>
                                 ))}
                             </div>
@@ -362,7 +365,7 @@ const Product = () => {
                             <p className="text-[var(--color-black-primary)]">{product?.mainCategoryName}</p>
                             <p className="text-2xl sm:text-3xl font-bold text-[var(--color-black-primary)] mb-4">{product?.name}</p>
                             <div className="flex items-center gap-8 mb-4">
-                                <p className="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
                                     <div className="flex justify-center text-yellow-500">
                                         {[...Array(5)].map((_, idx) => {
                                             const starValue = idx + 1;
@@ -383,7 +386,7 @@ const Product = () => {
                                     </div>
 
                                     <span className="text-[var(--color-black-primary)]">({product?.productReview?.reviewCount})</span>
-                                </p>
+                                </div>
                                 <button onClick={() => {
                                     if (!user) {
                                         setShowLoginRequiredModal(true);
@@ -396,18 +399,59 @@ const Product = () => {
                                 {hasDiscount ? (
                                     <>
                                         <span className="mr-2 line-through text-gray-400">
-                                            ${original.toFixed(2)}
+                                            {original.toFixed(2)}
                                         </span>
                                         <span className="text-[var(--color-green-primary)] text-lg font-bold">
-                                            ${calculatedPrice.toFixed(2)}
+                                            {calculatedPrice.toFixed(2)}
                                         </span>
                                     </>
                                 ) : (
                                     <span className="text-[var(--color-green-primary)] text-lg font-bold">
-                                        ${original.toFixed(2)}
+                                        {original.toFixed(2)}
                                     </span>
                                 )}
                             </p>
+
+                            {/* Size Selector */}
+                            <div className="mb-6">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-bold text-[var(--color-black-primary)] uppercase tracking-wider">
+                                        Size
+                                    </span>
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {["S", "M", "L", "XL", "XXL"].map((size) => {
+                                        const availableSizes = product?.sizes ? product.sizes : (product?.sizesString ? product.sizesString.split(",") : []);
+                                        const isAvailable = availableSizes.includes(size);
+                                        const isSelected = selectedSize === size;
+                                        return (
+                                            <button
+                                                key={size}
+                                                disabled={!isAvailable}
+                                                onClick={() => setSelectedSize(size)}
+                                                className={`relative w-12 h-12 flex items-center justify-center rounded-full border text-sm font-bold transition-all duration-200
+                                                    ${isAvailable
+                                                        ? isSelected
+                                                            ? "border-black bg-black text-white shadow-sm scale-105"
+                                                            : "border-gray-300 bg-white text-gray-950 hover:border-black cursor-pointer"
+                                                        : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                                    }`}
+                                            >
+                                                <span className={!isAvailable ? "line-through opacity-40" : ""}>
+                                                    {size}
+                                                </span>
+                                                {/* Diagonal strike-through line for unavailable sizes */}
+                                                {!isAvailable && (
+                                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                        <div className="w-full h-[1px] bg-gray-400 rotate-45"></div>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
                             <div className="mb-4">
                                 <p className="font-bold mb-2 text-[var(--color-black-primary)]">Quantity:</p>
                                 <div className="flex items-center border border-[var(--color-black-secondary)] w-max overflow-hidden">
