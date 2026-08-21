@@ -5,7 +5,7 @@ import { formatDate } from "../../../utils/date-utils";
 
 const InvoiceView = () => {
 	const location = useLocation();
-	const order = location.state?.orderData;
+	const order = (location.state as any)?.orderData;
 
 	if (!order) {
 		return (
@@ -18,15 +18,32 @@ const InvoiceView = () => {
 	const orderItems = order.orderSummaries || [];
 
 
+	const customerName = order.shippingAddress?.name || order.name || order.user?.name || "N/A";
+	const customerPhone = order.shippingAddress?.phone || order.phone || order.user?.phone || "N/A";
+	const customerEmail = order.user?.email || "N/A";
+	const deliveryAddress = [
+		order.shippingAddress?.address || order.address,
+		order.shippingAddress?.city
+	].filter(Boolean).join(", ") || "N/A";
+
 	return (
-		<div className="flex flex-col gap-8">
-			<div className="flex items-center justify-between flex-wrap">
+		<div className="flex flex-col gap-8 print-container">
+			<style>{`
+				@media print {
+					body { background: white !important; color: black !important; }
+					.no-print { display: none !important; }
+					.print-container { padding: 0 !important; margin: 0 !important; }
+					.print-border { border: 1px solid #e5e7eb !important; }
+				}
+			`}</style>
+
+			<div className="flex items-center justify-between flex-wrap no-print">
 				<PageHeader
 					headerTitle="Invoice"
 					headerDescription="View invoice details"
 				/>
 			</div>
-			<div className="grid grid-cols-12 gap-12 bg-white p-4 rounded-md border border-gray-300">
+			<div className="grid grid-cols-12 gap-12 bg-white p-6 rounded-md border border-gray-300 print-border">
 				<div className="col-span-12 xl:col-span-12">
 					<div className="grid grid-cols-2 pb-4 border-b border-gray-300">
 						<div>
@@ -34,42 +51,36 @@ const InvoiceView = () => {
 								Invoice
 							</p>
 						</div>
-						{/* <div className="text-right">
-							<p className="text-[#7A8086] text-xl font-bold">
-								Order ID: <span className="text-[#FE9F43] font-semibold">#{order.orderId}</span>
-							</p>
-							<p className="text-sm font-medium">
-								<span className="text-[#7A8086]">Created At:</span>{" "}
-								{new Date(order.createdAt).toLocaleDateString()}
-							</p>
-						</div> */}
 					</div>
-					<div className="grid grid-cols-3 mt-6">
-
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
 						<div>
-							<p className="text-xl font-semibold mb-2">Customer</p>
-							<p className="font-bold text-lg">Name: {order.user.name}</p>
-							<p className="font-medium">Email: {order.user.email}</p>
-							<p className="font-medium">Phone: {order.user.phone}</p>
+							<p className="text-xl font-semibold mb-2 text-gray-800">Customer & Delivery Info</p>
+							<p className="font-bold text-lg text-gray-900">Name: {customerName}</p>
+							<p className="font-medium text-gray-600">Email: {customerEmail}</p>
+							<p className="font-medium text-gray-600">Phone: {customerPhone}</p>
+							<p className="font-medium text-gray-800 mt-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+								<span className="font-bold text-gray-900 block text-xs uppercase tracking-wider mb-1">Delivery Address:</span>
+								{deliveryAddress}
+							</p>
 						</div>
 
 						<div>
-							<p className="text-xl font-semibold mb-2">Order Info</p>
+							<p className="text-xl font-semibold mb-2 text-gray-800">Order Info</p>
 							<p className="font-bold text-lg">Order ID: <span className="text-[var(--color-primary)]">#{order.orderId}</span></p>
-							<p className="font-medium">Date: {formatDate(order.createdAt)}</p>
+							<p className="font-medium text-gray-600">Date: {formatDate(order.createdAt)}</p>
 						</div>
 
 						<div>
-							<p className="text-xl font-semibold mb-2">Status</p>
+							<p className="text-xl font-semibold mb-2 text-gray-800">Status</p>
 							<p className="font-medium flex items-center">
-								<span className="mr-2">Payment:</span>
-								<span className={`px-2 py-1 text-xs font-semibold rounded-full ${order.paymentStatus === "Paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+								<span className="mr-2 text-gray-600">Payment:</span>
+								<span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${order.paymentStatus === "Paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
 									{order.paymentStatus}
 								</span>
 							</p>
 							<p className="font-medium flex items-center mt-2">
-								<span className="mr-2">Order:</span>
-								<span className={`px-2 py-1 text-xs font-semibold rounded-full ${order.status === "Completed" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+								<span className="mr-2 text-gray-600">Order:</span>
+								<span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${order.status === "Completed" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
 									{order.status}
 								</span>
 							</p>

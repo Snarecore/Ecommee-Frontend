@@ -64,13 +64,7 @@ const Login = () => {
             sessionStorage.setItem("user", JSON.stringify(user));
             setUser(user);
             JSON.parse(sessionStorage.getItem("user") || "{}");
-            if (user.role === "vendor") {
-                navigate("/vendor-dashboard");
-            } else if (user.role === "customer") {
-                navigate(from);
-            } else {
-                navigate("/");
-            }
+            navigate(from);
         }
     };
 
@@ -173,21 +167,11 @@ const Login = () => {
                     </button>
 
                     <p className="text-center text-[15px] text-[#092C4C]">
-                        Don't have an account? <span className="text-[var(--color-green-primary)] font-semibold">Sign Up</span>
+                        Don't have an account?{" "}
+                        <Link href={"/signup"} className="text-[var(--color-green-primary)] font-semibold hover:underline">
+                            Sign Up
+                        </Link>
                     </p>
-                    <div className="flex items-center justify-center gap-4">
-                        <Link href={"/vendor-signup"}
-                            className="bg-white text-[var(--color-green-primary)] font-bold px-4 py-2 rounded-md border"
-                        >
-                            Vendor Registration
-                        </Link>
-
-                        <Link href={"/signup"}
-                            className="bg-[var(--color-green-secondary)] font-bold px-4 py-2 rounded-md"
-                        >
-                            Customer Registration
-                        </Link>
-                    </div>
                 </form>
             </div>
         </div>

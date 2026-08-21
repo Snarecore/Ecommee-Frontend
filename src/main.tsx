@@ -9,7 +9,12 @@ import './App.css';
 import AppInitializer from "./providers/AppInitializer";
 import { HelmetProvider } from 'react-helmet-async';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
+const stripeKey =
+	(typeof import.meta !== 'undefined' && import.meta.env?.VITE_STRIPE_PUBLIC_KEY) ||
+	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY ||
+	'pk_test_51RnvzXBVnYSmQrwaX27nyzY5fVkPDmiMTAOqA7qgI5KlyF4MN7y36bkb5ny0gadpnBYnvmGCUPiN4E4x4fIeySyL00xzqFL7TF';
+
+const stripePromise = loadStripe(stripeKey);
 
 const queryClient = new QueryClient();
 

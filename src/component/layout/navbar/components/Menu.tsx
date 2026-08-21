@@ -261,32 +261,13 @@ const Menu = () => {
                         : "opacity-0 pointer-events-none"
                       } transition-opacity duration-300 z-60 border border-gray-300 dark:border-gray-700 dark:text-gray-200`}
                   >
-                    {user.role === "customer" ? (
-                      <div>
-                        <Link
-                          href="/customer-dashboard"
-                          className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <FaUser />
-                          User Profile
-                        </Link>
-                      </div>
-                    ) : user.role === "vendor" ? (
-                      <Link
-                        href="/vendor-dashboard"
-                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        <FaUser />
-                        Vendor Profile
-                      </Link>
-                    ) : (
-                      <Link
-                        href=""
-                        className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        Admin
-                      </Link>
-                    )}
+                    <Link
+                      href="/customer-dashboard"
+                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <FaUser />
+                      User Profile
+                    </Link>
                     <button
                       //@ts-ignore
                       onClick={handleLogout}
@@ -319,30 +300,13 @@ const Menu = () => {
             <div className="absolute right-0 mt-2 bg-white rounded shadow p-2 z-60 border border-gray-300 w-fit">
               {user ? (
                 <>
-                  {user.role === "customer" ? (
-                    <Link
-                      href="/customer-dashboard"
-                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
-                    >
-                      <FaUser />
-                      User Profile
-                    </Link>
-                  ) : user.role === "vendor" ? (
-                    <Link
-                      href="/vendor-dashboard"
-                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
-                    >
-                      <FaUser />
-                      Vendor Profile
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/admin-dashboard"
-                      className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
+                  <Link
+                    href="/customer-dashboard"
+                    className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-gray-100"
+                  >
+                    <FaUser />
+                    User Profile
+                  </Link>
                   <button
                     //@ts-ignore
                     onClick={handleLogout}

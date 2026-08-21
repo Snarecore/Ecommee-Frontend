@@ -25,17 +25,10 @@ const Header = () => {
 
                     <div className="hidden sm:flex sm:flex-row pl-4 items-center justify-center md:justify-end gap-6 text-sm w-auto">
                         <Link
-                            href={"/vendor-signup"}
-                            className="transition-all duration-300 text-[var(--color-green-primary)] hover:text-[var(--color-green-primary)]/80 hover:underline"
-                        >
-                            Become a Seller!
-                        </Link>
-                        <span className="text-[var(--color-green-primary)]/50">|</span>
-                        <Link
                             href="/login" 
                             className="transition-all duration-300 text-[var(--color-green-primary)] hover:text-[var(--color-green-primary)]/80 hover:underline"
                         >
-                            Login to Sell
+                            Sign In / Register
                         </Link>
 
                         <p
