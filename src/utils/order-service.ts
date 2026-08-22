@@ -309,6 +309,18 @@ export const updateOrderStatusInService = (params: {
     localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(orders));
     window.dispatchEvent(new Event("orders_updated"));
     window.dispatchEvent(new Event("storage"));
+    
+    // Automatically trigger notification for order shipping status update
+    try {
+      const { addShippingNotification } = require("../services/notification-service");
+      addShippingNotification(
+        target.orderId || target.id,
+        params.newStatus,
+        params.note || `Order status updated to "${params.newStatus}"`
+      );
+    } catch (err) {
+      console.error("Error triggering notification:", err);
+    }
   }
 
   return target;

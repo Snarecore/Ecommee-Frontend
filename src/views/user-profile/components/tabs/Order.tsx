@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MdClose } from "react-icons/md";
 import { FiEye, FiDownload } from "react-icons/fi";
 import {
@@ -159,9 +159,50 @@ const OrderTab = () => {
     setSelectedOrder(order);
   };
 
+  const hasAutoOpenedRef = useRef(false);
+
   const handleCloseModal = () => {
     setSelectedOrder(null);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("orderId")) {
+        params.delete("orderId");
+        const newSearch = params.toString() ? `?${params.toString()}` : "";
+        window.history.replaceState({}, "", `${window.location.pathname}${newSearch}`);
+      }
+    }
   };
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      combinedOrdersList.length > 0 &&
+      !selectedOrder &&
+      !hasAutoOpenedRef.current
+    ) {
+      const params = new URLSearchParams(window.location.search);
+      const targetOrderId = params.get("orderId");
+      if (targetOrderId) {
+        const found = combinedOrdersList.find(
+          (o: any) =>
+            o.id === targetOrderId ||
+            (o.orderId && o.orderId.toLowerCase().includes(targetOrderId.toLowerCase())) ||
+            (o.rawOrderId && o.rawOrderId.toLowerCase() === targetOrderId.toLowerCase())
+        );
+        if (found) {
+          hasAutoOpenedRef.current = true;
+          setSelectedOrder(found);
+          setTimeout(() => {
+            const cardId = found.id || found.rawOrderId || targetOrderId;
+            const el = document.getElementById(`order-card-${cardId}`);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          }, 200);
+        }
+      }
+    }
+  }, [combinedOrdersList]);
 
   if (isFetching || isLoading) return <OrderListSkeleton />;
 
@@ -191,6 +232,7 @@ const OrderTab = () => {
               return (
                 <div
                   key={order.id}
+                  id={`order-card-${order.id || order.rawOrderId || order.orderId}`}
                   className="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 space-y-4"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -265,8 +307,14 @@ const OrderTab = () => {
 
       {/* Detailed Shipping Tracker & Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <div
+          onClick={handleCloseModal}
+          className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 p-4 backdrop-blur-xs cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl cursor-default"
+          >
             {/* Modal Header */}
             <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div>

@@ -24,6 +24,16 @@ const UserProfile = () => {
 		fetchUserData();
 	}, []);
 
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const params = new URLSearchParams(window.location.search);
+			const tabParam = params.get("tab");
+			if (tabParam && ["order", "profile", "changePassword"].includes(tabParam)) {
+				setActiveTab(tabParam as TabType);
+			}
+		}
+	}, []);
+
 	return (
 		<div className="py-12 px-4 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto flex flex-wrap">
 			<UserSidebar
