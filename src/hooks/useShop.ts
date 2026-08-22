@@ -11,9 +11,7 @@ const useShop = () => {
     const [_, setSearchParams] = useSearchParams();
 
     const determineCategoryKey = (category: CategorySelection): string => {
-		if (category.mainCategoryId && category.firstCategoryId && category.secondCategoryId) {
-			return "thirdCategoryId";
-		} else if (category.mainCategoryId && category.firstCategoryId) {
+		if (category.mainCategoryId && category.firstCategoryId) {
 			return "secondCategoryId";
 		} else if (category.mainCategoryId) {
 			return "firstCategoryId";

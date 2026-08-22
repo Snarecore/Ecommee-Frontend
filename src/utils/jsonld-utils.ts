@@ -17,7 +17,6 @@ export type MinimalProduct = {
     mainCategoryName?: string;
     firstCategoryName?: string;
     secondCategoryName?: string;
-    thirdCategoryName?: string;
   
     productReview?: {
       ratingAverage?: number;
@@ -41,7 +40,6 @@ export type MinimalProduct = {
       p.mainCategoryName,
       p.firstCategoryName,
       p.secondCategoryName,
-      p.thirdCategoryName,
     ].filter(Boolean) as string[];
     return names.length ? names.join(" > ") : "Digital Goods";
   };

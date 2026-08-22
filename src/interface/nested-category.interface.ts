@@ -1,14 +1,3 @@
-export interface ThirdCategory {
-    id: string;
-    name: string;
-    slug: string;
-    bannerImage: string;
-    status: boolean;
-    mainCategoryId: string;
-    firstCategoryId: string;
-    secondCategoryId: string;
-}
-
 export interface SecondCategory {
     id: string;
     name: string;
@@ -17,7 +6,6 @@ export interface SecondCategory {
     status: boolean;
     mainCategoryId: string;
     firstCategoryId: string;
-    thirdCategories: ThirdCategory[];
 }
 
 export interface FirstCategory {

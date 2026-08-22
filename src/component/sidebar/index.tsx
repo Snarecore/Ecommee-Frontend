@@ -635,11 +635,10 @@ import {
   MainCategory,
   FirstCategory,
   SecondCategory,
-  ThirdCategory,
 } from "../../interface/nested-category.interface";
 import useShop from "../../hooks/useShop";
 
-type CategoryLevel = MainCategory | FirstCategory | SecondCategory | ThirdCategory;
+type CategoryLevel = MainCategory | FirstCategory | SecondCategory;
 
 interface NestedMenuItemProps {
   item: CategoryLevel;
@@ -672,10 +671,8 @@ const Chevron = ({ className = "" }: { className?: string }) => (
 const getChildren = (category: any): CategoryLevel[] | undefined => {
   if (Array.isArray(category?.firstCategories)) return category.firstCategories;
   if (Array.isArray(category?.secondCategories)) return category.secondCategories;
-  if (Array.isArray(category?.thirdCategories)) return category.thirdCategories;
   if (Array.isArray(category?.first_categories)) return category.first_categories;
   if (Array.isArray(category?.second_categories)) return category.second_categories;
-  if (Array.isArray(category?.third_categories)) return category.third_categories;
   if (Array.isArray(category?.children)) return category.children;
   return undefined;
 };
@@ -685,10 +682,8 @@ const getChildrenKey = (category: any): string | null => {
   const keys = [
     "firstCategories",
     "secondCategories",
-    "thirdCategories",
     "first_categories",
     "second_categories",
-    "third_categories",
     "children",
   ];
   return keys.find((k) => Array.isArray(category?.[k])) ?? null;

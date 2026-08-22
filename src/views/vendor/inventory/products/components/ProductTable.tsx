@@ -26,7 +26,6 @@ interface ProductDataProps {
 	mainCategoryName: string;
 	firstCategoryName: string;
 	secondCategoryName: string;
-	thirdCategoryName: string;
 	price: number;
 	cost: number;
 	discount: number;

@@ -26,8 +26,6 @@ import Message from "./views/vendor/content-cms/messages";
 import VendorProfile from "./views/vendor/vendor-profile";
 import RoleProtectedRoute from "./providers/RoleProtectedRoute";
 import { Role } from "./enum/role.enum";
-import Blog from "./views/blog";
-import BlogDetails from "./views/blog-details";
 import Chat from "./views/vendor/chat";
 import SubscriptionPage from "./views/vendor/subcription";
 import SalesDashboard from "./views/vendor/sales-dashboard";
@@ -208,8 +206,6 @@ const AppRoutes = () => {
                     <Route path="/terms-conditions" element={<PolicyTen />} />
                     <Route path="/vendor-agreement" element={<PolicyEleven />} />
                     <Route path="/" element={<PolicyTwelve />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/blog/:slug" element={<BlogDetails />} />
                     <Route path="*" element={<ErrorPage />} />
                     <Route
                         path="/customer-dashboard"

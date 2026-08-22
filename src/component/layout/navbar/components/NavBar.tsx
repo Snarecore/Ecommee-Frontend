@@ -138,15 +138,6 @@ const NavBar = () => {
                                 <FiMail className="text-sm opacity-80" />
                                 <span>Contact</span>
                             </Link>
-
-                            {/* Static Blog Link */}
-                            <Link 
-                                href="/blog" 
-                                className="px-3.5 py-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/15 transition-all duration-200 text-[13px] font-bold uppercase tracking-wider flex items-center gap-1.5"
-                            >
-                                <FiBookOpen className="text-sm opacity-80" />
-                                <span>Blog</span>
-                            </Link>
                         </div>
 
                         {/* Right Section: Notifications + User Profile */}
@@ -291,14 +282,6 @@ const NavBar = () => {
                                     className="px-4 py-2 text-xs font-bold text-white uppercase hover:bg-white/15 rounded-lg flex items-center gap-2"
                                 >
                                     <FiMail /> Contact
-                                </Link>
-
-                                <Link
-                                    href="/blog"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-4 py-2 text-xs font-bold text-white uppercase hover:bg-white/15 rounded-lg flex items-center gap-2"
-                                >
-                                    <FiBookOpen /> Blog
                                 </Link>
                             </div>
                         </div>

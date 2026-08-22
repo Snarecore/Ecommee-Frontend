@@ -70,7 +70,6 @@ const menu = [
 					{ id: 1, name: "Main Category", path: "/main-category" },
 					{ id: 2, name: "First Category", path: "/first-category" },
 					{ id: 3, name: "Second Category", path: "/second-category" },
-					{ id: 4, name: "Third Category", path: "/third-category" },
 				],
 			},
 			{

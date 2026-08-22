@@ -12,7 +12,6 @@ interface Product {
     mainCategoryName: string;
     firstCategoryName: string;
     secondCategoryName: string;
-    thirdCategoryName: string;
     price: number;
     cost: number;
     discountAmount: number;
@@ -87,11 +86,6 @@ const ProductDetails = () => {
                             <li className="flex border-x border-b border-[#90959B]">
                                 <p className="w-1/4 border-r border-[#90959B] text-[#092C4C] text-[14px] font-medium p-2">Second Category</p>
                                 <p className="w-3/4 text-black text-[14px] font-medium p-2 border-[#90959B]">{product?.secondCategoryName}</p>
-                            </li>
-
-                            <li className="flex border-x border-b border-[#90959B]">
-                                <p className="w-1/4 border-r border-[#90959B] text-[#092C4C] text-[14px] font-medium p-2">Third Category</p>
-                                <p className="w-3/4 text-black text-[14px] font-medium p-2 border-[#90959B]">{product?.thirdCategoryName}</p>
                             </li>
 
                             <li className="flex border-x border-b border-[#90959B]">
