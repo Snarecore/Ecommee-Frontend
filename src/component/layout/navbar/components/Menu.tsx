@@ -19,6 +19,7 @@ import { useAtomValue } from "jotai";
 import { userAtom, logoutUserAtom } from "../../../../store/user-store";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
+import NotificationDropdown from "./NotificationDropdown";
 
 interface SearchSuggestion {
   name: string;
@@ -123,6 +124,7 @@ const Menu = () => {
   const navigate = useNavigate();
   const setLogout = useSetAtom(logoutUserAtom);
   const handleLogout = () => {
+    setIsDropdownOpen(false);
     setLogout(() => navigate("/login"));
   };
 
@@ -190,7 +192,7 @@ const Menu = () => {
         )}
       </div>
 
-      <div className="flex items-center gap-6 sm:gap-6 text-sm">
+      <div className="flex items-center gap-4 sm:gap-6 text-sm">
         <Link href="/wishlist" className="group relative">
           <div className="flex flex-col items-center gap-1 md:ml-16">
             <FaRegHeart className="text-xl text-[var(--color-icon)]" />
@@ -224,17 +226,6 @@ const Menu = () => {
             <FiSun className="text-xl" />
           )}
         </button>
-        {/* 
-				<div className="hidden sm:block">
-					<div className="flex items-center gap-2 text-[var(--color-icon)]">
-						<FaRegUser className="text-xl cursor-pointer" />
-						<div className="flex gap-1">
-							<Link href="/login">Login</Link>
-							<span>|</span>
-							<Link href="/signup">Register</Link>
-						</div>
-					</div>
-				</div> */}
 
       </div>
     </nav>

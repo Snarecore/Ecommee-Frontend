@@ -136,7 +136,7 @@ const NavBar = () => {
                         {/* Right Portion: Notification Icon (Left) + User Profile Portion (Right) */}
                         <div className="flex items-center gap-3 sm:gap-4 pl-4 flex-shrink-0">
                             {/* Notification Bell with Tailwind Badge */}
-                            <NotificationDropdown />
+                            <NotificationDropdown variant="green" />
 
                             {/* User Profile Dropdown */}
                             <div className="relative" ref={dropdownRef}>

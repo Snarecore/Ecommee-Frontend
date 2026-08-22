@@ -10,7 +10,11 @@ import {
 } from "../../../../services/notification-service";
 import { NotificationItem, NotificationType } from "../../../../interface/notification.interface";
 
-const NotificationDropdown = () => {
+interface Props {
+  variant?: "light" | "green";
+}
+
+const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -19,8 +23,8 @@ const NotificationDropdown = () => {
   const { data, refetch } = useQuery({
     queryKey: ["notifications"],
     queryFn: fetchNotificationsApi,
-    refetchInterval: 30000,
-    staleTime: 5000
+    refetchInterval: 10000, // Poll every 10s for fast live updates
+    staleTime: 2000
   });
 
   const notifications = data?.notifications || [];
@@ -97,15 +101,20 @@ const NotificationDropdown = () => {
     }
   };
 
+  const iconClass =
+    variant === "green"
+      ? "text-white hover:bg-white/10"
+      : "text-[var(--color-icon)] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800";
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full text-white hover:bg-white/10 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+        className={`relative p-2 rounded-full transition-colors focus:outline-none flex items-center justify-center cursor-pointer ${iconClass}`}
         title="Notifications"
         aria-label="Notifications"
       >
-        <FiBell className="text-xl sm:text-2xl text-white" />
+        <FiBell className="text-xl sm:text-2xl" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1.5 flex items-center justify-center shadow-md animate-pulse">
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -114,7 +123,7 @@ const NotificationDropdown = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 sm:left-auto top-full mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden text-gray-800 dark:text-gray-100 animate-in fade-in duration-200">
+        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden text-gray-800 dark:text-gray-100 animate-in fade-in duration-200">
           <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-sm text-[var(--color-green-primary)] dark:text-green-400">
