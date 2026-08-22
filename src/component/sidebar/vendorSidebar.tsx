@@ -232,7 +232,7 @@ const VendorSidebar = () => {
 												<NavLink
 													key={subItem.id}
 													to={subItem.path}
-													className={({ isActive }) =>
+													className={({ isActive }: { isActive: boolean }) =>
 														`block w-[200px] rounded-md group pl-4 py-2.5 p-2 cursor-pointer text-[13px] transition-all 
 														hover:bg-gray-100 hover:text-[var(--color-primary)] 
 														${isActive ? "text-[var(--color-primary)] font-medium" : "text-[#646b72]"}`

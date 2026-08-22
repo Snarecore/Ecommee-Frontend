@@ -6,7 +6,7 @@ export function HelmetProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export function Helmet() {
+export function Helmet({ children }: { children?: React.ReactNode }) {
   return null;
 }
 export default Helmet;

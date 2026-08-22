@@ -89,7 +89,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                 {/* Product Image */}
                 <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
                     <Link
-                        href={`/product/${product.slug}`}
+                        href={`/product/${product.slug || product.id || (product as any)._id || ''}`}
                         className="block w-full h-full rounded-t-2xl"
                     >
                         <Image
@@ -162,7 +162,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
                     {/* Product Name */}
                     <h2 className="text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 mb-1 leading-snug">
-                        <Link href={`/product/${product.slug}`}>
+                        <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`}>
                             {name}
                         </Link>
                     </h2>

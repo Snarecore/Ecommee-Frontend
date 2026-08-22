@@ -34,7 +34,7 @@ const UserSidebar: React.FC<Props> = ({ activeTab, setActiveTab, userData }) => 
 					<div className="mb-6 flex gap-4 items-center">
 						<div className="flex items-center gap-4">
 							<div className="w-18 h-18">
-								<Image src={userData?.profile?.profileImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={userData?.name} className="rounded-full object-cover shadow-lg border-2 border-[var(--color-green-primary)]" width={500} height={500} />
+								<Image src={userData?.profile?.profileImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={userData?.name || "User Profile Picture"} className="rounded-full object-cover shadow-lg border-2 border-[var(--color-green-primary)]" width={500} height={500} />
 							</div>
 							<div className="flex flex-col items-center md:items-start text-center md:text-left">
 								<p className="text-2xl font-bold text-[var(--color-green-primary)]">

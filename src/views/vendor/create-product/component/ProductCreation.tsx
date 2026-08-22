@@ -73,7 +73,7 @@ const discountTypeOptions: Option[] = [
 const ProductCreation = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const editData = location.state?.editData;
+    const editData = (location.state as any)?.editData;
     const [isLoading, setIsLoading] = useState(false);
     const [description, setDescription] = useState("");
     const [uniqueCode, setUniqueCode] = useState("");

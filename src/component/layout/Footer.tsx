@@ -56,36 +56,32 @@ const Footer = () => {
                     <div className="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-4">
                         <div>
                             <p className="font-bold text-lg mb-6">{headerFooterData?.footerSectionTwoTitle}</p>
-                            <div className="flex flex-col gap-3">
+                            <ul className="flex flex-col gap-3">
                                 {
-                                    footerSectionTwo.map((sec: any) => (
-                                        <Link key={sec.link} href={`${sec.link}`}>
-                                            <ul>
-                                                <li>
-                                                    {sec.value}
-                                                </li>
-                                            </ul>
-                                        </Link>
+                                    footerSectionTwo.map((sec: any, idx: number) => (
+                                        <li key={sec.link || idx}>
+                                            <Link href={`${sec.link}`} className="hover:underline text-sm">
+                                                {sec.value}
+                                            </Link>
+                                        </li>
                                     ))
                                 }
-                            </div>
+                            </ul>
                         </div>
 
                         <div>
                             <h6 className="font-bold text-lg mb-6">{headerFooterData?.footerSectionThreeTitle}</h6>
-                            <div className="flex flex-col gap-3">
+                            <ul className="flex flex-col gap-3">
                                 {
-                                    footerSectionThree?.map((sec :any) => (
-                                        <Link key={sec.link} href={`${sec.link}`}>
-                                            <ul>
-                                                <li>
-                                                    {sec.value}
-                                                </li>
-                                            </ul>
-                                        </Link>
+                                    footerSectionThree?.map((sec :any, idx: number) => (
+                                        <li key={sec.link || idx}>
+                                            <Link href={`${sec.link}`} className="hover:underline text-sm">
+                                                {sec.value}
+                                            </Link>
+                                        </li>
                                     ))
                                 }
-                            </div>
+                            </ul>
                         </div>
 
                         <div>

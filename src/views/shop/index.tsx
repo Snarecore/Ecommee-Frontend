@@ -46,8 +46,9 @@ const Shop = () => {
 
     const handlePagination = (paginationData: { selected: number }) => {
         const selectedPage = paginationData.selected + 1;
-        searchParams.set("pageNumber", selectedPage.toString());
-        setSearchParams(searchParams);
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set("pageNumber", selectedPage.toString());
+        setSearchParams(newParams);
     };
 
     const {

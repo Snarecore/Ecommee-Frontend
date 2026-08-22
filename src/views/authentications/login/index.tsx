@@ -25,7 +25,7 @@ const requiredFields: any = [
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+    const from = (location.state as any)?.from?.pathname || "/";
     const setUser = useSetAtom(userAtom);
     const { postMutation, handleApiMutation } = useAPI();
     const [showPassword, setShowPassword] = useState(false);

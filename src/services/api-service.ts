@@ -1,10 +1,21 @@
 import { GetDataProps, PostDataProps, PatchDataProps, DeleteDataProps, FormDataProps } from "../models/api-models";
+import apiConfig from "../config/api.json";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const getApiBaseUrl = (): string => {
+    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (envUrl && envUrl !== "undefined") return envUrl;
+    if ((apiConfig as any)?.baseUrl) return (apiConfig as any).baseUrl;
+    return "http://localhost:5000/api/v1/";
+};
 
 async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { error: boolean; message: string }> {
     try {
-        const response = await fetch(`${apiUrl}${url}`, {
+        const baseUrl = getApiBaseUrl();
+        const fullUrl = url.startsWith("http://") || url.startsWith("https://")
+            ? url
+            : `${baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
+
+        const response = await fetch(fullUrl, {
             ...options,
             cache: "no-store",
             headers: {
@@ -14,16 +25,23 @@ async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { e
             },
             // @ts-ignore
             next: { revalidate: 0 }
+        }).catch((err) => {
+            console.warn("API fetch error caught safely:", err?.message || err);
+            return null;
         });
 
+        if (!response) {
+            return { error: true, message: "Backend API is currently offline or unreachable." };
+        }
+
         if (!response.ok) {
-            console.error(`Error: ${response.status} - ${response.statusText}`);
+            console.error(`API Error: ${response.status} - ${response.statusText}`);
             return { error: true, message: `Failed: ${response.statusText}` };
         }
 
-        return await response.json();
+        return await response.json().catch(() => ({ error: true, message: "Invalid JSON response" }));
     } catch (error) {
-        console.error("Fetch error: ", error);
+        console.warn("Fetch exception handled: ", error);
         return { error: true, message: "An error occurred while making the request." };
     }
 }

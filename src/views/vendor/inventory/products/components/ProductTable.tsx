@@ -251,7 +251,7 @@ const ProductsTable = ({ dataList, fetchProductList, pageCount, currentPageNumbe
 											</Link>
 											<Link
 												href="/edit-product"
-												state={{ editData: data }}
+												{...({ state: { editData: data } } as any)}
 												className="inline-flex items-center justify-center hover:bg-gray-200 border border-[#e6eaed] hover:text-[var(--color-primary)] p-2 rounded-md cursor-pointer"
 											>
 												<FaEdit />

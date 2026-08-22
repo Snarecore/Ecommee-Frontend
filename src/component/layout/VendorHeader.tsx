@@ -1,17 +1,13 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { RiArrowDropDownLine, RiArrowDropRightLine, RiLogoutCircleLine } from "react-icons/ri";
-//@ts-ignore
-import { CiSettings } from "react-icons/ci";
-//@ts-ignore
+
 import { FiUser } from "react-icons/fi";
 import userAvatar from "../../assets/avatar.png";
 import { TbLayoutGrid, TbListDetails, TbTablePlus } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaTags, FaUniversity } from "react-icons/fa";
-//@ts-ignore
-import user from "../../assets/avatar.png";
 import companyLogo from "../../assets/BazaarBound_Landscap_Logo.svg";
 import { NavLink, useNavigate } from "react-router-dom";
 import Link from "next/link";;
@@ -266,7 +262,7 @@ const VendorHeader = () => {
 															<NavLink
 																key={subItem.id}
 																to={subItem.path}
-																className={({ isActive }) =>
+																className={({ isActive }: { isActive: boolean }) =>
 																	`block w-[200px] rounded-md group pl-4 py-2.5 p-2 cursor-pointer text-[13px] transition-all hover:bg-gray-100 hover:text-[var(--color-primary)] ${isActive ? "text-[var(--color-primary)] font-medium" : "text-[#646b72]"}`
 																}>
 																<span className="flex justify-start items-center gap-2">

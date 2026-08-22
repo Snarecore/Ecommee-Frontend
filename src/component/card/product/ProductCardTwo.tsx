@@ -86,7 +86,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
         <>
             <div className="group rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden w-full h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
                 <figure className="relative h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
-                    <Link href={`/product/${product.slug}`} className="block w-full h-full rounded-t-2xl">
+                    <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-2xl">
                         <Image
                             src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
                             alt={name}
@@ -137,7 +137,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     </div>
 
                     <h2 className="text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 min-h-[36px] mb-1 leading-snug">
-                        <Link href={`/product/${product.slug}`}>{name}</Link>
+                        <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`}>{name}</Link>
                     </h2>
 
                     <div className="flex items-baseline gap-2 mb-1">

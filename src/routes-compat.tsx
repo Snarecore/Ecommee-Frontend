@@ -128,8 +128,8 @@ export function BrowserRouter({ children }: { children: React.ReactNode }) {
 export function Routes({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
-export function Route({ element }: { element: React.ReactNode }) {
-  return <>{element}</>;
+export function Route({ element, path, children }: { element?: React.ReactNode; path?: string; children?: React.ReactNode }) {
+  return <>{element}{children}</>;
 }
 
 // 9. Navigate shim
