@@ -2,11 +2,16 @@ import { formatPrettyDateWithTime } from "./date-utils";
 
 export type OrderStatus =
   | "Order Placed"
+  | "Pending"
+  | "Processing"
   | "Preparing Order"
+  | "Shipped"
   | "Loaded for Delivery"
   | "Handed Over to Courier"
   | "Out for Delivery"
   | "Delivered"
+  | "Completed"
+  | "Failed"
   | "Cancelled"
   | "Returned";
 

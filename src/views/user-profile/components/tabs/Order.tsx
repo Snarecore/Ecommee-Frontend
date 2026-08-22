@@ -39,29 +39,24 @@ const TIMELINE_STEPS: CustomerTimelineStep[] = [
     description: "Your order has been placed successfully."
   },
   {
-    key: "Preparing Order",
-    label: "Preparing Order",
-    description: "Your order has been collected from the store and is being packed."
+    key: "Processing",
+    label: "Processing",
+    description: "Your order is being prepared and processed by our store."
   },
   {
-    key: "Loaded for Delivery",
-    label: "Loaded for Delivery",
-    description: "Your package has been loaded into the delivery vehicle."
-  },
-  {
-    key: "Handed Over to Courier",
-    label: "Handed Over to Courier",
-    description: "Package handed over to our delivery partner."
-  },
-  {
-    key: "Out for Delivery",
-    label: "Out for Delivery",
-    description: "Your package is currently with the courier rider on its way to you."
+    key: "Shipped",
+    label: "Shipped",
+    description: "Your package has been shipped and is on its way."
   },
   {
     key: "Delivered",
     label: "Delivered",
     description: "Package delivered successfully."
+  },
+  {
+    key: "Completed",
+    label: "Completed",
+    description: "Order completed successfully."
   }
 ];
 
@@ -103,46 +98,62 @@ const OrderTab = () => {
     return () => window.removeEventListener("orders_updated", handleUpdate);
   }, [currentPageNumber]);
 
-  // Combine local storage orders with API list
-  const combinedOrdersList = [...localOrders];
-  if (dataList && dataList.length > 0) {
-    dataList.forEach((apiOrd: any) => {
-      if (!combinedOrdersList.some((o) => o.id === apiOrd.id || o.orderId === apiOrd.orderId)) {
-        combinedOrdersList.push({
-          id: apiOrd.id,
-          orderId: apiOrd.orderId,
-          createdAt: apiOrd.createdAt || new Date().toISOString(),
-          orderStatus: (apiOrd.orderStatus || apiOrd.status || "Order Placed") as OrderStatus,
-          paymentStatus: apiOrd.paymentStatus || "Pending",
-          paymentMethod: "COD",
-          subtotal: Number(apiOrd.totalAmount) || 0,
-          deliveryCharge: 60,
-          totalAmount: Number(apiOrd.totalAmount) || 0,
-          deliveryZone: "inside_dhaka",
-          shippingAddress: {
-            name: "Customer",
-            phone: "N/A",
-            address: "Delivery address",
-            city: "Dhaka"
-          },
-          items: (apiOrd.orderSummaries || []).map((s: any) => ({
-            id: s.id || Math.random().toString(),
-            productName: s.productName || "Product",
-            productImage: s.productImage || "",
-            price: s.price || 0,
-            quantity: s.quantity || 1
-          })),
-          statusHistory: [
-            {
-              status: (apiOrd.orderStatus || apiOrd.status || "Order Placed") as OrderStatus,
-              timestamp: apiOrd.createdAt || new Date().toISOString(),
-              updatedBy: "system"
-            }
-          ]
-        });
-      }
-    });
-  }
+  // Process API orders list from Backend first with top priority
+  const apiOrdersMapped = (dataList || []).map((apiOrd: any) => {
+    const currentStatus = (apiOrd.status || apiOrd.orderStatus || "Order Placed") as OrderStatus;
+    const historyList = Array.isArray(apiOrd.statusHistory) && apiOrd.statusHistory.length > 0
+      ? apiOrd.statusHistory
+      : [
+          {
+            status: currentStatus,
+            timestamp: apiOrd.createdAt || new Date().toISOString(),
+            updatedBy: "system"
+          }
+        ];
+
+    return {
+      id: apiOrd.id,
+      orderId: apiOrd.orderId ? `#${apiOrd.orderId}` : `ORD-${apiOrd.id?.slice(0, 6)}`,
+      rawOrderId: apiOrd.orderId,
+      createdAt: apiOrd.createdAt || new Date().toISOString(),
+      orderStatus: currentStatus,
+      status: currentStatus,
+      paymentStatus: apiOrd.paymentStatus || "Pending",
+      paymentMethod: apiOrd.paymentMethod || "COD",
+      subtotal: Number(apiOrd.totalAmount) || 0,
+      deliveryCharge: apiOrd.deliveryCharge || 60,
+      totalAmount: Number(apiOrd.totalAmount) || 0,
+      deliveryZone: apiOrd.deliveryZone || "inside_dhaka",
+      shippingAddress: apiOrd.shippingAddress || {
+        name: apiOrd.user?.name || "Customer",
+        phone: apiOrd.user?.phone || "N/A",
+        address: "Delivery address",
+        city: "Dhaka"
+      },
+      items: (apiOrd.orderSummaries || apiOrd.items || []).map((s: any) => ({
+        id: s.id || Math.random().toString(),
+        productName: s.productName || "Product",
+        productImage: s.productImage || "",
+        price: Number(s.price) || 0,
+        quantity: Number(s.quantity) || 1
+      })),
+      statusHistory: historyList
+    };
+  });
+
+  // Combine: API orders take highest precedence, then remaining local storage orders
+  const combinedOrdersList = [...apiOrdersMapped];
+  localOrders.forEach((locOrd) => {
+    const isDuplicate = combinedOrdersList.some(
+      (o) =>
+        o.id === locOrd.id ||
+        (o.rawOrderId && locOrd.orderId && o.rawOrderId.toLowerCase() === locOrd.orderId.toLowerCase()) ||
+        (o.orderId && locOrd.orderId && o.orderId.toLowerCase().includes(locOrd.orderId.toLowerCase()))
+    );
+    if (!isDuplicate) {
+      combinedOrdersList.push(locOrd);
+    }
+  });
 
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order);
@@ -307,75 +318,86 @@ const OrderTab = () => {
                   </h3>
 
                   <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-gray-200">
-                    {TIMELINE_STEPS.map((step) => {
+                    {(() => {
+                      const getStageIndex = (status?: string) => {
+                        if (!status) return 0;
+                        const s = status.trim().toLowerCase();
+                        if (s === "order placed" || s === "pending" || s === "placed") return 0;
+                        if (s === "processing" || s === "preparing order") return 1;
+                        if (
+                          s === "shipped" ||
+                          s === "loaded for delivery" ||
+                          s === "handed over to courier" ||
+                          s === "out for delivery"
+                        )
+                          return 2;
+                        if (s === "delivered") return 3;
+                        if (s === "completed") return 4;
+                        return 0;
+                      };
+
+                      const currentStatusStr: string = selectedOrder.orderStatus || selectedOrder.status || "Order Placed";
+                      const currentIndex = getStageIndex(currentStatusStr);
+                      const isOrderCompletedAll = currentStatusStr.trim().toLowerCase() === "completed";
                       const historyList: any[] = selectedOrder.statusHistory || [];
-                      const historyMatch = historyList.find((h) => h.status === step.key);
 
-                      // Determine stage completion index
-                      const orderStatusPipeline: OrderStatus[] = [
-                        "Order Placed",
-                        "Preparing Order",
-                        "Loaded for Delivery",
-                        "Handed Over to Courier",
-                        "Out for Delivery",
-                        "Delivered"
-                      ];
-                      const currentStatus: OrderStatus = selectedOrder.orderStatus || selectedOrder.status || "Order Placed";
-                      const currentIndex = orderStatusPipeline.indexOf(currentStatus);
-                      const stepIndex = orderStatusPipeline.indexOf(step.key);
+                      return TIMELINE_STEPS.map((step, stepIndex) => {
+                        const isCompleted = isOrderCompletedAll || stepIndex < currentIndex;
+                        const isCurrent = !isOrderCompletedAll && stepIndex === currentIndex;
 
-                      const isCompleted = stepIndex < currentIndex;
-                      const isCurrent = stepIndex === currentIndex;
-                      const isUpcoming = stepIndex > currentIndex;
+                        const historyMatch = historyList.find(
+                          (h) => getStageIndex(h.status) === stepIndex
+                        );
 
-                      return (
-                        <div key={step.key} className="relative flex items-start gap-4 group">
-                          {/* Step Icon Node */}
-                          <div
-                            className={`absolute -left-6 top-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs ${
-                              isCompleted
-                                ? "bg-emerald-500 text-white ring-4 ring-emerald-100"
-                                : isCurrent
-                                ? "bg-[var(--color-green-primary)] text-white ring-4 ring-emerald-200 animate-pulse"
-                                : "bg-gray-200 text-gray-400"
-                            }`}
-                          >
-                            {isCompleted ? "✓" : isCurrent ? "●" : "○"}
-                          </div>
+                        return (
+                          <div key={step.key} className="relative flex items-start gap-4 group">
+                            {/* Step Icon Node */}
+                            <div
+                              className={`absolute -left-6 top-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs ${
+                                isCompleted
+                                  ? "bg-emerald-500 text-white ring-4 ring-emerald-100"
+                                  : isCurrent
+                                  ? "bg-[var(--color-green-primary)] text-white ring-4 ring-emerald-200 animate-pulse"
+                                  : "bg-gray-200 text-gray-400"
+                              }`}
+                            >
+                              {isCompleted ? "✓" : isCurrent ? "●" : "○"}
+                            </div>
 
-                          {/* Step Content */}
-                          <div className="pl-4">
-                            <div className="flex items-center gap-2">
-                              <h4
-                                className={`font-bold text-sm ${
-                                  isCurrent
-                                    ? "text-[var(--color-green-primary)]"
-                                    : isCompleted
-                                    ? "text-gray-800"
-                                    : "text-gray-400"
-                                }`}
-                              >
-                                {step.label}
-                              </h4>
-                              {isCurrent && (
-                                <span className="text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                                  Current Stage
-                                </span>
+                            {/* Step Content */}
+                            <div className="pl-4">
+                              <div className="flex items-center gap-2">
+                                <h4
+                                  className={`font-bold text-sm ${
+                                    isCurrent
+                                      ? "text-[var(--color-green-primary)]"
+                                      : isCompleted
+                                      ? "text-gray-800"
+                                      : "text-gray-400"
+                                  }`}
+                                >
+                                  {step.label}
+                                </h4>
+                                {isCurrent && (
+                                  <span className="text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                                    Current Stage
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
+
+                              {/* Timestamp log */}
+                              {historyMatch && (
+                                <p className="text-[11px] font-semibold text-emerald-700 mt-1 flex items-center gap-1">
+                                  <FaClock size={10} /> {formatPrettyDateWithTime(historyMatch.timestamp)}
+                                  {historyMatch.note && <span className="text-gray-400 font-normal">({historyMatch.note})</span>}
+                                </p>
                               )}
                             </div>
-                            <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
-
-                            {/* Timestamp log */}
-                            {historyMatch && (
-                              <p className="text-[11px] font-semibold text-emerald-700 mt-1 flex items-center gap-1">
-                                <FaClock size={10} /> {formatPrettyDateWithTime(historyMatch.timestamp)}
-                                {historyMatch.note && <span className="text-gray-400 font-normal">({historyMatch.note})</span>}
-                              </p>
-                            )}
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
               )}
