@@ -142,7 +142,7 @@ const OrderTab = () => {
   });
 
   // Combine: API orders take highest precedence, then remaining local storage orders
-  const combinedOrdersList = [...apiOrdersMapped];
+  const combinedOrdersList: any[] = [...apiOrdersMapped];
   localOrders.forEach((locOrd) => {
     const isDuplicate = combinedOrdersList.some(
       (o) =>

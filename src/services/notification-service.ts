@@ -1,5 +1,7 @@
 import { NotificationItem, NotificationType } from "../interface/notification.interface";
 import apiConfig from "../config/api.json";
+import { getData, patchData } from "./api-service";
+import { getUserToken } from "../hooks/useApi";
 
 const STORAGE_KEY = "shipping_notifications_v1";
 
@@ -58,22 +60,30 @@ export const fetchNotificationsApi = async (): Promise<{
   notifications: NotificationItem[];
   unreadCount: number;
 }> => {
-  try {
-    if ((apiConfig as any)?.site?.notificationsUrl) {
-      const res = await fetch((apiConfig as any).site.notificationsUrl);
-      if (res.ok) {
-        const data = await res.json();
-        const list = data.notifications || data;
-        if (Array.isArray(list) && list.length > 0) {
-          return {
-            notifications: list,
-            unreadCount: data.unreadCount ?? list.filter((n: any) => !n.isRead).length
-          };
+  const token = getUserToken();
+  const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
+
+  if (notifUrl && token) {
+    try {
+      const res: any = await getData({ url: notifUrl, token });
+      if (res && !res.error) {
+        const payload = res.data || res;
+        const list = Array.isArray(payload.notifications)
+          ? payload.notifications
+          : Array.isArray(payload)
+          ? payload
+          : [];
+        const unreadCount =
+          payload.unreadCount ?? list.filter((n: any) => !n.isRead).length;
+
+        if (list.length > 0) {
+          saveStoredNotifications(list);
+          return { notifications: list, unreadCount };
         }
       }
+    } catch (err) {
+      console.warn("API fetch error for notifications, using fallback:", err);
     }
-  } catch {
-    // API fallback
   }
 
   const list = getStoredNotifications();
@@ -82,30 +92,32 @@ export const fetchNotificationsApi = async (): Promise<{
 };
 
 export const markNotificationReadApi = async (id: string): Promise<void> => {
-  try {
-    if ((apiConfig as any)?.site?.notificationsUrl) {
-      await fetch(`${(apiConfig as any).site.notificationsUrl}/${id}/read`, {
-        method: "PATCH"
-      });
+  const token = getUserToken();
+  const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
+
+  if (notifUrl && token) {
+    try {
+      await patchData({ url: `${notifUrl}/${id}/read`, token, body: {} });
+    } catch (err) {
+      console.warn("API markNotificationReadApi error:", err);
     }
-  } catch {
-    // API fallback
   }
 
   const list = getStoredNotifications();
-  const updated = list.map((n) => (n._id === id ? { ...n, isRead: true } : n));
+  const updated = list.map((n) => (n._id === id || (n as any).id === id ? { ...n, isRead: true } : n));
   saveStoredNotifications(updated);
 };
 
 export const markAllNotificationsReadApi = async (): Promise<void> => {
-  try {
-    if ((apiConfig as any)?.site?.notificationsUrl) {
-      await fetch(`${(apiConfig as any).site.notificationsUrl}/read-all`, {
-        method: "PATCH"
-      });
+  const token = getUserToken();
+  const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
+
+  if (notifUrl && token) {
+    try {
+      await patchData({ url: `${notifUrl}/read-all`, token, body: {} });
+    } catch (err) {
+      console.warn("API markAllNotificationsReadApi error:", err);
     }
-  } catch {
-    // API fallback
   }
 
   const list = getStoredNotifications();

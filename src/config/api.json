@@ -29,7 +29,8 @@
         "policyNineUrl": "policy-nine-cms",
         "policyTenUrl": "policy-ten-cms",
         "policyElevenUrl": "policy-eleven-cms",
-        "policyTwelveUrl": "policy-twelve-cms"
+        "policyTwelveUrl": "policy-twelve-cms",
+        "notificationsUrl": "site/notifications"
     },
     "vendor": {
         "productUrl": "product",
