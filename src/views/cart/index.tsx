@@ -265,23 +265,16 @@ const MyCart = () => {
                     <span className="font-bold">${cartSubtotal.toFixed(2)}</span>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      if (!user) {
-                        setShowLoginRequiredModal(true);
-                      } else {
-                        setShowPaymentForm(true);
-                      }
-                    }}
-                    disabled={user?.role === "vendor" || user?.role === "admin"}
+                  <Link
+                    href="/checkout"
                     className={`mt-10 block text-center w-full font-bold py-3 rounded-3xl transition-all duration-300 ${
                       user?.role === "vendor" || user?.role === "admin"
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-70"
-                        : "bg-[var(--color-green-primary)] text-white cursor-pointer"
+                        ? "pointer-events-none bg-gray-300 text-gray-500 opacity-70"
+                        : "bg-[var(--color-green-primary)] text-white hover:opacity-95 cursor-pointer shadow-md"
                     }`}
                   >
                     Proceed to Checkout
-                  </button>
+                  </Link>
                 </div>
               </div>
 

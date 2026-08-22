@@ -40,6 +40,8 @@
         "thirdCategoryUrl": "site/third-categories",
         "productUniqueCodeUrl": "unique-code/product",
         "orderListUrl": "orders/vendor-order",
+        "updateOrderStatusUrl": "orders/status",
+        "updateCourierInfoUrl": "orders/courier",
         "contactMessageUrl": "contact-us-message",
         "vendorMessageUrl": "vendor-message",
         "vendorProductReviewUrl": "product-review/update-approval-status"
@@ -70,7 +72,8 @@
         "adminListUrl": "site/admin"
     },
     "customer": {
-        "orderListUrl": "orders/customer-order"
+        "orderListUrl": "orders/customer-order",
+        "createOrderUrl": "orders"
     },
     "contentCMS": {
         "reviews": "reviews"
