@@ -32,7 +32,12 @@ export const getStoredNotifications = (): NotificationItem[] => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_NOTIFICATIONS));
       return INITIAL_DEMO_NOTIFICATIONS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_NOTIFICATIONS));
+      return INITIAL_DEMO_NOTIFICATIONS;
+    }
+    return parsed;
   } catch {
     return INITIAL_DEMO_NOTIFICATIONS;
   }
