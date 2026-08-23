@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useAPI } from "../../../../hooks/useApi";
-import apiConfig from "../../../../config/api.json";
-import avatar from "../../../../assets/avatar.png"
-import { userAtom } from "../../../../store/user-store";
+import { useAPI } from "@/hooks/useApi";
+import apiConfig from "@/config/api.json";
+import avatar from "@/assets/avatar.png";
+import { userAtom } from "@/store/user-store";
 import { useAtomValue } from "jotai";
 
 interface ConversationUser {

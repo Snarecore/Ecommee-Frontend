@@ -16,7 +16,9 @@ export interface Product {
     summary: string;
     description: string;
     discountType: DiscountType;
-    discountAmount: number;
+    quantity?: number;
+    sizesString?: string;
+    sizeStock?: Record<string, number>;
     vendor?: {
         profile?: {
             shopName?: string;

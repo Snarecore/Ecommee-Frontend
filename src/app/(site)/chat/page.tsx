@@ -1,13 +1,13 @@
 'use client';
 
-import Orders from "@/views/vendor/orders";
+import Chat from "@/views/chat";
 import RoleProtectedRoute from "@/providers/RoleProtectedRoute";
 import { Role } from "@/enum/role.enum";
 
-export default function VendorOrdersPage() {
+export default function CustomerChatPage() {
   return (
-    <RoleProtectedRoute allowedRoles={[Role.VENDOR]}>
-      <Orders />
+    <RoleProtectedRoute allowedRoles={[Role.CUSTOMER]}>
+      <Chat />
     </RoleProtectedRoute>
   );
 }

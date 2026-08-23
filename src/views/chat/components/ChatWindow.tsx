@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { LuSend } from "react-icons/lu";
-import { useAPI } from "../../../../hooks/useApi";
-import apiConfig from "../../../../config/api.json";
+import { useAPI } from "@/hooks/useApi";
+import apiConfig from "@/config/api.json";
 import { useAtomValue } from "jotai";
-import { userAtom } from "../../../../store/user-store";
-import avatar from "../../../../assets/avatar.png";
-import { formatDate } from "../../../../utils/date-utils";
-import { vendorMessageQueryKey } from "../../../../config/query-key";
+import { userAtom } from "@/store/user-store";
+import avatar from "@/assets/avatar.png";
+import { formatDate } from "@/utils/date-utils";
+import { vendorMessageQueryKey } from "@/config/query-key";
 
 const initialFieldValues = {
     content: "",

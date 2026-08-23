@@ -193,15 +193,6 @@ const NavBar = () => {
                                                     onClick={() => setIsDropdownOpen(false)}
                                                     className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors text-gray-700 dark:text-gray-200"
                                                 >
-                                                    <FaUser className="text-[var(--color-green-primary)]" />
-                                                    User Profile
-                                                </Link>
-
-                                                <Link
-                                                    href="/customer-dashboard?tab=order"
-                                                    onClick={() => setIsDropdownOpen(false)}
-                                                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors text-gray-700 dark:text-gray-200"
-                                                >
                                                     <FiPackage className="text-[var(--color-green-primary)] text-sm" />
                                                     My Orders
                                                 </Link>

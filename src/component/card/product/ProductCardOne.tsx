@@ -88,6 +88,11 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
                 {/* Product Image */}
                 <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
+                    {(product.quantity !== undefined && product.quantity <= 0) && (
+                        <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md z-10">
+                            Out of Stock
+                        </span>
+                    )}
                     <Link
                         href={`/product/${product.slug || product.id || (product as any)._id || ''}`}
                         className="block w-full h-full rounded-t-2xl"

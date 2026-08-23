@@ -422,34 +422,48 @@ const Product = () => {
                                 <div className="flex flex-wrap gap-3">
                                     {["S", "M", "L", "XL", "XXL"].map((size) => {
                                         const availableSizes = product?.sizes ? product.sizes : (product?.sizesString ? product.sizesString.split(",") : []);
-                                        const isAvailable = availableSizes.includes(size);
+                                        const isConfigured = availableSizes.length > 0 ? availableSizes.includes(size) : true;
+                                        const isOutOfStock = product?.sizeStock ? ((product.sizeStock[size] ?? 0) <= 0) : ((product?.quantity ?? 1) <= 0);
                                         const isSelected = selectedSize === size;
                                         return (
-                                            <button
-                                                key={size}
-                                                disabled={!isAvailable}
-                                                onClick={() => setSelectedSize(size)}
-                                                className={`relative w-12 h-12 flex items-center justify-center rounded-full border text-sm font-bold transition-all duration-200
-                                                    ${isAvailable
-                                                        ? isSelected
+                                            <div key={size} className="flex flex-col items-center">
+                                                <button
+                                                    disabled={!isConfigured}
+                                                    onClick={() => setSelectedSize(size)}
+                                                    className={`relative w-12 h-12 flex items-center justify-center rounded-full border text-sm font-bold transition-all duration-200
+                                                        ${!isConfigured
+                                                            ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                                            : isOutOfStock
+                                                            ? isSelected
+                                                                ? "border-red-500 bg-red-50 text-red-600 shadow-sm scale-105"
+                                                                : "border-red-200 bg-red-50/60 text-red-500 hover:border-red-400 cursor-pointer"
+                                                            : isSelected
                                                             ? "border-black bg-black text-white shadow-sm scale-105"
                                                             : "border-gray-300 bg-white text-gray-950 hover:border-black cursor-pointer"
-                                                        : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
-                                                    }`}
-                                            >
-                                                <span className={!isAvailable ? "line-through opacity-40" : ""}>
-                                                    {size}
-                                                </span>
-                                                {/* Diagonal strike-through line for unavailable sizes */}
-                                                {!isAvailable && (
-                                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                        <div className="w-full h-[1px] bg-gray-400 rotate-45"></div>
-                                                    </div>
+                                                        }`}
+                                                >
+                                                    <span className={(!isConfigured || isOutOfStock) ? "line-through opacity-60" : ""}>
+                                                        {size}
+                                                    </span>
+                                                    {(!isConfigured || isOutOfStock) && (
+                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                            <div className="w-full h-[1px] bg-red-400 rotate-45"></div>
+                                                        </div>
+                                                    )}
+                                                </button>
+                                                {isConfigured && isOutOfStock && (
+                                                    <span className="text-[10px] text-red-600 font-bold mt-1">Out of Stock</span>
                                                 )}
-                                            </button>
+                                            </div>
                                         );
                                     })}
                                 </div>
+                                {selectedSize && product?.sizeStock && (product.sizeStock[selectedSize] ?? 0) <= 0 && (
+                                    <p className="mt-3 text-xs font-bold text-red-600 flex items-center gap-1.5 bg-red-50 border border-red-200 px-3 py-2 rounded-lg w-max">
+                                        <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                                        Size {selectedSize} is currently Out of Stock!
+                                    </p>
+                                )}
                             </div>
 
                             <div className="mb-4">
@@ -471,15 +485,28 @@ const Product = () => {
                                 </div>
                             </div>
                             <div className="flex justify-start space-x-4 mb-4">
-                                <button className="border border-[var(--color-green-primary)] text-[var(--color-black-primary)] px-4 sm:px-6 py-2 font-semibold cursor-pointer transition"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleAddToCart();
-                                    }}
-                                >
-                                    Add to Cart
-                                </button>
+                                {(() => {
+                                    const isSelectedOut = selectedSize
+                                        ? (product?.sizeStock ? (product.sizeStock[selectedSize] ?? 0) <= 0 : (product?.quantity ?? 1) <= 0)
+                                        : (product?.quantity !== undefined && product.quantity <= 0);
+                                    return (
+                                        <button
+                                            disabled={isSelectedOut}
+                                            className={`px-4 sm:px-6 py-2 font-semibold transition border ${
+                                                isSelectedOut
+                                                    ? "border-red-300 bg-red-100 text-red-600 cursor-not-allowed font-bold"
+                                                    : "border-[var(--color-green-primary)] text-[var(--color-black-primary)] hover:bg-[var(--color-green-primary)] hover:text-white cursor-pointer"
+                                            }`}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                if (!isSelectedOut) handleAddToCart();
+                                            }}
+                                        >
+                                            {isSelectedOut ? "Out of Stock" : "Add to Cart"}
+                                        </button>
+                                    );
+                                })()}
                                 <button className="bg-[var(--color-green-primary)] text-white px-4 sm:px-6 py-2 font-semibold cursor-pointer transition"
                                     onClick={(e) => {
                                         e.preventDefault();
