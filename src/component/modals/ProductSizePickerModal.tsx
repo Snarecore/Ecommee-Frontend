@@ -4,16 +4,15 @@ import { IoClose } from "react-icons/io5";
 import { FiShoppingCart, FiArrowRight } from "react-icons/fi";
 import { Product } from "../../interface/product.interface";
 import { finalPrice } from "../../utils/product-utils";
+import { getProductSizes, isSizeOutOfStock, isProductOutOfStock } from "../../utils/stock-utils";
 
 interface ProductSizePickerModalProps {
     isOpen: boolean;
     product: Product;
     actionType: "addToCart" | "buyNow";
     onClose: () => void;
-    onConfirm: (product: Product) => void;
+    onConfirm: (product: Product, size?: string) => void;
 }
-
-const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
     isOpen,
@@ -36,18 +35,14 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
     const original = Number(price) || 0;
     const hasDiscount = calculatedPrice < original;
 
-    // Detect available sizes from product data
-    const productWithSizes = product as Product & { sizes?: string[]; sizesString?: string };
-    const availableSizes: string[] =
-        productWithSizes.sizes
-            ? productWithSizes.sizes
-            : productWithSizes.sizesString
-                ? productWithSizes.sizesString.split(",").map((s) => s.trim())
-                : SIZES; // default all available if no size data
+    const availableSizes = getProductSizes(product);
+    const productOutOfStock = isProductOutOfStock(product);
+    const selectedSizeIsOutOfStock = selectedSize ? isSizeOutOfStock(product, selectedSize) : false;
+    const isActionDisabled = !selectedSize || selectedSizeIsOutOfStock || productOutOfStock;
 
     const handleConfirm = () => {
-        if (!selectedSize) return;
-        onConfirm(product);
+        if (isActionDisabled || !selectedSize) return;
+        onConfirm(product, selectedSize);
         setSelectedSize(null);
         onClose();
     };
@@ -121,51 +116,63 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
                         Available Sizes
                     </p>
                     <div className="flex flex-wrap gap-2.5 mb-1">
-                        {SIZES.map((size) => {
-                            const isAvailable = availableSizes.includes(size);
+                        {availableSizes.map((size) => {
+                            const sizeOut = isSizeOutOfStock(product, size);
                             const isSelected = selectedSize === size;
                             return (
                                 <button
                                     key={size}
-                                    disabled={!isAvailable}
-                                    onClick={() => isAvailable && setSelectedSize(size)}
+                                    onClick={() => setSelectedSize(size)}
                                     className={`relative w-12 h-12 flex items-center justify-center rounded-xl text-sm font-bold transition-all duration-200
-                                        ${isAvailable
+                                        ${sizeOut
                                             ? isSelected
-                                                ? "bg-neutral-900 text-white border-2 border-neutral-900 scale-105 shadow-md"
-                                                : "border-2 border-neutral-200 bg-white text-neutral-800 hover:border-neutral-900 cursor-pointer"
-                                            : "border-2 border-neutral-100 bg-neutral-50 text-neutral-300 cursor-not-allowed"
+                                                ? "border-2 border-red-500 bg-red-50 text-red-600 scale-105 shadow-sm"
+                                                : "border-2 border-red-200 bg-red-50/60 text-red-500 hover:border-red-400 cursor-pointer"
+                                            : isSelected
+                                            ? "bg-neutral-900 text-white border-2 border-neutral-900 scale-105 shadow-md"
+                                            : "border-2 border-neutral-200 bg-white text-neutral-800 hover:border-neutral-900 cursor-pointer"
                                         }`}
                                 >
-                                    <span className={!isAvailable ? "line-through opacity-40" : ""}>
+                                    <span className={sizeOut ? "line-through opacity-70" : ""}>
                                         {size}
                                     </span>
-                                    {!isAvailable && (
+                                    {sizeOut && (
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none rounded-xl overflow-hidden">
-                                            <div className="w-full h-[1.5px] bg-neutral-300 rotate-45" />
+                                            <div className="w-full h-[1.5px] bg-red-400 rotate-45" />
                                         </div>
                                     )}
                                 </button>
                             );
                         })}
                     </div>
-                    {!selectedSize && (
-                        <p className="text-[11px] text-red-400 mt-1.5">Please select a size to continue.</p>
-                    )}
+                    {productOutOfStock ? (
+                        <p className="text-xs font-bold text-red-600 mt-2 bg-red-50 border border-red-200 px-3 py-2 rounded-lg text-center">
+                            This product is currently Out of Stock
+                        </p>
+                    ) : selectedSizeIsOutOfStock ? (
+                        <p className="text-xs font-bold text-red-600 mt-2 bg-red-50 border border-red-200 px-3 py-2 rounded-lg text-center flex items-center justify-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                            Size {selectedSize} is Out of Stock
+                        </p>
+                    ) : !selectedSize ? (
+                        <p className="text-[11px] text-neutral-400 mt-1.5">Please select a size to continue.</p>
+                    ) : null}
                 </div>
 
                 {/* Action Button */}
                 <div className="px-5 py-4">
                     <button
-                        disabled={!selectedSize}
+                        disabled={isActionDisabled}
                         onClick={handleConfirm}
                         className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200
-                            ${selectedSize
-                                ? "bg-[var(--color-green-primary)] text-white hover:bg-[#428146] shadow-sm hover:shadow-md cursor-pointer"
-                                : "bg-neutral-100 text-neutral-400 cursor-not-allowed"
+                            ${isActionDisabled
+                                ? "bg-red-100 text-red-500 border border-red-200 cursor-not-allowed font-bold"
+                                : "bg-[var(--color-green-primary)] text-white hover:bg-[#428146] shadow-sm hover:shadow-md cursor-pointer"
                             }`}
                     >
-                        {actionType === "addToCart" ? (
+                        {selectedSizeIsOutOfStock || productOutOfStock ? (
+                            "Out of Stock"
+                        ) : actionType === "addToCart" ? (
                             <>
                                 <FiShoppingCart className="w-4 h-4" />
                                 Add to Cart

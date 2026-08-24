@@ -20,6 +20,7 @@ import { Helmet } from "react-helmet-async";
 
 // 👇 Adjust this import path to wherever your helper lives
 import { finalPrice } from "../../utils/product-utils"; 
+import { isProductOutOfStock, isSizeOutOfStock } from "../../utils/stock-utils";
 
 const MyCart = () => {
   const { fetchData } = useAPI();
@@ -133,19 +134,35 @@ const MyCart = () => {
                       });
                       const hasDiscount = unitPrice < original;
                       const lineSubtotal = unitPrice * (item.quantity ?? 1);
+                      const isItemOutOfStock = isProductOutOfStock(item) || (item.selectedSize ? isSizeOutOfStock(item, item.selectedSize) : false);
 
                       return (
                         <div
-                          key={item.id}
+                          key={item.id + (item.selectedSize || "")}
                           className="flex flex-col md:grid md:grid-cols-12 items-start gap-4 pb-4 shadow-sm"
                         >
                           {/* Product & unit price */}
                           <div className="w-full md:col-span-8 flex flex-row gap-4 sm:gap-8 p-4">
-                            <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
+                            <div className="relative">
+                              <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
+                              {isItemOutOfStock && (
+                                <span className="absolute top-0 left-0 bg-red-600 text-white text-[9px] font-bold px-1 rounded">Out of Stock</span>
+                              )}
+                            </div>
                             <div>
                               <p className="font-bold text-[var(--color-green-primary)]">
                                 {item.name}
                               </p>
+                              {item.selectedSize && (
+                                <p className="text-xs text-gray-600 font-semibold mt-0.5">
+                                  Size: <span className="text-black">{item.selectedSize}</span>
+                                </p>
+                              )}
+                              {isItemOutOfStock && (
+                                <p className="text-xs text-red-600 font-bold mt-1">
+                                  Out of Stock! Please remove to proceed.
+                                </p>
+                              )}
 
                               {/* Unit price (desktop) */}
                               <p className="text-sm text-[var(--color-green-primary)] font-medium hidden md:block">
@@ -265,16 +282,36 @@ const MyCart = () => {
                     <span className="font-bold">${cartSubtotal.toFixed(2)}</span>
                   </div>
 
-                  <Link
-                    href="/checkout"
-                    className={`mt-10 block text-center w-full font-bold py-3 rounded-3xl transition-all duration-300 ${
-                      user?.role === "vendor" || user?.role === "admin"
-                        ? "pointer-events-none bg-gray-300 text-gray-500 opacity-70"
-                        : "bg-[var(--color-green-primary)] text-white hover:opacity-95 cursor-pointer shadow-md"
-                    }`}
-                  >
-                    Proceed to Checkout
-                  </Link>
+                  {(() => {
+                    const hasOutOfStock = cartItems.some(
+                      (item) => isProductOutOfStock(item) || (item.selectedSize ? isSizeOutOfStock(item, item.selectedSize) : false)
+                    );
+                    const isDisabled = hasOutOfStock || user?.role === "vendor" || user?.role === "admin";
+                    return (
+                      <>
+                        <Link
+                          href={isDisabled ? "#" : "/checkout"}
+                          onClick={(e) => {
+                            if (isDisabled) {
+                              e.preventDefault();
+                            }
+                          }}
+                          className={`mt-10 block text-center w-full font-bold py-3 rounded-3xl transition-all duration-300 ${
+                            isDisabled
+                              ? "pointer-events-none bg-gray-300 text-gray-500 opacity-70 cursor-not-allowed"
+                              : "bg-[var(--color-green-primary)] text-white hover:opacity-95 cursor-pointer shadow-md"
+                          }`}
+                        >
+                          {hasOutOfStock ? "Remove Out of Stock Items" : "Proceed to Checkout"}
+                        </Link>
+                        {hasOutOfStock && (
+                          <p className="text-xs text-red-600 font-bold text-center mt-2">
+                            Some items in your cart are Out of Stock. Please remove them to proceed.
+                          </p>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

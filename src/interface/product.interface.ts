@@ -16,7 +16,13 @@ export interface Product {
     summary: string;
     description: string;
     discountType: DiscountType;
+    discountAmount?: number;
     quantity?: number;
+    stock?: string | number | boolean;
+    stockStatus?: string;
+    isOutOfStock?: boolean;
+    inStock?: boolean;
+    totalStock?: number;
     sizesString?: string;
     sizeStock?: Record<string, number>;
     vendor?: {

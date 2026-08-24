@@ -9,6 +9,7 @@ import useCart from "../../../hooks/useCart";
 import { useNavigate } from "react-router-dom";
 import { finalPrice } from "../../../utils/product-utils";
 import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
+import { isProductOutOfStock } from "../../../utils/stock-utils";
 
 interface Props {
     product: Product;
@@ -24,6 +25,8 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     const navigate = useNavigate();
     const [modalOpen, setModalOpen] = useState(false);
     const [actionType, setActionType] = useState<"addToCart" | "buyNow">("addToCart");
+
+    const isOutOfStock = isProductOutOfStock(product);
 
     const renderStars = (rating: number) => {
         const stars = [];
@@ -65,6 +68,9 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     const openModal = (e: React.MouseEvent, type: "addToCart" | "buyNow") => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (isOutOfStock) return;
+
         if (type === "buyNow" && isInCart(product)) {
             navigate("/cart");
             return;
@@ -73,11 +79,11 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
         setModalOpen(true);
     };
 
-    const handleModalConfirm = (p: Product) => {
+    const handleModalConfirm = (p: Product, size?: string) => {
         if (actionType === "addToCart") {
-            addToCart(p);
+            addToCart(p, 1, size);
         } else {
-            addToCart(p);
+            addToCart(p, 1, size);
             navigate("/cart");
         }
     };
@@ -86,6 +92,11 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
         <>
             <div className="group rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden w-full h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
                 <figure className="relative h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
+                    {isOutOfStock && (
+                        <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md z-10">
+                            Out of Stock
+                        </span>
+                    )}
                     <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-2xl">
                         <Image
                             src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
@@ -161,20 +172,31 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     )}
 
                     <div className="pt-2 border-t border-neutral-100 flex items-center gap-2">
-                        <button
-                            className="w-1/2 py-2 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
-                            onClick={(e) => openModal(e, "addToCart")}
-                        >
-                            <FiShoppingCart className="w-3.5 h-3.5" />
-                            Add
-                        </button>
-                        <button
-                            className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
-                            onClick={(e) => openModal(e, "buyNow")}
-                        >
-                            Buy Now
-                            <FiArrowRight className="w-3.5 h-3.5" />
-                        </button>
+                        {isOutOfStock ? (
+                            <button
+                                disabled
+                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-xs font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
+                            >
+                                Out of Stock
+                            </button>
+                        ) : (
+                            <>
+                                <button
+                                    className="w-1/2 py-2 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                                    onClick={(e) => openModal(e, "addToCart")}
+                                >
+                                    <FiShoppingCart className="w-3.5 h-3.5" />
+                                    Add
+                                </button>
+                                <button
+                                    className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
+                                    onClick={(e) => openModal(e, "buyNow")}
+                                >
+                                    Buy Now
+                                    <FiArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

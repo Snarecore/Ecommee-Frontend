@@ -8,6 +8,7 @@ import { useAtomValue } from "jotai";
 import { userAtom } from "@/store/user-store";
 import useCart from "@/hooks/useCart";
 import { finalPrice } from "@/utils/product-utils";
+import { isProductOutOfStock, isSizeOutOfStock } from "@/utils/stock-utils";
 import {
   calculateDeliveryZoneAndFee,
   createOrderInService,
@@ -67,9 +68,15 @@ const CheckoutView = () => {
 
   const [orderSubmitted, setOrderSubmitted] = useState(false);
 
-  // Redirect if cart is empty (unless order was just submitted)
+  // Redirect if cart is empty or has out-of-stock items (unless order was just submitted)
   useEffect(() => {
-    if (cartItems.length === 0 && !orderSubmitted) {
+    const hasOutOfStock = cartItems.some(
+      (item) => isProductOutOfStock(item) || (item.selectedSize ? isSizeOutOfStock(item, item.selectedSize) : false)
+    );
+    if ((cartItems.length === 0 || hasOutOfStock) && !orderSubmitted) {
+      if (hasOutOfStock) {
+        showErrorToast("Your cart contains Out of Stock items. Please remove them before checkout.");
+      }
       router.push("/cart");
     }
   }, [cartItems, orderSubmitted, router]);

@@ -9,6 +9,7 @@ import useCart from "../../../hooks/useCart";
 import { useNavigate } from "react-router-dom";
 import { finalPrice } from "../../../utils/product-utils";
 import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
+import { isProductOutOfStock } from "../../../utils/stock-utils";
 
 interface Props {
     product: Product;
@@ -41,6 +42,8 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
         "addToCart"
     );
 
+    const isOutOfStock = isProductOutOfStock(product);
+
     const calculatedPrice = finalPrice({
         price: Number(price) || 0,
         discountType: discountType,
@@ -64,6 +67,8 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
         e.preventDefault();
         e.stopPropagation();
 
+        if (isOutOfStock) return;
+
         if (type === "buyNow" && isInCart(product)) {
             navigate("/cart");
             return;
@@ -73,11 +78,11 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
         setModalOpen(true);
     };
 
-    const handleModalConfirm = (p: Product) => {
+    const handleModalConfirm = (p: Product, size?: string) => {
         if (actionType === "addToCart") {
-            addToCart(p);
+            addToCart(p, 1, size);
         } else {
-            addToCart(p);
+            addToCart(p, 1, size);
             navigate("/cart");
         }
     };
@@ -88,7 +93,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
                 {/* Product Image */}
                 <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
-                    {(product.quantity !== undefined && product.quantity <= 0) && (
+                    {isOutOfStock && (
                         <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md z-10">
                             Out of Stock
                         </span>
@@ -193,24 +198,34 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
                     {/* Action Buttons */}
                     <div className="mt-1 pt-2 border-t border-neutral-100 flex items-center gap-2">
+                        {isOutOfStock ? (
+                            <button
+                                disabled
+                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-xs font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
+                            >
+                                Out of Stock
+                            </button>
+                        ) : (
+                            <>
+                                {/* Add to Cart */}
+                                <button
+                                    className="w-1/2 py-2 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                                    onClick={(e) => openModal(e, "addToCart")}
+                                >
+                                    <FiShoppingCart className="w-3.5 h-3.5" />
+                                    Add
+                                </button>
 
-                        {/* Add to Cart */}
-                        <button
-                            className="w-1/2 py-2 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
-                            onClick={(e) => openModal(e, "addToCart")}
-                        >
-                            <FiShoppingCart className="w-3.5 h-3.5" />
-                            Add
-                        </button>
-
-                        {/* Buy Now */}
-                        <button
-                            className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
-                            onClick={(e) => openModal(e, "buyNow")}
-                        >
-                            Buy Now
-                            <FiArrowRight className="w-3.5 h-3.5" />
-                        </button>
+                                {/* Buy Now */}
+                                <button
+                                    className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
+                                    onClick={(e) => openModal(e, "buyNow")}
+                                >
+                                    Buy Now
+                                    <FiArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

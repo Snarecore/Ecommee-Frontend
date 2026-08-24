@@ -4,6 +4,7 @@ import { Product } from "../interface/product.interface";
 
 export interface CartItem extends Product {
 	quantity: number;
+	selectedSize?: string;
 }
 
 export const cartAtom = atomWithStorage<CartItem[]>("cart", []);
