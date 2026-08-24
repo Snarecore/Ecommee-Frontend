@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
 import Link from "next/link";;
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "../../../routes-compat";
 
 interface MenuItem {
     id: string;

@@ -5,19 +5,30 @@ import { TabType } from "./components/UserSidebar";
 import { useAPI } from "../../hooks/useApi";
 import apiConfig from "../../config/api.json";
 
+import { useAtomValue } from "jotai";
+import { userAtom } from "../../store/user-store";
+
 const UserProfile = () => {
 	const [activeTab, setActiveTab] = useState<TabType>("order");
 	const { fetchData } = useAPI();
+	const initialUser = useAtomValue(userAtom);
 	const [userData, setUserData] = useState<{
 		email: string;
 		name: string;
 		phone: string;
 		profile: any;
-	} | null>(null);
+	} | null>(initialUser ? {
+		email: initialUser.email || "",
+		name: initialUser.name || "",
+		phone: initialUser.phone || "",
+		profile: initialUser.profile || null,
+	} : null);
 
 	const fetchUserData = async () => {
 		const result = await fetchData({ apiUrl: `${apiConfig.people.user}` });
-		setUserData(result);
+		if (result) {
+			setUserData(result);
+		}
 	};
 
 	useEffect(() => {
@@ -42,9 +53,7 @@ const UserProfile = () => {
 				userData={userData}
 			/>
 
-			{userData && (
-				<UserContent activeTab={activeTab} userData={userData} fetchUserData={fetchUserData}/>
-			)}
+			<UserContent activeTab={activeTab} userData={userData || { email: "", name: "", phone: "", profile: null }} fetchUserData={fetchUserData}/>
 		</div>
 	);
 };

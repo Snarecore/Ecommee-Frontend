@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useSetAtom } from "jotai";
 import { FaCalendarAlt, FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../../routes-compat";
 import { logoutUserAtom } from "../../../store/user-store";
 import { FaKey } from "react-icons/fa6";
 

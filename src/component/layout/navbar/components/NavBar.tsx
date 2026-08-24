@@ -2,7 +2,7 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../../../routes-compat";
 import { nestedCategoriesAtom } from "../../../../store/global-store";
 import { MainCategory } from "../../../../interface/nested-category.interface";
 import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/user-store";

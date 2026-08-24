@@ -146,17 +146,15 @@ const INITIAL_DEMO_ORDERS: Order[] = [
 ];
 
 export const getStoredOrders = (): Order[] => {
-  if (typeof window === "undefined") return INITIAL_DEMO_ORDERS;
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_ORDERS));
-      return INITIAL_DEMO_ORDERS;
-    }
-    return JSON.parse(raw);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     console.error("Error reading stored orders:", err);
-    return INITIAL_DEMO_ORDERS;
+    return [];
   }
 };
 

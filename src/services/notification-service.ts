@@ -5,43 +5,15 @@ import { getUserToken } from "../hooks/useApi";
 
 const STORAGE_KEY = "shipping_notifications_v1";
 
-const INITIAL_DEMO_NOTIFICATIONS: NotificationItem[] = [
-  {
-    _id: "notif_demo_1",
-    orderId: "ord-10024",
-    title: "Order Status: Out for Delivery",
-    message: "Your order #ORD-10024 is currently out for delivery via Steadfast Courier.",
-    type: "ORDER_SHIPPED",
-    isRead: false,
-    createdAt: new Date(Date.now() - 3600 * 1000 * 2).toISOString()
-  },
-  {
-    _id: "notif_demo_2",
-    orderId: "ORD-10023",
-    title: "Order Status: Processing",
-    message: "Your order #ORD-10023 has been accepted and is being prepared.",
-    type: "ORDER_PROCESSING",
-    isRead: false,
-    createdAt: new Date(Date.now() - 3600 * 1000 * 8).toISOString()
-  }
-];
-
 export const getStoredNotifications = (): NotificationItem[] => {
-  if (typeof window === "undefined") return INITIAL_DEMO_NOTIFICATIONS;
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_NOTIFICATIONS));
-      return INITIAL_DEMO_NOTIFICATIONS;
-    }
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_NOTIFICATIONS));
-      return INITIAL_DEMO_NOTIFICATIONS;
-    }
-    return parsed;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return INITIAL_DEMO_NOTIFICATIONS;
+    return [];
   }
 };
 

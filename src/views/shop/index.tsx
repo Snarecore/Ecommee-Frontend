@@ -154,7 +154,7 @@ const Shop = () => {
                                 </div>
                             </div>
 
-                            {isLoading || isFetching ? (
+                            {isLoading ? (
                                 <div className="min-w-svh">
                                     <ProductCardSkeletonTwo />
                                 </div>

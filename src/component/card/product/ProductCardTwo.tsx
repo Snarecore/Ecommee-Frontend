@@ -6,7 +6,7 @@ import useWishlist from "../../../hooks/useWishlist";
 import Link from "next/link";
 import { Product } from "../../../interface/product.interface";
 import useCart from "../../../hooks/useCart";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../../routes-compat";
 import { finalPrice } from "../../../utils/product-utils";
 import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
 import { isProductOutOfStock } from "../../../utils/stock-utils";

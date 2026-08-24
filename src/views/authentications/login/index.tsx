@@ -2,7 +2,7 @@ import Image from "next/image";
 import { LuMail } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "../../../routes-compat";
 import Link from "next/link";;
 import { ChangeEvent, useState } from "react";
 import { useSetAtom } from "jotai";

@@ -19,8 +19,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 0, // Always consider query data stale so fresh data is fetched on navigation
-            refetchOnWindowFocus: true, // Auto refetch when user focuses back on the tab
+            staleTime: 1000 * 60 * 5,
+            refetchOnWindowFocus: false, // Prevent auto refetch when user focuses back on tab
             refetchOnMount: true, // Auto refetch when component mounts
             refetchOnReconnect: true,
           },

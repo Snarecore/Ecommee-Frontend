@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "../routes-compat";
 import { userAtom, userLoadedAtom } from "../store/user-store";
 import { Role } from "../enum/role.enum";
 

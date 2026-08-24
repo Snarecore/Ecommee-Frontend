@@ -77,7 +77,7 @@ const AllCategories = () => {
 					</p>
 				</div>
 				<div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6 p-4 max-w-screen-2xl mx-auto px-4 py-4 my-4">
-					{isLoading || isFetching ? (
+					{isLoading ? (
 						<ProductCardSkeletonOne />
 					) : dataList?.length > 0 ? (
 						<>

@@ -1,5 +1,5 @@
 import { FiEye } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../routes-compat";
 import Link from "next/link";;
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import EmptyComponent from "../empty-component";

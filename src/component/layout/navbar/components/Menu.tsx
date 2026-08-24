@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { BiSearch } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../../../routes-compat";
 import Link from "next/link";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { useEffect, useState, useRef } from "react";
@@ -83,6 +83,7 @@ const Menu = () => {
   } = usePaginatedQuery({
     queryKey: [productListQueryKey, debouncedSearchText],
     url: getProductListApiUrl(),
+    enabled: Boolean(debouncedSearchText.trim()),
   });
 
   useEffect(() => {

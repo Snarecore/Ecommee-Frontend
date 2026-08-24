@@ -82,7 +82,7 @@ const OrderTab = () => {
     isFetching,
     refetch: fetchData
   } = usePaginatedQuery({
-    queryKey: [orderQueryKey],
+    queryKey: [orderQueryKey, currentPageNumber.toString()],
     url: getOrderListApiUrl()
   });
 
@@ -91,12 +91,11 @@ const OrderTab = () => {
   };
 
   useEffect(() => {
-    fetchData();
     loadStoredOrders();
     const handleUpdate = () => loadStoredOrders();
     window.addEventListener("orders_updated", handleUpdate);
     return () => window.removeEventListener("orders_updated", handleUpdate);
-  }, [currentPageNumber]);
+  }, []);
 
   // Process API orders list from Backend first with top priority
   const apiOrdersMapped = (dataList || []).map((apiOrd: any) => {
@@ -204,7 +203,7 @@ const OrderTab = () => {
     }
   }, [combinedOrdersList]);
 
-  if (isFetching || isLoading) return <OrderListSkeleton />;
+  if (isLoading) return <OrderListSkeleton />;
 
   return (
     <div>

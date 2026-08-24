@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "../../routes-compat";
 import Link from "next/link";;
 import { useAPI } from "../../hooks/useApi";
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
@@ -16,7 +16,6 @@ import { FaPencilAlt, FaStarHalfAlt } from "react-icons/fa";
 import 'swiper/css';
 import useWishlist from "../../hooks/useWishlist";
 import useCart from "../../hooks/useCart";
-import { useNavigate } from 'react-router-dom';
 import { vendorMessageQueryKey } from "../../config/query-key";
 import { productRatingQueryKey } from "../../config/query-key";
 import { userAtom } from "../../store/user-store";

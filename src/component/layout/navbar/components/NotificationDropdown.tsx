@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../../../routes-compat";
 import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import moment from "moment";
 import {

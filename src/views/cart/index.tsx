@@ -1,6 +1,6 @@
 import Image from "next/image";
 import useCart from "../../hooks/useCart";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../routes-compat";
 import Link from "next/link";;
 import { TbArrowBackUp } from "react-icons/tb";
 import { useAPI } from "../../hooks/useApi";
