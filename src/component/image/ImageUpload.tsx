@@ -54,7 +54,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange }) => {
 			/>
 			{preview && (
 				<div className="relative w-[120px] h-[120px]">
-					<Image src={preview} alt="Uploaded File" className="w-full h-full object-cover rounded-lg border border-gray-300 mt-2" width={500} height={500} onError={() => setPreview(null)} />
+					<img src={preview} alt="Uploaded File" className="w-full h-full object-cover rounded-lg border border-gray-300 mt-2" onError={() => setPreview(null)} />
 					<button onClick={removeImage} className="absolute top-3 right-1 bg-red-500 text-white rounded-md cursor-pointer hover:bg-red-600 hover:text-white transition-all duration-300">
 						<IoCloseSharp size={14} />
 					</button>

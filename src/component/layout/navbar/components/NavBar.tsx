@@ -2,7 +2,7 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useNavigate } from "../../../../routes-compat";
+import { useRouter } from "next/navigation";
 import { nestedCategoriesAtom } from "../../../../store/global-store";
 import { MainCategory } from "../../../../interface/nested-category.interface";
 import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/user-store";
@@ -19,7 +19,7 @@ const NavBar = () => {
 
     const user = useAtomValue(userAtom);
     const setLogout = useSetAtom(logoutUserAtom);
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -51,7 +51,7 @@ const NavBar = () => {
 
     const handleLogout = () => {
         setIsDropdownOpen(false);
-        setLogout(() => navigate("/login"));
+        setLogout(() => router.push("/login"));
     };
 
     const displayName = getUserDisplayName(user);
@@ -64,8 +64,8 @@ const NavBar = () => {
     return (
         <div className="relative">
             <div
-                className={`w-full z-50 bg-gradient-to-r from-[#3e7842] via-[#519755] to-[#3a753e] border-t border-white/15 shadow-md transition-all duration-300 ${
-                    isScrolled ? "fixed top-0 left-0 right-0 shadow-xl backdrop-blur-md bg-[#519755]/95" : "relative"
+                className={`w-full z-30 bg-gradient-to-r from-[#3e7842] via-[#519755] to-[#3a753e] border-t border-white/15 shadow-md transition-all duration-300 ${
+                    isScrolled ? "fixed top-0 left-0 right-0 z-50 shadow-xl backdrop-blur-md bg-[#519755]/95" : "relative"
                 }`}
             >
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6">
@@ -189,7 +189,7 @@ const NavBar = () => {
                                                 </div>
 
                                                 <Link
-                                                    href="/customer-dashboard"
+                                                    href="/customer-dashboard?tab=order"
                                                     onClick={() => setIsDropdownOpen(false)}
                                                     className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors text-gray-700 dark:text-gray-200"
                                                 >

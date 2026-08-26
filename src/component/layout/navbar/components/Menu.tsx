@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { BiSearch } from "react-icons/bi";
-import { useNavigate } from "../../../../routes-compat";
 import Link from "next/link";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useAtom, useSetAtom } from "jotai";
 import { wishlistCounterAtom } from "../../../../store/wishlist-store";
 import { cartCounterAtom } from "../../../../store/cart-store";
@@ -46,10 +46,12 @@ const Menu = () => {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (savedTheme === 'dark') {
       setTheme('dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
@@ -118,11 +120,11 @@ const Menu = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
+  const router = useRouter();
   const setLogout = useSetAtom(logoutUserAtom);
 
   return (
-    <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-colors duration-300 py-3 sm:py-4">
+    <nav className="relative z-50 bg-[#fbf9f5] backdrop-blur-md border-b border-gray-200/80 transition-colors duration-300 py-3 sm:py-4">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo */}
         <Link href={"/"} className="flex items-center flex-shrink-0 group">
@@ -142,7 +144,7 @@ const Menu = () => {
             <input
               type="text"
               placeholder="Search products, categories..."
-              className="w-full pl-11 pr-10 py-2.5 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/15 focus:border-[var(--color-green-primary)] transition-all duration-300 shadow-xs"
+              className="w-full pl-11 pr-10 py-2.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/80 text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/15 focus:border-[var(--color-green-primary)] transition-all duration-300 shadow-xs"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />

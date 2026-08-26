@@ -156,8 +156,12 @@ export const useAPI = () => {
 
     const fetchData = async ({ apiUrl }: FetchDataProps) => {
         try {
-            const response = await getMutation.mutateAsync({ url: apiUrl }) as ApiResponse<any>;
-            return response?.data;
+            const response = await queryClient.fetchQuery({
+                queryKey: [apiUrl],
+                queryFn: () => getData({ url: apiUrl, token: getUserToken() }),
+                staleTime: 1000 * 60 * 5,
+            }) as ApiResponse<any>;
+            return response?.data ?? response;
         } catch (e: any) {
             showErrorToast(e?.response?.data?.message || e?.data?.message || e?.message);
         }

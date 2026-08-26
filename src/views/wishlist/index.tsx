@@ -1,3 +1,4 @@
+'use client';
 import { useEffect } from "react";
 import useWishlist from "../../hooks/useWishlist";
 import usePagination from "../../hooks/usePagination";
@@ -8,7 +9,6 @@ import { FaAngleRight } from "react-icons/fa6";
 import Link from "next/link";;
 import { metaDataAtom } from "../../store/global-store";
 import { useAtomValue } from "jotai";
-import { Helmet } from "react-helmet-async";
 
 const Wishlist = () => {
     const wishlistLimit = 5;
@@ -31,17 +31,7 @@ const Wishlist = () => {
 
     return (
         <>
-            <Helmet>
-                <title>
-                    {(wishlistMeta?.metaTitle || "Wishlist")
-                        .split(" ")
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(" ")}
-                </title>
-                <meta name="description" content={wishlistMeta?.metaDescription} />
-                <meta name="keywords" content={wishlistMeta?.metaKeywords} />
-            </Helmet>
-            <div className="min-h-screen">
+                        <div className="min-h-screen">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="flex items-center justify-between mb-12 animate-fade-in-down">
                         <div>

@@ -1,7 +1,8 @@
+'use client';
 import Image from "next/image";
 import useCart from "../../hooks/useCart";
-import { useNavigate } from "../../routes-compat";
-import Link from "next/link";;
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TbArrowBackUp } from "react-icons/tb";
 import { useAPI } from "../../hooks/useApi";
 import { useEffect, useState } from "react";
@@ -16,7 +17,6 @@ import Modal from "../../component/modals/Modal";
 import { useAtomValue } from "jotai";
 import { userAtom } from "../../store/user-store";
 import { metaDataAtom } from "../../store/global-store";
-import { Helmet } from "react-helmet-async";
 
 // 👇 Adjust this import path to wherever your helper lives
 import { finalPrice } from "../../utils/product-utils"; 
@@ -24,7 +24,7 @@ import { isProductOutOfStock, isSizeOutOfStock } from "../../utils/stock-utils";
 
 const MyCart = () => {
   const { fetchData } = useAPI();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [response, setResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
@@ -70,19 +70,7 @@ const MyCart = () => {
   }, 0);
 
   return (
-    <>
-      <Helmet>
-        <title>
-          {(cartMeta?.metaTitle || "Cart")
-            .split(" ")
-            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")}
-        </title>
-        <meta name="description" content={cartMeta?.metaDescription} />
-        <meta name="keywords" content={cartMeta?.metaKeywords} />
-      </Helmet>
-
-      <div className="py-8 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto sm:px-2">
+    <div className="py-8 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto sm:px-2">
         <div className="rounded-2xl p-6 ">
           <p className="text-3xl font-bold pb-4 text-[var(--color-green-primary)]">
             Shopping Cart
@@ -289,21 +277,21 @@ const MyCart = () => {
                     const isDisabled = hasOutOfStock || user?.role === "vendor" || user?.role === "admin";
                     return (
                       <>
-                        <Link
-                          href={isDisabled ? "#" : "/checkout"}
-                          onClick={(e) => {
-                            if (isDisabled) {
-                              e.preventDefault();
+                        <button
+                          disabled={isDisabled}
+                          onClick={() => {
+                            if (!isDisabled) {
+                              router.push("/checkout");
                             }
                           }}
                           className={`mt-10 block text-center w-full font-bold py-3 rounded-3xl transition-all duration-300 ${
                             isDisabled
-                              ? "pointer-events-none bg-gray-300 text-gray-500 opacity-70 cursor-not-allowed"
+                              ? "bg-gray-300 text-gray-500 opacity-70 cursor-not-allowed"
                               : "bg-[var(--color-green-primary)] text-white hover:opacity-95 cursor-pointer shadow-md"
                           }`}
                         >
                           {hasOutOfStock ? "Remove Out of Stock Items" : "Proceed to Checkout"}
-                        </Link>
+                        </button>
                         {hasOutOfStock && (
                           <p className="text-xs text-red-600 font-bold text-center mt-2">
                             Some items in your cart are Out of Stock. Please remove them to proceed.
@@ -338,7 +326,7 @@ const MyCart = () => {
                   onSuccess={() => {
                     clearCart();
                     setShowPaymentForm(false);
-                    navigate("/success");
+                    router.push("/success");
                   }}
                 />
               </Modal>
@@ -372,7 +360,7 @@ const MyCart = () => {
               Product You May Also Like
             </p>
             <button
-              onClick={() => navigate("/shop")}
+              onClick={() => router.push("/shop")}
               className="hover:bg-[var(--color-green-primary)] text-[var(--color-green-primary)] hover:text-white border border-[var(--color-green-primary)] px-8 py-2 rounded-full cursor-pointer transition-all ease-in-out duration-300"
             >
               See More
@@ -400,7 +388,6 @@ const MyCart = () => {
           </div>
         </div>
       </div>
-    </>
   );
 };
 

@@ -40,8 +40,11 @@ const useCart = () => {
 		}
 	};	
 
-	const removeFromCart = (product: Product) => {
-		const filteredItems = cartItems.filter((item) => item.id !== product.id);
+	const removeFromCart = (product: Product, selectedSize?: string) => {
+		const filteredItems = cartItems.filter(
+			(item) => !(item.id === product.id &&
+				(selectedSize ? item.selectedSize === selectedSize : !item.selectedSize || item.selectedSize === (product as any).selectedSize))
+		);
 		setCartItems(filteredItems);
 		showErrorToast("Item removed from cart.");
 	};

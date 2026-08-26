@@ -6,7 +6,8 @@ import {
     useStripe
 } from '@stripe/react-stripe-js';
 import { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import { postData } from '../../services/api-service';
+import { getUserToken } from '../../hooks/useApi';
 import { showErrorToast, showSuccessToast } from '../../utils/toast-utils';
 
 import { finalPrice } from "../../utils/product-utils";
@@ -83,11 +84,14 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
     useEffect(() => {
         const createPaymentIntent = async () => {
             try {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}payments`, {
-                    products,
-                    currency: 'usd'
+                const response: any = await postData({
+                    url: 'payments',
+                    token: getUserToken(),
+                    body: { products, currency: 'usd' }
                 });
-                setClientSecret(response.data.clientSecret);
+                if (response?.clientSecret || response?.data?.clientSecret) {
+                    setClientSecret(response.clientSecret || response.data.clientSecret);
+                }
             } catch (error) {
                 console.error('Failed to create payment intent: ', error);
             }
@@ -123,11 +127,12 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
         try {
             let secret = clientSecret;
             if (!secret) {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}payments`, {
-                    products,
-                    currency: 'usd'
+                const response: any = await postData({
+                    url: 'payments',
+                    token: getUserToken(),
+                    body: { products, currency: 'usd' }
                 });
-                secret = response.data.clientSecret;
+                secret = response?.clientSecret || response?.data?.clientSecret;
                 setClientSecret(secret);
             }
 
@@ -157,9 +162,10 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
                     city: city.trim()
                 };
 
-                await axios.post(
-                    `${process.env.NEXT_PUBLIC_API_BASE_URL}orders`,
-                    {
+                await postData({
+                    url: 'orders',
+                    token: getUserToken(),
+                    body: {
                         paymentIntentId: result.paymentIntent.id,
                         products,
                         totalAmount: discountedTotal,
@@ -168,13 +174,8 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
                         name: name.trim(),
                         phone: phone.trim(),
                         address: address.trim()
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
                     }
-                );
+                });
                 onSuccess();
             }
         } catch (err: any) {

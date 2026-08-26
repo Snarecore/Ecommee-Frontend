@@ -627,7 +627,7 @@ import Link from "next/link";;
 
 import { useAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 // import Link from "next/link";
 import { isLoadingAtom, nestedCategoriesAtom } from "../../store/global-store";
 import ProductCategorySkeleton from "../skeleton/ProductCategorySkeleton";
@@ -878,7 +878,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) => {
-  const location = useLocation();
+  const pathname = usePathname() || "/";
   const [openPath, setOpenPath] = useState<string[]>([]);
   const [nestedCategories] = useAtom(nestedCategoriesAtom);
   const [isLoading] = useAtom(isLoadingAtom);
@@ -996,7 +996,7 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
             <NestedMenuItem
               key={String((category as any).id)}
               item={category}
-              activePath={location.pathname}
+              activePath={pathname}
               openPath={openPath}
               setOpenPath={setOpenPath}
               selectedCategoryId={selectedCategoryId}

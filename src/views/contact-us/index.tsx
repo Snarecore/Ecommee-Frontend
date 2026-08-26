@@ -1,3 +1,4 @@
+'use client';
 import { IoLocationSharp } from "react-icons/io5";
 import { MdLocalPhone } from "react-icons/md";
 import { SiGmail } from "react-icons/si";
@@ -7,7 +8,6 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { contactMessageQueryKey } from "../../config/query-key";
 import { metaDataAtom } from "../../store/global-store";
 import { useAtomValue } from "jotai";
-import { Helmet } from "react-helmet-async";
 
 const initialFieldValues = {
     name: "",
@@ -89,17 +89,7 @@ const ContactUs = () => {
 
     return (
         <>
-            <Helmet>
-                <title>
-                    {contactMeta?.metaTitle
-                        ?.split(" ")
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(" ")}
-                </title>
-                <meta name="description" content={contactMeta?.metaDescription} />
-                <meta name="keywords" content={contactMeta?.metaKeywords} />
-            </Helmet>
-            <div className="max-w-screen-2xl mx-auto py-4 px-4">
+                        <div className="max-w-screen-2xl mx-auto py-4 px-4">
                 <div className="text-center mt-4">
                     <p className="text-center text-5xl font-bold mb-3 text-[var(--color-black-primary)]">{response?.pageTitle}</p>
                     <p className="text-[var(--color-black-primary)] text-[18px]">{response?.pageSubTitle}</p>

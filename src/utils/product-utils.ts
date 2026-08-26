@@ -23,3 +23,34 @@ export function finalPrice({
 
     return +Math.max(result, 0).toFixed(2);
 }
+
+const DEFAULT_PLACEHOLDER = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+export function formatImageUrl(url?: string | null | any): string {
+    if (!url) return DEFAULT_PLACEHOLDER;
+    if (typeof url !== "string") return DEFAULT_PLACEHOLDER;
+    
+    let trimmed = url.trim();
+    if (!trimmed) return DEFAULT_PLACEHOLDER;
+
+    if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+        try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return formatImageUrl(parsed[0]);
+            }
+            if (parsed && typeof parsed === "object" && parsed.url) {
+                return formatImageUrl(parsed.url);
+            }
+            return DEFAULT_PLACEHOLDER;
+        } catch {
+            return DEFAULT_PLACEHOLDER;
+        }
+    }
+
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/") || trimmed.startsWith("data:")) {
+        return trimmed;
+    }
+
+    return `/${trimmed}`;
+}

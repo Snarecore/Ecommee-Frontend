@@ -17,6 +17,7 @@ async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { e
 
         const response = await fetch(fullUrl, {
             ...options,
+            credentials: "include",
             cache: "no-store",
             headers: {
                 "Pragma": "no-cache",

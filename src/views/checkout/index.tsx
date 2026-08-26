@@ -67,9 +67,16 @@ const CheckoutView = () => {
   const elements = useElements();
 
   const [orderSubmitted, setOrderSubmitted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Redirect if cart is empty or has out-of-stock items (unless order was just submitted)
   useEffect(() => {
+    if (!isMounted) return;
+
     const hasOutOfStock = cartItems.some(
       (item) => isProductOutOfStock(item) || (item.selectedSize ? isSizeOutOfStock(item, item.selectedSize) : false)
     );
@@ -79,7 +86,7 @@ const CheckoutView = () => {
       }
       router.push("/cart");
     }
-  }, [cartItems, orderSubmitted, router]);
+  }, [cartItems, orderSubmitted, router, isMounted]);
 
   // Form State
   const [name, setName] = useState(user?.name || "");
@@ -290,7 +297,8 @@ const CheckoutView = () => {
           ? "Stripe payment successful! Order placed."
           : "Cash on Delivery order placed successfully!"
       );
-      router.push(`/order-confirmation/${createdOrderId || newOrder.id}`);
+      const targetOrderId = newOrder.id || newOrder.orderId || createdOrderId;
+      router.push(`/order-confirmation/${targetOrderId}`);
     } catch (err: any) {
       console.error("Order payment error:", err);
       setPaymentError(err?.message || "Payment process failed. Please check your card details or try again.");
@@ -298,6 +306,14 @@ const CheckoutView = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fbf9f5]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-green-primary)]"></div>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0 && !orderSubmitted) return null;
 

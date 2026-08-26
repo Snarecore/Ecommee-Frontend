@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useMemo, useState, ChangeEvent } from "react";
 import CommentComposer from "./CommentComposer";
 import CommentList from "./CommentList";

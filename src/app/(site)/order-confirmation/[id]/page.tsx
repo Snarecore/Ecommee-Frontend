@@ -1,5 +1,4 @@
 'use client';
-
 import OrderConfirmationView from "@/views/order-confirmation/index";
 import { useParams } from "next/navigation";
 

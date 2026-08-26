@@ -1,19 +1,19 @@
+'use client';
+
 import Pagination from "../../component/pagination";
 import apiConfig from "../../config/api.json";
 import { useAPI } from "../../hooks/useApi";
 import Sidebar from "../../component/sidebar";
-import 'aos/dist/aos.css';
 import { productListQueryKey } from "../../config/query-key";
 import EmptyComponent from "../../component/empty-component";
 import ProductCardSkeletonTwo from "../../component/skeleton/ProductCardSkeletonTwo";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { metaDataAtom, nestedCategoriesAtom } from "../../store/global-store";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import { Product } from "../../interface/product.interface";
 import { FaSlidersH } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { Helmet } from "react-helmet-async";
 import ProductCardOne from "../../component/card/product/ProductCardOne";
 
 export interface ShopPageCmsData {
@@ -27,17 +27,18 @@ export interface ShopPageCmsData {
 const Shop = () => {
     const dataLimit = 12;
     const { fetchData, usePaginatedQuery } = useAPI();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const metaData = useAtomValue(metaDataAtom);
     const shopMeta = metaData?.find(item => item.page?.toLowerCase().includes("shop"));
 
-    const categoryEntry = Array.from(searchParams.entries()).find(
-        ([key]) => key.endsWith('CategoryId')
-    );
+    const searchEntries = searchParams ? Array.from(searchParams.entries()) : [];
+    const categoryEntry = searchEntries.find(([key]) => key.endsWith('CategoryId'));
     const categoryKey = categoryEntry?.[0] || '';
     const categoryId = categoryEntry?.[1] || '';
-    const currentPageNumber = parseInt(searchParams.get("pageNumber") || "1");
+    const currentPageNumber = parseInt(searchParams?.get("pageNumber") || "1");
 
     const getProductListApiUrl = () => {
         const apiUrl = `${apiConfig.site.productListUrl}?${categoryKey}=${categoryId}&page=${currentPageNumber}&limit=${dataLimit}`;
@@ -46,9 +47,9 @@ const Shop = () => {
 
     const handlePagination = (paginationData: { selected: number }) => {
         const selectedPage = paginationData.selected + 1;
-        const newParams = new URLSearchParams(searchParams.toString());
+        const newParams = new URLSearchParams(searchParams ? searchParams.toString() : "");
         newParams.set("pageNumber", selectedPage.toString());
-        setSearchParams(newParams);
+        router.push(`${pathname}?${newParams.toString()}`);
     };
 
     const {
@@ -107,18 +108,7 @@ const Shop = () => {
     const categoryBannerImage = selectedCategory?.bannerImage;
 
     return (
-        <>
-            <Helmet>
-                <title>
-                    {(shopMeta?.metaTitle || "Shop")
-                        .split(" ")
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(" ")}
-                </title>
-                <meta name="description" content={shopMeta?.metaDescription} />
-                <meta name="keywords" content={shopMeta?.metaKeywords} />
-            </Helmet>
-            <div>
+        <div>
                 <div className="bg-blue-300 p-4 h-48 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${categoryBannerImage || response?.bannerImage})` }}>
                     <p className="text-2xl font-semibold text-white">
                         {breadcrumbPath.length > 0 ? breadcrumbPath.join(" → ") : "Shop"}
@@ -184,7 +174,6 @@ const Shop = () => {
                     </div>
                 </div>
             </div>
-        </>
     );
 };
 

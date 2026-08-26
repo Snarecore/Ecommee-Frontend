@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { FiShoppingCart, FiArrowRight } from "react-icons/fi";
 import { Product } from "../../interface/product.interface";
@@ -22,6 +22,18 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
     onConfirm,
 }) => {
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (isOpen && product) {
+            const availableSizes = getProductSizes(product);
+            const firstInStock = availableSizes.find(s => !isSizeOutOfStock(product, s));
+            if (firstInStock) {
+                setSelectedSize(firstInStock);
+            } else if (availableSizes.length > 0) {
+                setSelectedSize(availableSizes[0]);
+            }
+        }
+    }, [isOpen, product]);
 
     if (!isOpen) return null;
 

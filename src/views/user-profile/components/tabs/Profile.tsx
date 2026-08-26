@@ -1,3 +1,4 @@
+'use client';
 import Image, { StaticImageData } from "next/image";
 import { useState, ChangeEvent } from "react";
 import { IoCloseSharp, IoCloudUploadOutline } from "react-icons/io5";

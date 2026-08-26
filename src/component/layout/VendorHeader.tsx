@@ -1,7 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { RiArrowDropDownLine, RiArrowDropRightLine, RiLogoutCircleLine } from "react-icons/ri";
-
 import { FiUser } from "react-icons/fi";
 import userAvatar from "../../assets/avatar.png";
 import { TbLayoutGrid, TbListDetails, TbTablePlus } from "react-icons/tb";
@@ -9,8 +10,8 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaTags, FaUniversity } from "react-icons/fa";
 import companyLogo from "../../assets/BazaarBound_Landscap_Logo.svg";
-import { NavLink, useNavigate } from "react-router-dom";
-import Link from "next/link";;
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { BiCube } from "react-icons/bi";
 import { TfiLayoutSlider } from "react-icons/tfi";
 import { GoDotFill } from "react-icons/go";
@@ -20,22 +21,19 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { logoutUserAtom, userAtom } from "../../store/user-store";
 import { FaKey } from "react-icons/fa6";
 
-// const IconButton = ({ icon }: { icon: React.ReactNode }) => (
-// 	<button className="p-2 hover:bg-gray-50 rounded-lg transition-colors relative">
-// 		{icon}
-// 	</button>
-// );
-
 const MenuItem = ({
 	icon,
 	text,
 	className = "",
+	onClick,
 }: {
 	icon: React.ReactNode;
 	text: string;
 	className?: string;
+	onClick?: () => void;
 }) => (
 	<div
+		onClick={onClick}
 		className={`flex items-center gap-3 p-2 hover:bg-gray-50 cursor-pointer ${className}`}
 	>
 		{icon}
@@ -121,7 +119,6 @@ const menu = [
 			},
 		],
 	},
-
 ];
 
 const VendorHeader = () => {
@@ -131,6 +128,8 @@ const VendorHeader = () => {
 	const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 	const [openSubMenu, setOpenSubMenu] = useState<number | null>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const pathname = usePathname() || "/";
+	const router = useRouter();
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -149,12 +148,11 @@ const VendorHeader = () => {
 		setOpenSubMenu(openSubMenu === id ? null : id);
 	};
 
-	const navigate = useNavigate();
 	const setLogout = useSetAtom(logoutUserAtom);
 	const userData = useAtomValue(userAtom);
 
 	const handleLogout = () => {
-		setLogout(() => navigate("/login"));
+		setLogout(() => router.push("/login"));
 	};
 
 	return (
@@ -180,18 +178,16 @@ const VendorHeader = () => {
 							<Image src={userAvatar} alt="user" className="w-[45px] h-[45px] rounded-full border border-gray-200" />
 							<div>
 								<p className="text-[15px] font-semibold text-gray-800">
-									{/* {userData?.name} */}
+									{userData?.name}
 								</p>
-								{/* <p className="text-[12px] text-gray-500 capitalize">{userData?.role}</p> */}
+								<p className="text-[12px] text-gray-500 capitalize">{userData?.role}</p>
 							</div>
 						</div>
 						<MenuItem icon={<FiUser />} text="My Profile" />
-						{/* <MenuItem icon={<CiSettings />} text="Settings" /> */}
 						<MenuItem
 							icon={<RiLogoutCircleLine />}
 							text="Logout"
 							className="text-red-500 font-medium hover:bg-[var(--color-primary)]"
-							//@ts-ignore
 							onClick={handleLogout}
 						/>
 					</div>
@@ -210,14 +206,14 @@ const VendorHeader = () => {
 
 									{section.items.map((item) => {
 										const isParentActive = item.subItems.some(
-											(subItem) => subItem.path === location.pathname
+											(subItem) => subItem.path === pathname
 										);
 										const isOpen = openSubMenu === item.id;
 
 										return (
 											<div key={item.id}>
-												<NavLink
-													to={item.subItems.length > 0 ? "#" : item.path}
+												<Link
+													href={item.subItems.length > 0 ? "#" : item.path}
 													className={`w-[200px] group px-[12px] py-[8px] flex items-center justify-between cursor-pointer rounded-md transition-all mb-[2px] ${isOpen || isParentActive
 														? "bg-[#FFF7F0] text-[var(--color-primary)]"
 														: "hover:bg-gray-100"
@@ -252,24 +248,26 @@ const VendorHeader = () => {
 															)}
 														</span>
 													)}
-												</NavLink>
+												</Link>
 
 												{/* Submenu */}
 												{item.subItems.length > 0 && isOpen && (
 													<ul>
-														{item.subItems.map((subItem) => (
-															<NavLink
-																key={subItem.id}
-																to={subItem.path}
-																className={({ isActive }: { isActive: boolean }) =>
-																	`block w-[200px] rounded-md group pl-4 py-2.5 p-2 cursor-pointer text-[13px] transition-all hover:bg-gray-100 hover:text-[var(--color-primary)] ${isActive ? "text-[var(--color-primary)] font-medium" : "text-[#646b72]"}`
-																}>
-																<span className="flex justify-start items-center gap-2">
-																	<GoDotFill className="text-[10px]" />
-																	{subItem.name}
-																</span>
-															</NavLink>
-														))}
+														{item.subItems.map((subItem) => {
+															const isActive = subItem.path === pathname;
+															return (
+																<Link
+																	key={subItem.id}
+																	href={subItem.path}
+																	className={`block w-[200px] rounded-md group pl-4 py-2.5 p-2 cursor-pointer text-[13px] transition-all hover:bg-gray-100 hover:text-[var(--color-primary)] ${isActive ? "text-[var(--color-primary)] font-medium" : "text-[#646b72]"}`}
+																>
+																	<span className="flex justify-start items-center gap-2">
+																		<GoDotFill className="text-[10px]" />
+																		{subItem.name}
+																	</span>
+																</Link>
+															);
+														})}
 													</ul>
 												)}
 											</div>
@@ -287,7 +285,6 @@ const VendorHeader = () => {
 			)}
 
 			<div className="flex justify-end items-center px-4 lg:py-1 bg-white border-b border-gray-200">
-
 				<div className="flex gap-4 items-center">
 					<div
 						className="hidden lg:flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors relative"

@@ -6,7 +6,8 @@ import {
     useStripe
 } from '@stripe/react-stripe-js';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { postData } from '../../services/api-service';
+import { getUserToken } from '../../hooks/useApi';
 import { showErrorToast, showSuccessToast } from '../../utils/toast-utils';
 
 interface StripeCheckoutProps {
@@ -36,23 +37,18 @@ const VendorPaymentCheckout = ({ tierId, onSuccess }: StripeCheckoutProps) => {
     const elements = useElements();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const user = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem("user") || "{}") : {};
-    const token = user?.token || '';
 
     useEffect(() => {
         const createPaymentIntent = async () => {
             try {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}vendor/subscription/payment-intent`, {
-                    tierId,
-                    currency: 'usd'
-                },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-                setClientSecret(response.data.clientSecret);
+                const response: any = await postData({
+                    url: 'vendor/subscription/payment-intent',
+                    token: getUserToken(),
+                    body: { tierId, currency: 'usd' }
+                });
+                if (response?.clientSecret || response?.data?.clientSecret) {
+                    setClientSecret(response.clientSecret || response.data.clientSecret);
+                }
             } catch (error) {
                 console.error('Failed to create payment intent: ', error);
             }
@@ -82,19 +78,15 @@ const VendorPaymentCheckout = ({ tierId, onSuccess }: StripeCheckoutProps) => {
             showErrorToast(message);
         } else if (result.paymentIntent.status === 'succeeded') {
             showSuccessToast('Payment successful');
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}vendor/subscription/select`,
-                {
+            const response: any = await postData({
+                url: 'vendor/subscription/select',
+                token: getUserToken(),
+                body: {
                     paymentIntentId: result.paymentIntent.id,
                     tierId,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
                 }
-            );
-            onSuccess(response.data);
+            });
+            onSuccess(response?.data || response);
         }
 
         setLoading(false);

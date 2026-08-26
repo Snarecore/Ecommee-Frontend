@@ -1,5 +1,8 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAtomValue } from "jotai";
-import { Navigate } from "../routes-compat";
 import { userAtom, userLoadedAtom } from "../store/user-store";
 import { Role } from "../enum/role.enum";
 
@@ -11,15 +14,16 @@ interface RoleProtectedRouteProps {
 const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps) => {
     const user = useAtomValue(userAtom);
     const userLoaded = useAtomValue(userLoadedAtom);
+    const router = useRouter();
 
-    if (!userLoaded) return null;
+    useEffect(() => {
+        if (userLoaded && (!user || !allowedRoles.includes(user.role as Role))) {
+            router.replace("/login");
+        }
+    }, [user, userLoaded, allowedRoles, router]);
 
-    // if (!user) {
-    //     return <Navigate to="/login" replace />;
-    // }
-
-    if (!allowedRoles.includes(user?.role as Role)) {
-        return <Navigate to="/login" replace />;
+    if (!userLoaded || !user || !allowedRoles.includes(user.role as Role)) {
+        return null;
     }
 
     return children;

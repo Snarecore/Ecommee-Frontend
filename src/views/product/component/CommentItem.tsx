@@ -1,3 +1,4 @@
+'use client';
 import Image from "next/image";
 import { IoSend } from "react-icons/io5";
 import type { Comment } from "./CommentsSection";

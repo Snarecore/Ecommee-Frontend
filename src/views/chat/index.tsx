@@ -67,8 +67,8 @@ const Chat = () => {
         setIsSending(true);
 
         try {
-            const res = await postMutation({
-                apiUrl: apiConfig.messageLinks.sendMessageUrl,
+            const res = await postMutation.mutateAsync({
+                url: apiConfig.messageLinks.sendMessageUrl,
                 body: { content: textToSend }
             });
 

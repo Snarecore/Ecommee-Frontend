@@ -1,11 +1,12 @@
+'use client';
 import { useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
-import { useAPI } from "../../../../hooks/useApi";
-import apiConfig from "../../../../config/api.json";
-import TableSkeleton from "../../../../component/skeleton/TableSkeleton";
-import EmptyComponent from "../../../../component/empty-component";
-import DeleteModal from "../../../../component/modals/DeleteModal";
-import Pagination from "../../../../component/pagination";
+import { useAPI } from "../../../hooks/useApi";
+import apiConfig from "../../../config/api.json";
+import TableSkeleton from "../../../component/skeleton/TableSkeleton";
+import EmptyComponent from "../../../component/empty-component";
+import DeleteModal from "../../../component/modals/DeleteModal";
+import Pagination from "../../../component/pagination";
 
 interface InboxTableDataProps {
     id: string;

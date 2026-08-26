@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { Role } from "../../../../enum/role.enum";
 import { useAPI } from "../../../../hooks/useApi";

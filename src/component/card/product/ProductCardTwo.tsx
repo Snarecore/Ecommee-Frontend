@@ -6,10 +6,10 @@ import useWishlist from "../../../hooks/useWishlist";
 import Link from "next/link";
 import { Product } from "../../../interface/product.interface";
 import useCart from "../../../hooks/useCart";
-import { useNavigate } from "../../../routes-compat";
+import { useRouter } from "next/navigation";
 import { finalPrice } from "../../../utils/product-utils";
 import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
-import { isProductOutOfStock } from "../../../utils/stock-utils";
+import { isProductOutOfStock, getProductSizes } from "../../../utils/stock-utils";
 
 interface Props {
     product: Product;
@@ -22,7 +22,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     const { name, mainCategoryName, price, featuredImage, rating, discountType, discountAmount } = product;
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart, isInCart } = useCart();
-    const navigate = useNavigate();
+    const router = useRouter();
     const [modalOpen, setModalOpen] = useState(false);
     const [actionType, setActionType] = useState<"addToCart" | "buyNow">("addToCart");
 
@@ -71,8 +71,17 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
         if (isOutOfStock) return;
 
+        const sizes = getProductSizes(product);
+        if (sizes.length === 0) {
+            addToCart(product, 1);
+            if (type === "buyNow") {
+                router.push("/checkout");
+            }
+            return;
+        }
+
         if (type === "buyNow" && isInCart(product)) {
-            navigate("/cart");
+            router.push("/checkout");
             return;
         }
         setActionType(type);
@@ -84,7 +93,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
             addToCart(p, 1, size);
         } else {
             addToCart(p, 1, size);
-            navigate("/cart");
+            router.push("/checkout");
         }
     };
 

@@ -95,92 +95,12 @@ export const getOrderCreatedAt = (order?: OrderLike | null): string => {
   return formatPrettyDateWithTime(rawDate);
 };
 
-const INITIAL_DEMO_ORDERS: Order[] = [
-  {
-    id: "ord-10024",
-    orderId: "ORD-10024",
-    userId: "user-default",
-    createdAt: new Date(Date.now() - 3600 * 1000 * 24).toISOString(),
-    updatedAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
-    orderStatus: "Out for Delivery",
-    paymentStatus: "Pending",
-    paymentMethod: "COD",
-    subtotal: 1750,
-    deliveryCharge: 60,
-    totalAmount: 1810,
-    deliveryZone: "inside_dhaka",
-    shippingAddress: {
-      name: "Majba Rahman",
-      phone: "+8801810172434",
-      address: "House 24, Road 12, Sector 4, Uttara",
-      city: "Dhaka"
-    },
-    specialNote: "Please call 10 minutes before delivery.",
-    courierName: "Steadfast Courier",
-    trackingId: "ST-8891234",
-    courierTrackingLink: "https://steadfast.com.bd/t/ST-8891234",
-    items: [
-      {
-        id: "prod-1",
-        productName: "Leaf Black Half Shirt",
-        productImage: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&auto=format&fit=crop&q=60",
-        price: 1750,
-        quantity: 1
-      }
-    ],
-    statusHistory: [
-      {
-        status: "Order Placed",
-        timestamp: new Date(Date.now() - 3600 * 1000 * 24).toISOString(),
-        updatedBy: "system",
-        note: "Order created successfully"
-      },
-      {
-        status: "Preparing Order",
-        timestamp: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
-        updatedBy: "admin",
-        updatedByUserId: "admin_1",
-        note: "Items packed from store warehouse"
-      },
-      {
-        status: "Loaded for Delivery",
-        timestamp: new Date(Date.now() - 3600 * 1000 * 12).toISOString(),
-        updatedBy: "admin",
-        updatedByUserId: "admin_1",
-        note: "Loaded into delivery van"
-      },
-      {
-        status: "Handed Over to Courier",
-        timestamp: new Date(Date.now() - 3600 * 1000 * 8).toISOString(),
-        updatedBy: "admin",
-        updatedByUserId: "admin_1",
-        note: "Handed over to Steadfast Courier"
-      },
-      {
-        status: "Out for Delivery",
-        timestamp: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
-        updatedBy: "admin",
-        updatedByUserId: "admin_1",
-        note: "Rider out for delivery"
-      }
-    ]
-  }
-];
-
 export const getStoredOrders = (): Order[] => {
   if (typeof window === "undefined") return [];
   try {
-    const rawV2 = localStorage.getItem(STORAGE_KEY_V2);
-    if (rawV2) return JSON.parse(rawV2);
-
-    const rawV1 = localStorage.getItem(STORAGE_KEY_V1);
-    if (rawV1) {
-      const parsed = JSON.parse(rawV1);
-      return Array.isArray(parsed) ? parsed : [];
-    }
-    return [];
-  } catch (err) {
-    console.error("Error reading stored orders:", err);
+    const raw = localStorage.getItem(STORAGE_KEY_V2) || localStorage.getItem(STORAGE_KEY_V1);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
     return [];
   }
 };
@@ -209,7 +129,7 @@ export const createOrderInService = (params: {
     createdAt: nowISO,
     updatedAt: nowISO,
     orderStatus: "Order Placed",
-    paymentStatus: params.paymentStatus || (params.paymentMethod === "Online" ? "Pending" : "Pending"),
+    paymentStatus: params.paymentStatus || (params.paymentMethod === "Online" ? "Paid" : "Pending"),
     paymentMethod: params.paymentMethod,
     subtotal: params.subtotal,
     deliveryCharge,
@@ -228,13 +148,16 @@ export const createOrderInService = (params: {
     ]
   };
 
-  const existing = getStoredOrders();
-  const updated = [newOrder, ...existing];
   if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(updated));
-    localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(updated));
+    try {
+      const existing = getStoredOrders();
+      existing.unshift(newOrder);
+      localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(existing));
+      localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(existing));
+    } catch (e) {
+      console.error("Failed to store order in localStorage:", e);
+    }
     window.dispatchEvent(new Event("orders_updated"));
-    window.dispatchEvent(new Event("storage"));
   }
   return newOrder;
 };
@@ -323,6 +246,13 @@ export const updateOrderStatusInService = (params: {
 };
 
 export const getOrderByIdFromService = (orderId: string): Order | undefined => {
+  if (!orderId) return undefined;
   const orders = getStoredOrders();
-  return orders.find((o) => o.id === orderId || o.orderId === orderId);
+  const cleanId = orderId.replace(/^#/, "").trim().toLowerCase();
+
+  return orders.find((o) => {
+    const idMatches = o.id?.toLowerCase() === cleanId;
+    const orderIdMatches = o.orderId?.replace(/^#/, "").trim().toLowerCase() === cleanId;
+    return idMatches || orderIdMatches;
+  });
 };

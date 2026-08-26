@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from "react";
 import UserSidebar from "./components/UserSidebar";
 import UserContent from "./components/UserContent";

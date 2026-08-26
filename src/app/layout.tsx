@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../App.css";
+import "./globals.css";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
@@ -23,20 +23,16 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('theme') || 'light';
-                  if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
+                  localStorage.setItem('theme', 'light');
+                  document.documentElement.classList.remove('dark');
                 } catch (e) {}
               })();
             `,
           }}
         />
       </head>
-      <body>
-        <div id="root">
+      <body className="bg-[#fbf9f5]">
+        <div id="root" className="bg-[#fbf9f5]">
           <Providers>{children}</Providers>
         </div>
       </body>

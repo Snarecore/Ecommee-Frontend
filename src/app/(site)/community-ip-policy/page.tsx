@@ -1,5 +1,3 @@
-'use client';
-
 import PolicyFour from "@/views/policy-four";
 
 export default function CommunityIpPolicyPage() {

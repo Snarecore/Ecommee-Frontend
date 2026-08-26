@@ -1,9 +1,10 @@
+'use client';
 import Image from "next/image";
 import { LuMail } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";
-import { useNavigate, useLocation } from "../../../routes-compat";
-import Link from "next/link";;
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 import { useSetAtom } from "jotai";
 import { userAtom } from "../../../store/user-store";
@@ -23,13 +24,14 @@ const requiredFields: any = [
 ];
 
 const Login = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const from = (location.state as any)?.from?.pathname || "/";
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const from = searchParams?.get("from") || "/";
     const setUser = useSetAtom(userAtom);
     const { postMutation, handleApiMutation } = useAPI();
     const [showPassword, setShowPassword] = useState(false);
     const [fieldValues, setFieldValues] = useState(initialFieldValues);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -41,30 +43,45 @@ const Login = () => {
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
-        const mutation = postMutation;
-        const url = apiConfig.auth.loginUrl;
+        try {
+            const mutation = postMutation;
+            const url = apiConfig.auth.loginUrl;
 
-        const result = await handleApiMutation({
-            // @ts-ignore
-            mutation,
-            url,
-            body: fieldValues,
-            invalidateQueryKey: [loginQueryKey],
-            showSuccessMessage: true,
-            showErrorMessage: true,
-            requiredFields
-        });
+            const result = await handleApiMutation({
+                // @ts-ignore
+                mutation,
+                url,
+                body: fieldValues,
+                invalidateQueryKey: [loginQueryKey],
+                showSuccessMessage: true,
+                showErrorMessage: true,
+                requiredFields
+            });
 
-        // @ts-ignore
-        if (result?.success && result.data?.data?.user) {
-            // @ts-ignore
-            const { user } = result.data.data;
-            setCookie("user", JSON.stringify(user), 7);
-            sessionStorage.setItem("user", JSON.stringify(user));
-            setUser(user);
-            JSON.parse(sessionStorage.getItem("user") || "{}");
-            navigate(from);
+            if (result?.success && result.data) {
+                const resData: any = result.data;
+                const unpackedUser = resData?.data?.user || resData?.data?.data?.user || resData?.user || resData?.data;
+
+                if (unpackedUser && typeof unpackedUser === 'object') {
+                    const userToSave = {
+                        ...unpackedUser,
+                        token: unpackedUser.token || unpackedUser.accessToken || resData?.data?.token || resData?.token
+                    };
+                    setCookie("user", JSON.stringify(userToSave), 7);
+                    sessionStorage.setItem("user", JSON.stringify(userToSave));
+                    localStorage.setItem("user", JSON.stringify(userToSave));
+                    setUser(userToSave);
+                    router.push(from);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -161,9 +178,17 @@ const Login = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-[var(--color-green-secondary)] py-2 rounded-lg font-bold cursor-pointer"
+                        disabled={isSubmitting}
+                        className="w-full bg-[var(--color-green-secondary)] py-2.5 rounded-lg font-bold cursor-pointer hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Sign In
+                        {isSubmitting ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                <span>Signing In...</span>
+                            </>
+                        ) : (
+                            <span>Sign In</span>
+                        )}
                     </button>
 
                     <p className="text-center text-[15px] text-[#092C4C]">

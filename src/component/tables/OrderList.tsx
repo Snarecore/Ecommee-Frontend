@@ -1,6 +1,6 @@
 import { FiEye } from "react-icons/fi";
-import { useNavigate } from "../../routes-compat";
-import Link from "next/link";;
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import EmptyComponent from "../empty-component";
 
@@ -22,10 +22,10 @@ const OrderListTable = ({
     headers: string[];
     data: any[];
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
-    const handleInvoice = (data: OrdersDataProps) => {
-		navigate(`/invoice/${data.id}`, { state: { orderData: data } });
+	const handleNavigate = (data: OrdersDataProps) => {
+		router.push(`/order-confirmation/${data.id}`);
 	};
     
     return (
@@ -74,7 +74,7 @@ const OrderListTable = ({
         
         
                                         <td className="p-3 flex items-center gap-3">
-                                            <button onClick={() => handleInvoice(row)} className="border border-gray-300 text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-200 cursor-pointer p-2 rounded-md transition duration-300">
+                                            <button onClick={() => handleNavigate(row)} className="border border-gray-300 text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-200 cursor-pointer p-2 rounded-md transition duration-300">
                                                 <FiEye />
                                             </button>
                                         </td>

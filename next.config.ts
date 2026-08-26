@@ -1,64 +1,29 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "localhost",
+        hostname: "**",
       },
       {
         protocol: "https",
-        hostname: "bazaarbound-api.qligence.com",
+        hostname: "**",
       },
-      {
-        protocol: "https",
-        hostname: "bazaarbound.com",
-      },
-      {
-        protocol: "https",
-        hostname: "ecommerce-backend.genxsolutions.org",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.bazaarbound.com",
-      },
-      {
-        protocol: "https",
-        hostname: "*.bazaarbound.com",
-      },
-      {
-        protocol: "https",
-        hostname: "*.qligence.com",
-      },
-      {
-        protocol: "https",
-        hostname: "*.genxsolutions.org",
-      }
     ],
   },
-  webpack: (config) => {
-    config.resolve.alias['react-router-dom'] = path.resolve(process.cwd(), './src/routes-compat.tsx');
-    config.resolve.alias['react-helmet-async'] = path.resolve(process.cwd(), './src/helmet-compat.tsx');
-    return config;
-  },
   experimental: {
-    turbo: {
-      resolveAlias: {
-        'react-router-dom': './src/routes-compat.tsx',
-        'react-helmet-async': './src/helmet-compat.tsx',
-      },
-    },
+    optimizePackageImports: ["react-icons", "swiper", "jotai", "react-fast-marquee"],
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
-  }
+    ignoreBuildErrors: false,
+  },
 };
 
 export default nextConfig;

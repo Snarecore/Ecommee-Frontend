@@ -1,3 +1,4 @@
+'use client';
 import Image from "next/image";
 import { LuMail } from "react-icons/lu";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";

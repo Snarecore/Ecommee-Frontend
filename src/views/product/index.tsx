@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "../../routes-compat";
-import Link from "next/link";;
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAPI } from "../../hooks/useApi";
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 import ProductImageZoom from "../../component/product-image-zoom";
@@ -21,13 +21,12 @@ import { productRatingQueryKey } from "../../config/query-key";
 import { userAtom } from "../../store/user-store";
 import { useAtomValue } from "jotai";
 import Modal from "../../component/modals/Modal";
-import { Helmet } from "react-helmet-async";
 import userImage from "../../assets/user.png"
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import { buildOrganizationJsonLd, buildProductJsonLd, stripHtml } from "../../utils/jsonld-utils";
 import CommentsSection from "./component/CommentsSection";
 import SimilarProducts from "./component/SimilarProducts";
-import { finalPrice } from "../../utils/product-utils";
+import { finalPrice, formatImageUrl } from "../../utils/product-utils";
 import { getProductSizes, isSizeOutOfStock, isProductOutOfStock } from "../../utils/stock-utils";
 
 const initialFieldValues = {
@@ -65,19 +64,26 @@ export interface ProductItem extends ProductInterface {
     };
     sizes?: string[];
     sizesString?: string;
+    relatedProducts?: ProductInterface[];
+    vendorId?: string;
 }
 
-const Product = () => {
+interface ProductProps {
+    initialData?: ProductItem | null;
+}
+
+const Product = ({ initialData }: ProductProps) => {
     const [fieldValues, setFieldValues] = useState(initialFieldValues);
     const [fieldValuesRating, setFieldValuesRating] = useState(ratingInitialFieldValues);
-    const { slug } = useParams();
+    const params = useParams();
+    const slug = typeof params?.slug === "string" ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : "";
     const { fetchData, postMutation, handleApiMutation, usePaginatedQuery } = useAPI();
     const apiUrl = apiConfig.vendor.vendorMessageUrl;
     const ratingApiUrl = apiConfig.site.productRatingUrl;
     const { addToCart, isInCart } = useCart();
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-    const navigate = useNavigate();
-    const [product, setProduct] = useState<ProductItem | null>(null);
+    const router = useRouter();
+    const [product, setProduct] = useState<ProductItem | null>(initialData || null);
     const [relatedProducts, setRelatedProducts] = useState<ProductInterface[]>([]);
     //@ts-ignore
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -100,22 +106,56 @@ const Product = () => {
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     useEffect(() => {
+        const isValidProduct = (data: any): data is ProductItem => {
+            return Boolean(data && typeof data === "object" && !data.error && (data.id || data.slug || data.name));
+        };
+
+        if (isValidProduct(initialData)) {
+            setProduct(initialData);
+            if (initialData.featuredImage) {
+                setSelectedImage(initialData.featuredImage);
+            }
+            if (initialData.relatedProducts) {
+                setRelatedProducts(initialData.relatedProducts);
+            }
+            setFieldValues(prev => ({
+                ...prev,
+                vendorId: initialData.vendorId || "",
+            }));
+            setFieldValuesRating(prev => ({
+                ...prev,
+                productId: initialData.id || "",
+                vendorId: initialData.vendorId || ""
+            }));
+
+            const sizes = getProductSizes(initialData);
+            const firstInStock = sizes.find(s => !isSizeOutOfStock(initialData, s));
+            if (firstInStock) {
+                setSelectedSize(firstInStock);
+            } else if (sizes.length > 0) {
+                setSelectedSize(sizes[0]);
+            }
+            return;
+        }
+
         const fetchProductData = async () => {
+            if (!slug) return;
             setIsLoading(true);
             try {
-                const response = await fetchData({ apiUrl: `${apiConfig.site.productUrl}${slug}` });
-                if (response) {
+                const res = await fetchData({ apiUrl: `${apiConfig.site.productUrl}${slug}` });
+                const response = res?.data || res;
+                if (isValidProduct(response)) {
                     setProduct(response);
                     setSelectedImage(response.featuredImage);
-                    setRelatedProducts(response.relatedProducts);
+                    setRelatedProducts(response.relatedProducts || []);
                     setFieldValues(prev => ({
                         ...prev,
-                        vendorId: response.vendorId,
+                        vendorId: response.vendorId || "",
                     }));
                     setFieldValuesRating(prev => ({
                         ...prev,
-                        productId: response.id,
-                        vendorId: response.vendorId
+                        productId: response.id || "",
+                        vendorId: response.vendorId || ""
                     }));
 
                     const sizes = getProductSizes(response);
@@ -136,8 +176,8 @@ const Product = () => {
             }
         };
 
-        if (slug) fetchProductData();
-    }, [slug]);
+        fetchProductData();
+    }, [slug, initialData]);
 
     const handleImageClick = (imageUrl: string) => {
         setSelectedImage(imageUrl);
@@ -284,27 +324,16 @@ const Product = () => {
     const hasDiscount = calculatedPrice < original;
     return (
         <>
-            <Helmet>
-                <title>{product?.seoData?.metaTitle || product?.name}</title>
-                <meta
-                    name="description"
-                    content={
-                        product?.seoData?.metaDescription ||
-                        stripHtml(product?.summary || product?.description)
-                    }
+            {product && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(buildProductJsonLd(product)) }}
                 />
-                <meta name="keywords" content={product?.seoData?.metaKeywords} />
-
-                {product && (
-                    <script type="application/ld+json">
-                        {JSON.stringify(buildProductJsonLd(product))}
-                    </script>
-                )}
-
-                <script type="application/ld+json">
-                    {JSON.stringify(buildOrganizationJsonLd())}
-                </script>
-            </Helmet>
+            )}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd()) }}
+            />
 
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <style>
@@ -331,7 +360,7 @@ const Product = () => {
                         <div className="w-full lg:w-[40%]">
                             <div className="mb-4 relative">
                                 <ProductImageZoom
-                                    imageSrc={(selectedImage || product?.featuredImage) ?? ''}
+                                    imageSrc={formatImageUrl(selectedImage || product?.featuredImage)}
                                     imageAlt={product?.name}
                                     containerClassName="rounded-lg shadow-md w-full h-[400px] sm:h-[500px] lg:h-[600px]"
                                     zoomScale={1.8}
@@ -356,7 +385,7 @@ const Product = () => {
                                     onClick={() => handleImageClick(product?.featuredImage ?? '')}
                                     className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border-2 transition ${selectedImage === product?.featuredImage ? "border-[var(--color-green-primary)]" : "border-gray-300"}`}
                                 >
-                                    <Image src={product?.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={product?.name || ""} className="w-full h-full object-cover" width={500} height={500} />
+                                    <Image src={formatImageUrl(product?.featuredImage)} alt={product?.name || ""} className="w-full h-full object-cover" width={500} height={500} />
                                 </button>
                                 {product?.productImages.map((image, index) => (
                                     <button
@@ -364,7 +393,7 @@ const Product = () => {
                                         onClick={() => handleImageClick(image.imageUrl)}
                                         className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border-2 transition cursor-pointer ${selectedImage === image.imageUrl ? "border-[var(--color-green-primary)]" : "border-gray-300"}`}
                                     >
-                                        <Image src={image.imageUrl || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" width={500} height={500} />
+                                        <Image src={formatImageUrl(image.imageUrl)} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" width={500} height={500} />
                                     </button>
                                 ))}
                             </div>
@@ -522,10 +551,10 @@ const Product = () => {
                                                     e.stopPropagation();
                                                     if (!isSelectedOut) {
                                                         if (product && isInCart(product)) {
-                                                            navigate('/cart');
+                                                            router.push('/cart');
                                                         } else {
                                                             handleAddToCart();
-                                                            navigate('/cart');
+                                                            router.push('/cart');
                                                         }
                                                     }
                                                 }}

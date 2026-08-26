@@ -1,8 +1,23 @@
 import { useEffect, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "../../../../routes-compat";
+import { useRouter } from "next/navigation";
 import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle } from "react-icons/fi";
-import moment from "moment";
+
+// Native replacement for moment().fromNow()
+const timeAgo = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "just now";
+  const diffMs = Date.now() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSec < 60) return "just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 30) return `${diffDay}d ago`;
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+};
 import {
   fetchNotificationsApi,
   markNotificationReadApi,
@@ -17,7 +32,7 @@ interface Props {
 const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data, refetch } = useQuery({
@@ -59,25 +74,15 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const handleNotificationClick = async (notif: NotificationItem) => {
     if (!notif.isRead) {
       await markNotificationReadApi(notif._id);
-      queryClient.setQueryData(["notifications"], (old: any) => {
-        if (!old) return old;
-        const updatedNotifs = old.notifications.map((n: NotificationItem) =>
-          n._id === notif._id ? { ...n, isRead: true } : n
-        );
-        return {
-          notifications: updatedNotifs,
-          unreadCount: Math.max(0, old.unreadCount - 1)
-        };
-      });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     }
-
     setIsOpen(false);
 
     if (notif.orderId) {
-      const cleanOrderId = notif.orderId.replace("#", "");
-      navigate(`/customer-dashboard?tab=order&orderId=${cleanOrderId}`);
+      const cleanOrderId = notif.orderId.replace(/^#/, "");
+      router.push(`/customer-dashboard?tab=order&orderId=${cleanOrderId}`);
     } else {
-      navigate("/customer-dashboard?tab=order");
+      router.push("/customer-dashboard?tab=order");
     }
   };
 
@@ -169,7 +174,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
                         {notif.title}
                       </p>
                       <span className="text-[10px] text-gray-400 whitespace-nowrap">
-                        {moment(notif.createdAt).fromNow()}
+                        {timeAgo(notif.createdAt)}
                       </span>
                     </div>
 
@@ -190,7 +195,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
             <button
               onClick={() => {
                 setIsOpen(false);
-                navigate("/customer-dashboard?tab=order");
+                router.push("/customer-dashboard?tab=order");
               }}
               className="text-xs font-medium text-[var(--color-green-primary)] dark:text-green-400 hover:underline cursor-pointer"
             >

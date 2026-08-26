@@ -1,3 +1,4 @@
+'use client';
 import ProductCategory from "../../component/product-category";
 import { useState, useEffect } from "react";
 import ProductCardTwo from "../../component/card/product/ProductCardTwo";
@@ -10,7 +11,6 @@ import EmptyComponent from "../../component/empty-component";
 import { Product } from "../../interface/product.interface";
 import { metaDataAtom } from "../../store/global-store";
 import { useAtomValue } from "jotai";
-import { Helmet } from "react-helmet-async";
 
 const AllCategories = () => {
 	const dataLimit = 10;
@@ -56,17 +56,7 @@ const AllCategories = () => {
 
 	return (
 		<>
-			<Helmet>
-				<title>
-					{(allCategoriesMeta?.metaTitle || "All Categories")
-						.split(" ")
-						.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-						.join(" ")}
-				</title>
-				<meta name="description" content={allCategoriesMeta?.metaDescription} />
-				<meta name="keywords" content={allCategoriesMeta?.metaKeywords} />
-			</Helmet>
-			<div className="mb-10">
+						<div className="mb-10">
 				<ProductCategory contentData={contentData} />
 				<div className="text-center mt-20">
 					<p className="text-4xl font-bold text-[var(--color-green-primary)] uppercase">

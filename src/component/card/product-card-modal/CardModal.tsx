@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
-import Link from "next/link";;
-import { useNavigate, useLocation } from "../../../routes-compat";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
 interface MenuItem {
     id: string;
@@ -160,7 +160,7 @@ const NestedMenuItem = ({
     openItems: string[];
 }) => {
     const hasChildren = item.children && item.children.length > 0;
-    const navigate = useNavigate();
+    const router = useRouter();
     const isOpen = openItems.includes(item.id);
     const isActive = item.path === activePath;
 
@@ -172,7 +172,7 @@ const NestedMenuItem = ({
                     : [...prev, item.id]
             );
         } else if (item.path) {
-            navigate(item.path);
+            router.push(item.path);
         }
     };
 
@@ -222,13 +222,13 @@ const NestedMenuItem = ({
 };
 
 const CardModal = () => {
-    const location = useLocation();
+    const pathname = usePathname();
     const [openItems, setOpenItems] = useState<string[]>([]);
-    const [activePath, setActivePath] = useState(location.pathname);
+    const [activePath, setActivePath] = useState(pathname || "/");
 
     useEffect(() => {
-        setActivePath(location.pathname);
-    }, [location]);
+        setActivePath(pathname || "/");
+    }, [pathname]);
 
     useEffect(() => {
         const findParentIds = (items: MenuItem[], targetPath: string): string[] => {

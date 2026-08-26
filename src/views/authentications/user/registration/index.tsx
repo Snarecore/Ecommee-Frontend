@@ -1,10 +1,11 @@
+'use client';
 import Image from "next/image";
 import { FiPhone, FiUser } from "react-icons/fi";
 import { LuMail } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 import companyLogo from "../../../../assets/BazaarBound Logo.svg";
-import { useNavigate } from "react-router-dom";
-import Link from "next/link";;
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 import { useAPI } from "../../../../hooks/useApi";
 import apiConfig from "../../../../config/api.json";
@@ -23,47 +24,39 @@ const initialFieldValues = {
 
 const requiredFields = [
 	{ key: "name", value: "name", label: "text" },
-	{ key: "phone", value: "phone", label: "text" },
 	{ key: "email", value: "email", label: "text" },
+	{ key: "phone", value: "phone", label: "text" },
 	{ key: "password", value: "password", label: "text" },
-	{ key: "confirmPassword", value: "confirm password", label: "text" }
+	{ key: "confirmPassword", value: "confirmPassword", label: "text" }
 ];
 
 const UserRegistration = () => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { postMutation, handleApiMutation } = useAPI();
+	const [fieldValues, setFieldValues] = useState(initialFieldValues);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-	const [fieldValues, setFieldValues] = useState(initialFieldValues);
 
-	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = event.target;
-		setFieldValues((prev) => ({
-			...prev,
-			[name]: value
-		}));
+	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setFieldValues(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmitForm = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (fieldValues.password !== fieldValues.confirmPassword) {
-			showSuccessToast("Passwords do not match");
-			return;
-		}
-
-		const result = await handleApiMutation({
+		const success = await handleApiMutation({
 			mutation: postMutation,
 			url: apiConfig.auth.registrationUrl,
 			body: fieldValues,
+			requiredFields,
 			invalidateQueryKey: [userRegistrationQueryKey],
-			showSuccessMessage: true,
-			showErrorMessage: true,
-			requiredFields
 		});
 
-		if (result?.success) {
-			navigate("/login");
+		if (success) {
+			showSuccessToast("Account created successfully!");
+			setFieldValues(initialFieldValues);
+			router.push("/login");
 		}
 	};
 
@@ -79,7 +72,7 @@ const UserRegistration = () => {
 						Create New Account
 					</p>
 				</div>
-				<form className="space-y-5" onSubmit={handleRegister}>
+				<form className="space-y-5" onSubmit={handleSubmitForm}>
 					<div className="space-y-4">
 						<div>
 							<label className="block mb-1.5">

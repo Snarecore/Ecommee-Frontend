@@ -1,5 +1,3 @@
-'use client';
-
 import Success from "@/views/success";
 import RoleProtectedRoute from "@/providers/RoleProtectedRoute";
 import { Role } from "@/enum/role.enum";

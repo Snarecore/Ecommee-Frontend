@@ -1,3 +1,4 @@
+'use client';
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { MdClose } from "react-icons/md";

@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 export interface CategorySelection {
     id: string;
@@ -8,7 +8,7 @@ export interface CategorySelection {
 }
 
 const useShop = () => {
-    const [_, setSearchParams] = useSearchParams();
+    const router = useRouter();
 
     const determineCategoryKey = (category: CategorySelection): string => {
 		if (category.mainCategoryId && category.firstCategoryId) {
@@ -25,7 +25,7 @@ const useShop = () => {
         const updatedParams = new URLSearchParams();
         updatedParams.set(categoryKey, selectedCategory.id);
         updatedParams.set('pageNumber', "1");
-        setSearchParams(updatedParams);
+        router.push(`/shop?${updatedParams.toString()}`);
     };
 
     return {

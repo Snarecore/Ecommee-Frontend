@@ -1,5 +1,3 @@
-'use client';
-
 import Cart from "@/views/cart/index";
 
 export default function CartPage() {

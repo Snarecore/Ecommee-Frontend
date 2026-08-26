@@ -1,9 +1,10 @@
+'use client';
 import Image from "next/image";
 import { useState, ChangeEvent } from "react";
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import Link from "next/link";;
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import companyLogo from "../../../assets/BazaarBound Logo.svg";
 
@@ -17,15 +18,14 @@ const requiredFields: any = [
 ];
 
 const ResetPassword = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const { postMutation, handleApiMutation } = useAPI();
     const apiUrl = apiConfig.auth.resetPasswordUrl;
 
-    const [searchParams] = useSearchParams();
-    const location = useLocation() as { state?: { email?: string; token?: string } } | any;
+    const searchParams = useSearchParams();
 
-    const email = (searchParams.get("email") ?? location?.state?.email ?? "").trim();
-    const token = (searchParams.get("token") ?? location?.state?.token ?? "").trim();
+    const email = (searchParams?.get("email") ?? "").trim();
+    const token = (searchParams?.get("token") ?? "").trim();
 
     const [fields, setFields] = useState<FieldValues>({ password: "", confirm: "" });
     const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ const ResetPassword = () => {
 
             if (result?.success) {
                 setFields({ password: "", confirm: "" });
-                navigate("/login");
+                router.push("/login");
             }
         } finally {
             setIsLoading(false);

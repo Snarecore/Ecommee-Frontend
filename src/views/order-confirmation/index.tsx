@@ -16,6 +16,10 @@ import {
 } from "react-icons/fa";
 import { getOrderCreatedAt } from "@/utils/order-service";
 
+import { getData } from "@/services/api-service";
+import { getUserToken } from "@/hooks/useApi";
+import { formatImageUrl } from "@/utils/product-utils";
+
 interface OrderConfirmationViewProps {
   orderId: string;
 }
@@ -25,13 +29,31 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (orderId) {
+    const loadOrder = async () => {
+      if (!orderId) {
+        setLoading(false);
+        return;
+      }
       const found = getOrderByIdFromService(orderId);
       if (found) {
         setOrder(found);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    }
+      try {
+        const token = getUserToken();
+        const res: any = await getData({ url: `orders/${orderId}`, token });
+        const apiOrder = res?.data || res;
+        if (apiOrder && !apiOrder.error && (apiOrder.id || apiOrder.orderId)) {
+          setOrder(apiOrder);
+        }
+      } catch (err) {
+        console.error("Failed to load order from API:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadOrder();
   }, [orderId]);
 
   if (loading) {
@@ -78,74 +100,75 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 text-sm bg-gray-50 p-4 rounded-xl border border-gray-100">
             <div>
               <span className="text-gray-400 block text-xs">Order ID</span>
-              <span className="font-bold text-gray-800">{order.orderId}</span>
+              <strong className="font-extrabold text-gray-800 text-base">
+                {order.orderId || `#${(order as any).id?.slice(0, 8)}`}
+              </strong>
             </div>
-            <div className="h-8 w-px bg-gray-200 hidden sm:block"></div>
+            <div className="h-8 w-px bg-gray-200 hidden sm:block" />
             <div>
               <span className="text-gray-400 block text-xs">Order Date</span>
-              <span className="font-semibold text-gray-800">
-                {getOrderCreatedAt(order)}
-              </span>
+              <strong className="font-semibold text-gray-700">{getOrderCreatedAt(order)}</strong>
             </div>
-            <div className="h-8 w-px bg-gray-200 hidden sm:block"></div>
+            <div className="h-8 w-px bg-gray-200 hidden sm:block" />
             <div>
-              <span className="text-gray-400 block text-xs">Estimated Delivery</span>
-              <span className="font-bold text-emerald-700 flex items-center gap-1">
-                <FaCalendarAlt /> 2-3 Business Days
-              </span>
+              <span className="text-gray-400 block text-xs">Payment Method</span>
+              <strong className="font-semibold text-gray-700">{order.paymentMethod || "COD"}</strong>
             </div>
           </div>
         </div>
 
-        {/* Shipping & Payment Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Order Status & Shipping Info Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Shipping Address */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-3">
             <h3 className="font-bold text-gray-800 text-base flex items-center gap-2 border-b pb-3">
-              <FaMapMarkerAlt className="text-[var(--color-green-primary)]" /> Delivery Details
+              <FaMapMarkerAlt className="text-[var(--color-green-primary)]" /> Shipping Address
             </h3>
-            <div className="text-sm space-y-1 text-gray-600">
-              <p className="font-bold text-gray-800">{order.shippingAddress.name}</p>
-              <p>{order.shippingAddress.phone}</p>
-              <p>{order.shippingAddress.address}</p>
-              <p className="font-medium text-gray-700">{order.shippingAddress.city}</p>
-            </div>
+            {order.shippingAddress ? (
+              <div className="text-sm space-y-1 text-gray-600">
+                <p className="font-bold text-gray-800 text-base">{order.shippingAddress.name}</p>
+                <p className="flex items-center gap-2">📞 {order.shippingAddress.phone}</p>
+                <p className="flex items-start gap-2 mt-1">📍 {order.shippingAddress.address}</p>
+                <p className="font-semibold text-gray-700 mt-1">City: {order.shippingAddress.city}</p>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-500">Address details unavailable.</p>
+            )}
           </div>
 
+          {/* Payment & Delivery Summary */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-3">
             <h3 className="font-bold text-gray-800 text-base flex items-center gap-2 border-b pb-3">
-              <FaTruck className="text-[var(--color-green-primary)]" /> Payment Information
+              <FaTruck className="text-[var(--color-green-primary)]" /> Delivery & Status
             </h3>
-            <div className="text-sm space-y-2 text-gray-600">
-              <div className="flex justify-between">
-                <span>Payment Method:</span>
-                <span className="font-bold text-gray-800 flex items-center gap-1">
-                  {order.paymentMethod === "COD" ? (
-                    <>
-                      <FaMoneyBillWave className="text-emerald-600" /> Cash on Delivery
-                    </>
-                  ) : (
-                    <>
-                      <FaCreditCard className="text-blue-600" /> Online Payment
-                    </>
-                  )}
+            <div className="text-sm space-y-2.5 text-gray-600">
+              <div className="flex justify-between items-center">
+                <span>Order Status:</span>
+                <span className="bg-emerald-100 text-emerald-800 font-bold px-3 py-0.5 rounded-full text-xs">
+                  {order.orderStatus || "Order Placed"}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span>Payment Status:</span>
                 <span
-                  className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                  className={`font-bold px-3 py-0.5 rounded-full text-xs ${
                     order.paymentStatus === "Paid"
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-emerald-100 text-emerald-800"
                       : "bg-amber-100 text-amber-800"
                   }`}
                 >
-                  {order.paymentStatus}
+                  {order.paymentStatus || "Pending"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Delivery Zone:</span>
+                <span className="font-semibold text-gray-800">
+                  {order.deliveryZone === "inside_dhaka" ? "Inside Dhaka (৳60)" : "Outside Dhaka (৳120)"}
                 </span>
               </div>
               {order.specialNote && (
-                <div className="pt-2 border-t text-xs text-gray-500">
-                  <span className="font-semibold block text-gray-700">Special Note:</span>
-                  &quot;{order.specialNote}&quot;
+                <div className="pt-2 border-t text-xs text-gray-500 italic">
+                  Note: &quot;{order.specialNote}&quot;
                 </div>
               )}
             </div>
@@ -159,42 +182,57 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           </h3>
 
           <div className="divide-y divide-gray-100">
-            {order.items.map((item) => (
-              <div key={item.id} className="py-3 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={item.productImage}
-                    alt={item.productName}
-                    width={56}
-                    height={56}
-                    className="w-14 h-14 object-cover rounded-xl border shrink-0"
-                  />
-                  <div>
-                    <h4 className="font-bold text-sm text-gray-800">{item.productName}</h4>
-                    <p className="text-xs text-gray-500">Quantity: {item.quantity}</p>
+            {(() => {
+              const itemsList: any[] = order.items || (order as any).orderSummaries || (order as any).orderItems || (order as any).products || [];
+              if (itemsList.length === 0) {
+                return (
+                  <p className="text-xs text-gray-500 py-3">No item details available.</p>
+                );
+              }
+              return itemsList.map((item: any, idx: number) => {
+                const pName = item.productName || item.product?.name || item.name || "Product";
+                const pImg = formatImageUrl(item.productImage || item.image || item.product?.featuredImage);
+                const pPrice = Number(item.price || item.product?.price || 0);
+                const pQty = Number(item.quantity || 1);
+
+                return (
+                  <div key={item.id || idx} className="py-3 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={pImg}
+                        alt={pName}
+                        width={56}
+                        height={56}
+                        className="w-14 h-14 object-cover rounded-xl border shrink-0"
+                      />
+                      <div>
+                        <h4 className="font-bold text-sm text-gray-800">{pName}</h4>
+                        <p className="text-xs text-gray-500">Quantity: {pQty}</p>
+                      </div>
+                    </div>
+                    <div className="font-bold text-sm text-gray-800">
+                      ৳{(pPrice * pQty).toFixed(2)}
+                    </div>
                   </div>
-                </div>
-                <div className="font-bold text-sm text-gray-800">
-                  ৳{(item.price * item.quantity).toFixed(2)}
-                </div>
-              </div>
-            ))}
+                );
+              });
+            })()}
           </div>
 
           <div className="border-t border-gray-100 pt-4 space-y-2 text-sm text-gray-600">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>৳{order.subtotal.toFixed(2)}</span>
+              <span>৳{Number(order.subtotal || order.totalAmount || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>
                 Delivery Fee ({order.deliveryZone === "inside_dhaka" ? "Inside Dhaka" : "Outside Dhaka"})
               </span>
-              <span>৳{order.deliveryCharge.toFixed(2)}</span>
+              <span>৳{Number(order.deliveryCharge || 60).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-base font-extrabold text-[var(--color-green-primary)] pt-2 border-t">
               <span>Total Amount</span>
-              <span>৳{order.totalAmount.toFixed(2)}</span>
+              <span>৳{Number(order.totalAmount || order.subtotal || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>

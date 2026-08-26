@@ -5,8 +5,11 @@ import { useAtomValue } from 'jotai';
 import { userAtom } from '@/store/user-store';
 import { getUserToken } from '@/hooks/useApi';
 import apiConfig from '@/config/api.json';
-import Image from 'next/image';
-import moment from 'moment';
+const formatChatTime = (dateStr?: string): string => {
+    const d = dateStr ? new Date(dateStr) : new Date();
+    const valid = !isNaN(d.getTime()) ? d : new Date();
+    return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(valid);
+};
 import {
     IoChatbubbleEllipsesSharp,
     IoClose,
@@ -398,7 +401,7 @@ const FloatingChat = () => {
                                                 </div>
                                                 <div className="flex items-center gap-1 mt-0.5 px-1">
                                                     <span className="text-[9px] text-gray-400">
-                                                        {moment(msg.createdAt).isValid() ? moment(msg.createdAt).format('h:mm A') : moment().format('h:mm A')}
+                                                        {formatChatTime(msg.createdAt)}
                                                     </span>
                                                     {isMe && <IoCheckmarkDoneSharp className="w-3 h-3 text-green-500" />}
                                                 </div>

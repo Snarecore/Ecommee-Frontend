@@ -1,8 +1,9 @@
+'use client';
 import Image from "next/image";
 import { useSetAtom } from "jotai";
 import { FaCalendarAlt, FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { useNavigate } from "../../../routes-compat";
+import { useRouter } from "next/navigation";
 import { logoutUserAtom } from "../../../store/user-store";
 import { FaKey } from "react-icons/fa6";
 
@@ -21,10 +22,11 @@ interface Props {
 }
 
 const UserSidebar: React.FC<Props> = ({ activeTab, setActiveTab, userData }) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const setLogout = useSetAtom(logoutUserAtom);
+
 	const handleLogout = () => {
-		setLogout(() => navigate("/login"));
+		setLogout(() => router.push("/login"));
 	};
 
 	return (

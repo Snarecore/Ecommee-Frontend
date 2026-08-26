@@ -1,3 +1,4 @@
+'use client';
 import Image from "next/image";
 import { FaHeart } from "react-icons/fa";
 import { FiHeart } from "react-icons/fi";
@@ -5,7 +6,7 @@ import useWishlist from "../../../hooks/useWishlist";
 import Link from "next/link";
 import { Product } from "../../../interface/product.interface";
 import useCart from "../../../hooks/useCart";
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/navigation";
 import { finalPrice } from "../../../utils/product-utils";
 
 interface Props {
@@ -19,7 +20,7 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
     const { name, mainCategoryName, price, featuredImage, discountType, discountAmount } = product;
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart, isInCart } = useCart();
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const calculatedPrice = finalPrice({
         price: Number(price) || 0,
@@ -110,10 +111,10 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
                             e.preventDefault();
                             e.stopPropagation();
                             if (isInCart(product)) {
-                                navigate('/cart');
+                                router.push('/cart');
                             } else {
                                 addToCart(product);
-                                navigate('/cart');
+                                router.push('/cart');
                             }
                         }}
                     >
