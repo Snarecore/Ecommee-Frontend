@@ -532,6 +532,11 @@ const OrderTab = () => {
                         {selectedOrder.paymentStatus || "Pending"}
                       </strong>
                     </p>
+                    {(selectedOrder.couponCode || Number(selectedOrder.discountAmount) > 0) && (
+                      <p className="text-emerald-700 font-semibold pt-1">
+                        Coupon Applied: <strong>{selectedOrder.couponCode || "Discount"}</strong> (-৳{Number(selectedOrder.discountAmount || 0).toFixed(2)})
+                      </p>
+                    )}
                     {selectedOrder.specialNote && (
                       <p className="pt-2 text-gray-500 italic">
                         Note: &quot;{selectedOrder.specialNote}&quot;

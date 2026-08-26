@@ -288,6 +288,12 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
               </span>
               <span>৳{Number(order.deliveryCharge || 60).toFixed(2)}</span>
             </div>
+            {((order as any).couponCode || Number((order as any).discountAmount) > 0) && (
+              <div className="flex justify-between text-emerald-600 font-semibold">
+                <span>Coupon Discount ({(order as any).couponCode || "Applied"})</span>
+                <span>-৳{Number((order as any).discountAmount || 0).toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-base font-extrabold text-[var(--color-green-primary)] pt-2 border-t">
               <span>Total Amount</span>
               <span>৳{Number(order.totalAmount || order.subtotal || 0).toFixed(2)}</span>
