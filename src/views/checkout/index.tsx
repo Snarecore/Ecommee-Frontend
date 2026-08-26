@@ -41,6 +41,8 @@ import {
   useStripe
 } from "@stripe/react-stripe-js";
 
+import CouponInput from "@/component/coupon/CouponInput";
+
 const ELEMENT_OPTIONS = {
   style: {
     base: {
@@ -68,6 +70,13 @@ const CheckoutView = () => {
 
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    couponCode: string;
+    discountAmount: number;
+    discountType: string;
+    discountValue: number;
+  } | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -122,7 +131,8 @@ const CheckoutView = () => {
 
   // Authoritative delivery zone & fee calculation
   const { deliveryZone, deliveryCharge } = calculateDeliveryZoneAndFee(city);
-  const grandTotal = cartSubtotal + deliveryCharge;
+  const couponDiscount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const grandTotal = Math.max(0, cartSubtotal + deliveryCharge - couponDiscount);
 
   // Handle Form Submission
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -253,6 +263,7 @@ const CheckoutView = () => {
         name: name.trim(),
         phone: phone.trim(),
         address: address.trim(),
+        couponCode: appliedCoupon?.couponCode || undefined,
         shippingAddress: {
           name: name.trim(),
           phone: phone.trim(),
@@ -663,6 +674,29 @@ const CheckoutView = () => {
                 })}
               </div>
 
+              {/* Coupon Section */}
+              <div className="border-t pt-4">
+                <CouponInput
+                  items={cartItems.map((i) => ({ productId: i.id, quantity: i.quantity ?? 1 }))}
+                  deliveryZone={deliveryZone}
+                  appliedCouponCode={appliedCoupon?.couponCode}
+                  appliedDiscountAmount={appliedCoupon?.discountAmount}
+                  onCouponApplied={(res) => {
+                    setAppliedCoupon({
+                      couponCode: res.couponCode,
+                      discountAmount: res.discountAmount,
+                      discountType: res.discountType,
+                      discountValue: res.discountValue
+                    });
+                    showSuccessToast(`Coupon "${res.couponCode}" applied! (-৳${res.discountAmount.toFixed(2)})`);
+                  }}
+                  onCouponRemoved={() => {
+                    setAppliedCoupon(null);
+                    showSuccessToast("Coupon removed.");
+                  }}
+                />
+              </div>
+
               {/* Cost Calculations */}
               <div className="border-t border-b border-gray-100 py-4 space-y-2 text-sm text-gray-600">
                 <div className="flex justify-between">
@@ -675,6 +709,12 @@ const CheckoutView = () => {
                   </span>
                   <span className="font-semibold text-gray-800">৳{deliveryCharge.toFixed(2)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-emerald-600 font-semibold">
+                    <span>Coupon Discount ({appliedCoupon.couponCode})</span>
+                    <span>-৳{appliedCoupon.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-base font-extrabold text-[var(--color-green-primary)] pt-2 border-t border-gray-100">
                   <span>Total Amount</span>
                   <span>৳{grandTotal.toFixed(2)}</span>
