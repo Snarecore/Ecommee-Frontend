@@ -298,7 +298,12 @@ const CheckoutView = () => {
         paymentStatus: paymentMethod === "Online" ? "Paid" : "Pending",
         specialNote: specialNote.trim(),
         items: orderItems,
-        subtotal: cartSubtotal
+        subtotal: cartSubtotal,
+        couponCode: appliedCoupon?.couponCode || createdOrderData?.couponCode || undefined,
+        discountAmount: appliedCoupon ? appliedCoupon.discountAmount : Number(createdOrderData?.discountAmount || 0),
+        totalAmount: grandTotal,
+        id: createdOrderData?.id,
+        orderId: createdOrderData?.orderId
       });
 
       setOrderSubmitted(true);

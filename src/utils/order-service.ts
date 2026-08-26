@@ -69,6 +69,8 @@ export interface Order {
   
   shippingAddress: ShippingAddress;
   specialNote?: string;
+  couponCode?: string;
+  discountAmount?: number;
   
   courierName?: string;
   trackingId?: string;
@@ -129,17 +131,24 @@ export const createOrderInService = (params: {
   specialNote?: string;
   items: OrderItem[];
   subtotal: number;
+  couponCode?: string;
+  discountAmount?: number;
+  totalAmount?: number;
+  orderId?: string;
+  id?: string;
 }): Order => {
   const { deliveryZone, deliveryCharge } = calculateDeliveryZoneAndFee(
     params.shippingAddress.city
   );
-  const totalAmount = params.subtotal + deliveryCharge;
+  const couponDiscount = Number(params.discountAmount || 0);
+  const calculatedTotal = Math.max(0, params.subtotal + deliveryCharge - couponDiscount);
+  const totalAmount = params.totalAmount !== undefined ? params.totalAmount : calculatedTotal;
   const nowISO = new Date().toISOString();
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  const orderId = `ORD-${randomSuffix}`;
+  const orderId = params.orderId || `ORD-${randomSuffix}`;
 
   const newOrder: Order = {
-    id: `ord-${Date.now()}`,
+    id: params.id || `ord-${Date.now()}`,
     orderId,
     userId: params.userId || "user-default",
     createdAt: nowISO,
@@ -153,6 +162,8 @@ export const createOrderInService = (params: {
     deliveryZone,
     shippingAddress: params.shippingAddress,
     specialNote: params.specialNote,
+    couponCode: params.couponCode,
+    discountAmount: couponDiscount,
     items: params.items,
     statusHistory: [
       {
