@@ -293,9 +293,7 @@ const CheckoutView = () => {
       setOrderSubmitted(true);
       clearCart();
       showSuccessToast(
-        paymentMethod === "Online"
-          ? "Stripe payment successful! Order placed."
-          : "Cash on Delivery order placed successfully!"
+        "Order submitted successfully! Your order is now waiting for admin approval."
       );
       const targetOrderId = newOrder.id || newOrder.orderId || createdOrderId;
       router.push(`/order-confirmation/${targetOrderId}`);

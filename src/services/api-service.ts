@@ -8,7 +8,9 @@ const getApiBaseUrl = (): string => {
     return "http://localhost:5000/api/v1/";
 };
 
-async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { error: boolean; message: string }> {
+export type ApiErrorResponse = { error: boolean; status?: number; message: string };
+
+async function apiRequest<T>(url: string, options: RequestInit): Promise<T | ApiErrorResponse> {
     try {
         const baseUrl = getApiBaseUrl();
         const fullUrl = url.startsWith("http://") || url.startsWith("https://")
@@ -36,7 +38,12 @@ async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { e
 
         if (!response.ok) {
             console.error(`API Error: ${response.status} - ${response.statusText}`);
-            return { error: true, message: `Failed: ${response.statusText}` };
+            const errData = await response.json().catch(() => null);
+            return {
+                error: true,
+                status: response.status,
+                message: errData?.message || `Failed (${response.status}): ${response.statusText}`
+            };
         }
 
         return await response.json().catch(() => ({ error: true, message: "Invalid JSON response" }));
@@ -46,21 +53,21 @@ async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { e
     }
 }
 
-export async function getData<T>({ url, token }: GetDataProps): Promise<T | { error: boolean; message: string }> {
+export async function getData<T>({ url, token }: GetDataProps): Promise<T | ApiErrorResponse> {
     const headers: HeadersInit = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "GET" });
 }
 
-export async function postData<T>({ url, token, body }: PostDataProps): Promise<T | { error: boolean; message: string }> {
+export async function postData<T>({ url, token, body }: PostDataProps): Promise<T | ApiErrorResponse> {
     const headers: HeadersInit = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "POST", body: JSON.stringify(body) });
 }
 
-export async function patchData<T>({ url, token, body }: PatchDataProps): Promise<T | { error: boolean; message: string }> {
+export async function patchData<T>({ url, token, body }: PatchDataProps): Promise<T | ApiErrorResponse> {
     const headers: HeadersInit = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 

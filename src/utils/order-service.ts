@@ -1,8 +1,8 @@
 import { formatPrettyDateWithTime } from "./date-utils";
 
 export type OrderStatus =
-  | "Order Placed"
   | "Pending"
+  | "Order Placed"
   | "Processing"
   | "Preparing Order"
   | "Shipped"
@@ -13,7 +13,16 @@ export type OrderStatus =
   | "Completed"
   | "Failed"
   | "Cancelled"
-  | "Returned";
+  | "Returned"
+  | "Rejected";
+
+export type RejectionReason =
+  | "Product unavailable"
+  | "Out of stock"
+  | "Delivery unavailable"
+  | "Customer information issue"
+  | "Payment issue"
+  | "Other";
 
 export type PaymentStatus = "Pending" | "Paid" | "Failed" | "Refunded";
 export type PaymentMethod = "COD" | "Online";
@@ -64,6 +73,13 @@ export interface Order {
   courierName?: string;
   trackingId?: string;
   courierTrackingLink?: string;
+
+  acceptedAt?: string;
+  acceptedBy?: string;
+  rejectedAt?: string;
+  rejectedBy?: string;
+  rejectionReason?: RejectionReason | string;
+  rejectionMessage?: string;
   
   items: OrderItem[];
   statusHistory: OrderStatusHistoryItem[];
@@ -128,7 +144,7 @@ export const createOrderInService = (params: {
     userId: params.userId || "user-default",
     createdAt: nowISO,
     updatedAt: nowISO,
-    orderStatus: "Order Placed",
+    orderStatus: "Pending",
     paymentStatus: params.paymentStatus || (params.paymentMethod === "Online" ? "Paid" : "Pending"),
     paymentMethod: params.paymentMethod,
     subtotal: params.subtotal,
@@ -140,10 +156,10 @@ export const createOrderInService = (params: {
     items: params.items,
     statusHistory: [
       {
-        status: "Order Placed",
+        status: "Pending",
         timestamp: nowISO,
         updatedBy: "system",
-        note: "Order created successfully"
+        note: "Order submitted by customer - Pending Admin Approval"
       }
     ]
   };
@@ -160,6 +176,228 @@ export const createOrderInService = (params: {
     window.dispatchEvent(new Event("orders_updated"));
   }
   return newOrder;
+};
+
+export const acceptOrderInService = async (params: {
+  orderId: string;
+  adminUserId?: string;
+  note?: string;
+}): Promise<Order | null> => {
+  const { patchData } = require("../services/api-service");
+  const { getUserToken } = require("../hooks/useApi");
+  const token = getUserToken();
+
+  // Try API first
+  try {
+    const apiRes: any = await patchData({
+      url: `orders/${params.orderId}/accept`,
+      token,
+      body: { note: params.note || "Order accepted by admin" }
+    });
+
+    if (apiRes && (apiRes.status === 409 || (apiRes.message && apiRes.message.includes("409")))) {
+      throw new Error("409 Conflict: Order status has already changed or is no longer Pending.");
+    }
+  } catch (err: any) {
+    if (err?.message?.includes("409")) {
+      throw err;
+    }
+    console.warn("NestJS accept API endpoint fallback to local persistence:", err?.message || err);
+  }
+
+  const orders = getStoredOrders();
+  const idx = orders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
+
+  if (idx === -1) {
+    // Construct target if not found in localStorage
+    return {
+      id: params.orderId,
+      orderId: params.orderId,
+      createdAt: new Date().toISOString(),
+      orderStatus: "Order Placed",
+      paymentStatus: "Pending",
+      paymentMethod: "COD",
+      subtotal: 0,
+      deliveryCharge: 60,
+      totalAmount: 60,
+      deliveryZone: "inside_dhaka",
+      shippingAddress: { name: "Customer", phone: "", address: "", city: "Dhaka" },
+      items: [],
+      statusHistory: [
+        {
+          status: "Order Placed",
+          timestamp: new Date().toISOString(),
+          updatedBy: "admin",
+          note: params.note || "Order accepted by admin"
+        }
+      ]
+    };
+  }
+
+  const target = { ...orders[idx] };
+  if (target.orderStatus !== "Pending") {
+    throw new Error("409 Conflict: Only Pending orders can be accepted.");
+  }
+
+  const nowISO = new Date().toISOString();
+  target.orderStatus = "Order Placed";
+  target.updatedAt = nowISO;
+  target.acceptedAt = nowISO;
+  target.acceptedBy = params.adminUserId || "admin_default";
+
+  if (!target.statusHistory) target.statusHistory = [];
+  target.statusHistory = [
+    ...target.statusHistory,
+    {
+      status: "Order Placed",
+      timestamp: nowISO,
+      updatedBy: "admin",
+      updatedByUserId: params.adminUserId || "admin_default",
+      note: params.note || "Order accepted by admin"
+    }
+  ];
+
+  orders[idx] = target;
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(orders));
+    localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(orders));
+    window.dispatchEvent(new Event("orders_updated"));
+    window.dispatchEvent(new Event("storage"));
+
+    try {
+      const { addShippingNotification } = require("../services/notification-service");
+      addShippingNotification(
+        target.orderId || target.id,
+        "Order Placed",
+        `🎉 Your order #${target.orderId || target.id} has been accepted and is now being prepared.`
+      );
+    } catch (err) {
+      console.error("Error triggering notification:", err);
+    }
+  }
+
+  return target;
+};
+
+export const rejectOrderInService = async (params: {
+  orderId: string;
+  adminUserId?: string;
+  rejectionReason: RejectionReason | string;
+  rejectionMessage?: string;
+}): Promise<Order | null> => {
+  if (!params.rejectionReason) {
+    throw new Error("Rejection reason is mandatory.");
+  }
+
+  const { patchData } = require("../services/api-service");
+  const { getUserToken } = require("../hooks/useApi");
+  const token = getUserToken();
+
+  // Try NestJS API endpoint first
+  try {
+    const apiRes: any = await patchData({
+      url: `orders/${params.orderId}/reject`,
+      token,
+      body: {
+        rejectionReason: params.rejectionReason,
+        rejectionMessage: params.rejectionMessage?.trim() || ""
+      }
+    });
+
+    if (apiRes && (apiRes.status === 409 || (apiRes.message && apiRes.message.includes("409")))) {
+      throw new Error("409 Conflict: Order status has already changed or is no longer Pending.");
+    }
+  } catch (err: any) {
+    if (err?.message?.includes("409")) {
+      throw err;
+    }
+    console.warn("NestJS reject API endpoint fallback to local persistence:", err?.message || err);
+  }
+
+  const orders = getStoredOrders();
+  const idx = orders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
+
+  if (idx === -1) {
+    return {
+      id: params.orderId,
+      orderId: params.orderId,
+      createdAt: new Date().toISOString(),
+      orderStatus: "Rejected",
+      paymentStatus: "Refunded",
+      paymentMethod: "COD",
+      subtotal: 0,
+      deliveryCharge: 60,
+      totalAmount: 60,
+      deliveryZone: "inside_dhaka",
+      shippingAddress: { name: "Customer", phone: "", address: "", city: "Dhaka" },
+      rejectionReason: params.rejectionReason,
+      rejectionMessage: params.rejectionMessage,
+      items: [],
+      statusHistory: [
+        {
+          status: "Rejected",
+          timestamp: new Date().toISOString(),
+          updatedBy: "admin",
+          note: `Order rejected - ${params.rejectionReason}`
+        }
+      ]
+    };
+  }
+
+  const target = { ...orders[idx] };
+  if (target.orderStatus !== "Pending") {
+    throw new Error("409 Conflict: Only Pending orders can be rejected.");
+  }
+
+  const nowISO = new Date().toISOString();
+  target.orderStatus = "Rejected";
+  target.updatedAt = nowISO;
+  target.rejectedAt = nowISO;
+  target.rejectedBy = params.adminUserId || "admin_default";
+  target.rejectionReason = params.rejectionReason;
+  target.rejectionMessage = params.rejectionMessage?.trim();
+
+  // If payment was paid, mark as refunded on rejection
+  if (target.paymentStatus === "Paid") {
+    target.paymentStatus = "Refunded";
+  }
+
+  if (!target.statusHistory) target.statusHistory = [];
+  const noteText = `Order rejected - ${params.rejectionReason}${
+    params.rejectionMessage ? `: ${params.rejectionMessage}` : ""
+  }`;
+
+  target.statusHistory = [
+    ...target.statusHistory,
+    {
+      status: "Rejected",
+      timestamp: nowISO,
+      updatedBy: "admin",
+      updatedByUserId: params.adminUserId || "admin_default",
+      note: noteText
+    }
+  ];
+
+  orders[idx] = target;
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(orders));
+    localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(orders));
+    window.dispatchEvent(new Event("orders_updated"));
+    window.dispatchEvent(new Event("storage"));
+
+    try {
+      const { addShippingNotification } = require("../services/notification-service");
+      addShippingNotification(
+        target.orderId || target.id,
+        "Rejected",
+        `Your order #${target.orderId || target.id} was not accepted (${params.rejectionReason}).`
+      );
+    } catch (err) {
+      console.error("Error triggering notification:", err);
+    }
+  }
+
+  return target;
 };
 
 export const updateOrderStatusInService = (params: {
@@ -185,6 +423,18 @@ export const updateOrderStatusInService = (params: {
   }
 
   const target = { ...orders[idx] };
+
+  // Validation rule: Pending orders cannot skip directly to Processing, Shipped, or Delivered
+  if (
+    target.orderStatus === "Pending" &&
+    params.newStatus !== "Order Placed" &&
+    params.newStatus !== "Rejected" &&
+    params.newStatus !== "Cancelled"
+  ) {
+    console.error(`Invalid status transition from Pending to ${params.newStatus}. Must be Accepted or Rejected first.`);
+    return null;
+  }
+
   const nowISO = new Date().toISOString();
 
   target.orderStatus = params.newStatus;
@@ -200,7 +450,7 @@ export const updateOrderStatusInService = (params: {
   }
 
   // Cancellation matrix
-  if (params.newStatus === "Cancelled") {
+  if (params.newStatus === "Cancelled" || params.newStatus === "Rejected") {
     if (target.paymentStatus === "Paid") {
       target.paymentStatus = "Refunded";
     }

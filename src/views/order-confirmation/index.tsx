@@ -12,7 +12,9 @@ import {
   FaCalendarAlt,
   FaShieldAlt,
   FaMoneyBillWave,
-  FaCreditCard
+  FaCreditCard,
+  FaClock,
+  FaTimesCircle
 } from "react-icons/fa";
 import { getOrderCreatedAt } from "@/utils/order-service";
 
@@ -82,20 +84,64 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
     );
   }
 
+  const isPending = order.orderStatus === "Pending";
+  const isRejected = order.orderStatus === "Rejected";
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-6">
-        {/* Success Header Card */}
+        {/* Dynamic Header Card */}
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-md text-center">
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-4xl">
-            <FaCheckCircle />
-          </div>
-          <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
-            Order Placed Successfully! 🎉
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Thank you for shopping with us. We have received your order and are preparing it for shipment.
-          </p>
+          {isPending ? (
+            <>
+              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600 text-4xl">
+                <FaClock />
+              </div>
+              <h1 className="text-3xl font-extrabold text-amber-700">
+                Order Received
+              </h1>
+              <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+                Your order has been successfully submitted and is currently waiting for admin approval.
+              </p>
+            </>
+          ) : isRejected ? (
+            <>
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 text-4xl">
+                <FaTimesCircle />
+              </div>
+              <h1 className="text-3xl font-extrabold text-red-600">
+                Order Rejected
+              </h1>
+              <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+                We regret to inform you that your order could not be accepted by the store admin.
+              </p>
+
+              {order.rejectionReason && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-left max-w-md mx-auto space-y-1">
+                  <p className="text-xs font-bold text-red-700 uppercase tracking-wide">
+                    Reason: {order.rejectionReason}
+                  </p>
+                  {order.rejectionMessage && (
+                    <p className="text-sm text-red-800 italic">
+                      &quot;{order.rejectionMessage}&quot;
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-4xl">
+                <FaCheckCircle />
+              </div>
+              <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
+                Order Accepted! 🎉
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Thank you for shopping with us. Your order has been confirmed and is now being prepared.
+              </p>
+            </>
+          )}
 
           <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 text-sm bg-gray-50 p-4 rounded-xl border border-gray-100">
             <div>
@@ -144,8 +190,20 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
             <div className="text-sm space-y-2.5 text-gray-600">
               <div className="flex justify-between items-center">
                 <span>Order Status:</span>
-                <span className="bg-emerald-100 text-emerald-800 font-bold px-3 py-0.5 rounded-full text-xs">
-                  {order.orderStatus || "Order Placed"}
+                <span
+                  className={`font-bold px-3 py-0.5 rounded-full text-xs ${
+                    isPending
+                      ? "bg-amber-100 text-amber-800"
+                      : isRejected
+                      ? "bg-red-100 text-red-800"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}
+                >
+                  {isPending
+                    ? "Pending Approval"
+                    : isRejected
+                    ? "Rejected"
+                    : order.orderStatus || "Order Placed"}
                 </span>
               </div>
               <div className="flex justify-between items-center">

@@ -35,9 +35,14 @@ interface CustomerTimelineStep {
 
 const TIMELINE_STEPS: CustomerTimelineStep[] = [
   {
+    key: "Pending",
+    label: "Pending Approval",
+    description: "Order Submitted - Awaiting Admin Acceptance"
+  },
+  {
     key: "Order Placed",
     label: "Order Placed",
-    description: "Your order has been placed successfully."
+    description: "Order Accepted by Admin"
   },
   {
     key: "Processing",
@@ -53,11 +58,6 @@ const TIMELINE_STEPS: CustomerTimelineStep[] = [
     key: "Delivered",
     label: "Delivered",
     description: "Package delivered successfully."
-  },
-  {
-    key: "Completed",
-    label: "Completed",
-    description: "Order completed successfully."
   }
 ];
 
@@ -243,14 +243,16 @@ const OrderTab = () => {
                         </span>
                         <span
                           className={`px-3 py-0.5 text-xs font-bold rounded-full ${
-                            isDelivered
-                              ? "bg-emerald-100 text-emerald-800"
-                              : isCancelled
+                            currentStatus === "Pending"
+                              ? "bg-amber-100 text-amber-800"
+                              : currentStatus === "Rejected" || isCancelled
                               ? "bg-red-100 text-red-800"
+                              : isDelivered || currentStatus === "Order Placed"
+                              ? "bg-green-100 text-green-800"
                               : "bg-blue-100 text-blue-800"
                           }`}
                         >
-                          {currentStatus}
+                          {currentStatus === "Pending" ? "Pending Approval" : currentStatus}
                         </span>
                       </div>
                       <p className="text-xs text-gray-500">
@@ -333,7 +335,26 @@ const OrderTab = () => {
 
             {/* Modal Content */}
             <div className="p-6 overflow-y-auto space-y-8">
-              {/* Special Cancelled / Returned Banners */}
+              {/* Special Cancelled / Returned / Rejected Banners */}
+              {(selectedOrder.orderStatus === "Rejected" || selectedOrder.status === "Rejected") && (
+                <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 flex items-center gap-3">
+                  <FaExclamationCircle className="text-red-600 text-2xl shrink-0" />
+                  <div>
+                    <h4 className="font-bold">Order Rejected ✕</h4>
+                    {selectedOrder.rejectionReason && (
+                      <p className="text-xs font-bold text-red-700 mt-0.5">
+                        Reason: {selectedOrder.rejectionReason}
+                      </p>
+                    )}
+                    {selectedOrder.rejectionMessage && (
+                      <p className="text-xs text-red-800 italic mt-0.5">
+                        &quot;{selectedOrder.rejectionMessage}&quot;
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {(selectedOrder.orderStatus === "Cancelled" || selectedOrder.status === "Cancelled") && (
                 <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 flex items-center gap-3">
                   <FaExclamationCircle className="text-red-600 text-2xl shrink-0" />
@@ -359,30 +380,32 @@ const OrderTab = () => {
               )}
 
               {/* Vertical Shipping Progress Timeline */}
-              {selectedOrder.orderStatus !== "Cancelled" && selectedOrder.orderStatus !== "Returned" && (
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <h3 className="text-base font-extrabold text-gray-800 mb-6 flex items-center gap-2">
-                    <FaHistory className="text-[var(--color-green-primary)]" /> Live Shipping Timeline
-                  </h3>
+              {selectedOrder.orderStatus !== "Cancelled" &&
+                selectedOrder.orderStatus !== "Returned" &&
+                selectedOrder.orderStatus !== "Rejected" && (
+                  <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                    <h3 className="text-base font-extrabold text-gray-800 mb-6 flex items-center gap-2">
+                      <FaHistory className="text-[var(--color-green-primary)]" /> Live Shipping Timeline
+                    </h3>
 
-                  <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-gray-200">
-                    {(() => {
-                      const getStageIndex = (status?: string) => {
-                        if (!status) return 0;
-                        const s = status.trim().toLowerCase();
-                        if (s === "order placed" || s === "pending" || s === "placed") return 0;
-                        if (s === "processing" || s === "preparing order") return 1;
-                        if (
-                          s === "shipped" ||
-                          s === "loaded for delivery" ||
-                          s === "handed over to courier" ||
-                          s === "out for delivery"
-                        )
-                          return 2;
-                        if (s === "delivered") return 3;
-                        if (s === "completed") return 4;
-                        return 0;
-                      };
+                    <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-gray-200">
+                      {(() => {
+                        const getStageIndex = (status?: string) => {
+                          if (!status) return 0;
+                          const s = status.trim().toLowerCase();
+                          if (s === "pending") return 0;
+                          if (s === "order placed" || s === "placed" || s === "accepted") return 1;
+                          if (s === "processing" || s === "preparing order") return 2;
+                          if (
+                            s === "shipped" ||
+                            s === "loaded for delivery" ||
+                            s === "handed over to courier" ||
+                            s === "out for delivery"
+                          )
+                            return 3;
+                          if (s === "delivered" || s === "completed") return 4;
+                          return 0;
+                        };
 
                       const currentStatusStr: string = selectedOrder.orderStatus || selectedOrder.status || "Order Placed";
                       const currentIndex = getStageIndex(currentStatusStr);
