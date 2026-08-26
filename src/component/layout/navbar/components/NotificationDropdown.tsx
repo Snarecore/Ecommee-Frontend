@@ -52,12 +52,10 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
 
     window.addEventListener("notifications_updated", handleUpdate);
     window.addEventListener("orders_updated", handleUpdate);
-    window.addEventListener("storage", handleUpdate);
 
     return () => {
       window.removeEventListener("notifications_updated", handleUpdate);
       window.removeEventListener("orders_updated", handleUpdate);
-      window.removeEventListener("storage", handleUpdate);
     };
   }, [refetch]);
 

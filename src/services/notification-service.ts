@@ -17,12 +17,13 @@ export const getStoredNotifications = (): NotificationItem[] => {
   }
 };
 
-export const saveStoredNotifications = (notifications: NotificationItem[]) => {
+export const saveStoredNotifications = (notifications: NotificationItem[], emitEvents: boolean = true) => {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
-    window.dispatchEvent(new Event("notifications_updated"));
-    window.dispatchEvent(new Event("storage"));
+    if (emitEvents) {
+      window.dispatchEvent(new Event("notifications_updated"));
+    }
   } catch (err) {
     console.error("Error saving notifications:", err);
   }
@@ -49,7 +50,7 @@ export const fetchNotificationsApi = async (): Promise<{
           payload.unreadCount ?? list.filter((n: any) => !n.isRead).length;
 
         if (list.length > 0) {
-          saveStoredNotifications(list);
+          saveStoredNotifications(list, false);
           return { notifications: list, unreadCount };
         }
       }
