@@ -24,9 +24,8 @@ async function apiRequest<T>(url: string, options: RequestInit): Promise<T | { e
                 "Cache-Control": "no-cache, no-store, must-revalidate",
                 ...options.headers,
             },
-            // @ts-ignore
             next: { revalidate: 0 }
-        }).catch((err) => {
+        } as RequestInit).catch((err) => {
             console.warn("API fetch error caught safely:", err?.message || err);
             return null;
         });

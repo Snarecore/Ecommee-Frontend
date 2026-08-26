@@ -28,8 +28,7 @@ export const getUserDisplayName = (user: User | null): string => {
 export const userAtom = atom<User | null>(null);
 export const userLoadedAtom = atom(false);
 
-//@ts-ignore
-export const logoutUserAtom = atom(null, (get :any, set: any, navigate: () => void) => {
+export const logoutUserAtom = atom(null, (_get, set, navigate: () => void) => {
     deleteCookie("user");
     sessionStorage.removeItem("user");
     set(userAtom, null);
