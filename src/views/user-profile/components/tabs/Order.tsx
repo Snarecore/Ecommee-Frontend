@@ -155,6 +155,13 @@ const OrderTab = () => {
     }
   });
 
+  // Ensure newest orders placed appear first at top (createdAt DESC)
+  combinedOrdersList.sort((a: any, b: any) => {
+    const timeA = new Date(a.createdAt || a.timestamp || 0).getTime();
+    const timeB = new Date(b.createdAt || b.timestamp || 0).getTime();
+    return timeB - timeA;
+  });
+
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order);
   };

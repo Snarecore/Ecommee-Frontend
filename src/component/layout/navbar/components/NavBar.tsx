@@ -3,18 +3,19 @@ import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { nestedCategoriesAtom } from "../../../../store/global-store";
+import { nestedCategoriesAtom, megaDiscountAtom } from "../../../../store/global-store";
 import { MainCategory } from "../../../../interface/nested-category.interface";
 import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/user-store";
 import { FaRegUser, FaUser } from "react-icons/fa6";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { FiMenu, FiX, FiHome, FiMail, FiBookOpen, FiPackage } from "react-icons/fi";
+import { FiMenu, FiX, FiHome, FiMail, FiBookOpen, FiPackage, FiZap } from "react-icons/fi";
 import NotificationDropdown from "./NotificationDropdown";
 
 const NavBar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [nestedCategories] = useAtom(nestedCategoriesAtom);
+    const [megaDiscount] = useAtom(megaDiscountAtom);
     const mainCategories = (nestedCategories ?? []) as unknown as MainCategory[];
 
     const user = useAtomValue(userAtom);
@@ -138,6 +139,17 @@ const NavBar = () => {
                                 <FiMail className="text-sm opacity-80" />
                                 <span>Contact</span>
                             </Link>
+
+                            {/* Dynamic Mega Discount Promotional Link */}
+                            {megaDiscount?.isActive && (
+                                <Link 
+                                    href="/shop?discountOnly=true&pageNumber=1" 
+                                    className="px-3.5 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-gray-900 font-extrabold text-[13px] uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all duration-200"
+                                >
+                                    <FiZap className="text-sm text-gray-900" />
+                                    <span>{megaDiscount.menuText || "Mega Sale"}</span>
+                                </Link>
+                            )}
                         </div>
 
                         {/* Right Section: Notifications + User Profile */}
@@ -274,6 +286,16 @@ const NavBar = () => {
                                 >
                                     <FiMail /> Contact
                                 </Link>
+
+                                {megaDiscount?.isActive && (
+                                    <Link
+                                        href="/shop?discountOnly=true&pageNumber=1"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="px-4 py-2 text-xs font-extrabold text-amber-300 uppercase bg-amber-400/20 hover:bg-amber-400/30 rounded-lg flex items-center gap-2"
+                                    >
+                                        <FiZap className="text-amber-300" /> {megaDiscount.menuText || "Mega Sale"}
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     )}
