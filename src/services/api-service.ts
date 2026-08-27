@@ -10,7 +10,54 @@ const getApiBaseUrl = (): string => {
 
 export type ApiErrorResponse = { error: boolean; status?: number; message: string };
 
-async function apiRequest<T>(url: string, options: RequestInit): Promise<T | ApiErrorResponse> {
+let isRefreshing = false;
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+    if (isRefreshing && refreshPromise) {
+        return refreshPromise;
+    }
+    isRefreshing = true;
+    refreshPromise = (async () => {
+        try {
+            const baseUrl = getApiBaseUrl();
+            const response = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/refresh-token`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
+            if (response.ok) {
+                const resData = await response.json();
+                const newToken = resData?.accessToken || resData?.data?.accessToken;
+                if (newToken) {
+                    if (typeof window !== "undefined") {
+                        const rawUser = sessionStorage.getItem("user") || localStorage.getItem("user");
+                        if (rawUser) {
+                            const parsedUser = JSON.parse(rawUser);
+                            parsedUser.token = newToken;
+                            sessionStorage.setItem("user", JSON.stringify(parsedUser));
+                            localStorage.setItem("user", JSON.stringify(parsedUser));
+                        }
+                    }
+                    return newToken;
+                }
+            }
+            if (typeof window !== "undefined") {
+                sessionStorage.removeItem("user");
+                localStorage.removeItem("user");
+            }
+            return null;
+        } catch {
+            return null;
+        } finally {
+            isRefreshing = false;
+            refreshPromise = null;
+        }
+    })();
+    return refreshPromise;
+}
+
+async function apiRequest<T>(url: string, options: RequestInit, isRetry = false): Promise<T | ApiErrorResponse> {
     try {
         const baseUrl = getApiBaseUrl();
         const fullUrl = url.startsWith("http://") || url.startsWith("https://")
@@ -34,6 +81,15 @@ async function apiRequest<T>(url: string, options: RequestInit): Promise<T | Api
 
         if (!response) {
             return { error: true, message: "Backend API is currently offline or unreachable." };
+        }
+
+        if (response.status === 401 && !isRetry && !url.includes("auth/login") && !url.includes("auth/refresh-token")) {
+            const newToken = await refreshAccessToken();
+            if (newToken) {
+                const newHeaders = new Headers(options.headers || {});
+                newHeaders.set("Authorization", `Bearer ${newToken}`);
+                return apiRequest<T>(url, { ...options, headers: newHeaders }, true);
+            }
         }
 
         if (!response.ok) {
