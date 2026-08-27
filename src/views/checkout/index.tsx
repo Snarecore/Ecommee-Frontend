@@ -323,7 +323,7 @@ const CheckoutView = () => {
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fbf9f5]">
+      <div className="min-h-screen flex items-center justify-center bg-[#FBF9F5] dark:bg-slate-900">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-green-primary)]"></div>
       </div>
     );

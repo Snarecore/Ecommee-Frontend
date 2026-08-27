@@ -23,16 +23,22 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  localStorage.setItem('theme', 'light');
-                  document.documentElement.classList.remove('dark');
+                  var savedTheme = localStorage.getItem('theme');
+                  if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  }
                 } catch (e) {}
               })();
             `,
           }}
         />
       </head>
-      <body className="bg-[#fbf9f5]">
-        <div id="root" className="bg-[#fbf9f5]">
+      <body className="bg-[#FBF9F5] dark:bg-slate-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+        <div id="root" className="bg-[#FBF9F5] dark:bg-slate-900 min-h-screen transition-colors duration-300">
           <Providers>{children}</Providers>
         </div>
       </body>

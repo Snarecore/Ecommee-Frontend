@@ -99,7 +99,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden w-full h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
+            <div className="group rounded-2xl transition-all duration-300 overflow-hidden w-full h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
                 <figure className="relative h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
                     {isOutOfStock && (
                         <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md z-10">

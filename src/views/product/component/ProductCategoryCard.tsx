@@ -32,7 +32,7 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
     const hasDiscount = calculatedPrice < original;
 
     return (
-        <div className="rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden w-full h-[460px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
+        <div className="rounded-3xl transition-all duration-300 overflow-hidden w-full h-[460px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
             <figure className="relative h-[250px] w-full overflow-hidden bg-neutral-50 group">
                 <Link href={`/product/${product.slug}`} className="block w-full h-full">
                     <Image 

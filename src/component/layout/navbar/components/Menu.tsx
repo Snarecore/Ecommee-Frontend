@@ -49,9 +49,11 @@ const Menu = () => {
     if (savedTheme === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       setTheme('light');
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
 
@@ -61,8 +63,10 @@ const Menu = () => {
     localStorage.setItem('theme', nextTheme);
     if (nextTheme === 'dark') {
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   };
 
@@ -124,7 +128,7 @@ const Menu = () => {
   const setLogout = useSetAtom(logoutUserAtom);
 
   return (
-    <nav className="relative z-50 bg-[#fbf9f5] backdrop-blur-md border-b border-gray-200/80 transition-colors duration-300 py-3 sm:py-4">
+    <nav className="relative z-50 bg-[#FBF9F5] dark:bg-slate-900 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800 transition-colors duration-300 py-3 sm:py-4">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo */}
         <Link href={"/"} className="flex items-center flex-shrink-0 group">

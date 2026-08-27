@@ -1,14 +1,24 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme=dark], [data-theme=dark] *));
+
 @layer base {
-  html, body, #root, header, nav {
+  html, body, #root {
     margin: 0;
     font-family: "Inter", sans-serif;
-    background-color: #fbf9f5 !important;
-    color: #1a1a1a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  html:not(.dark), body:not(.dark), #root:not(.dark) {
+    background-color: #FBF9F5 !important;
+    color: #1a1a1a;
+  }
+
+  html.dark, body.dark, #root.dark {
+    background-color: #0f172a !important;
+    color: #f8fafc;
   }
 }
 
@@ -18,7 +28,7 @@
   --color-active: #fff7f0;
   --color-primary: #1b4d3e;
   --color-black-primary: #1a1a1a;
-  --color-white-primary: #fbf9f5;
+  --color-white-primary: #FBF9F5;
 }
 
 [class^="number-slide"],

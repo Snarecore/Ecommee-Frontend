@@ -39,7 +39,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
                             <Link
                                 href={linkHref}
                                 key={category?.id}
-                                className="group relative w-[200px] sm:w-[220px] md:w-[240px] h-[260px] sm:h-[290px] md:h-[320px] rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 transform transition-all duration-500 ease-out cursor-pointer flex flex-col justify-end hover:-translate-y-1.5"
+                                className="group relative w-[200px] sm:w-[220px] md:w-[240px] h-[260px] sm:h-[290px] md:h-[320px] rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700 transform transition-all duration-500 ease-out cursor-pointer flex flex-col justify-end hover:-translate-y-1.5"
                             >
                                 <div className="absolute inset-0 w-full h-full">
                                     <Image 

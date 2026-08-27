@@ -39,11 +39,26 @@ const Shop = () => {
     const categoryKey = categoryEntry?.[0] || '';
     const categoryId = categoryEntry?.[1] || '';
     const currentPageNumber = parseInt(searchParams?.get("pageNumber") || "1");
+    const minPrice = searchParams?.get("minPrice") || "";
+    const maxPrice = searchParams?.get("maxPrice") || "";
+    const inStockOnly = searchParams?.get("inStockOnly") || "";
+    const discountOnly = searchParams?.get("discountOnly") || "";
+    const sortBy = searchParams?.get("sortBy") || "";
 
     const getProductListApiUrl = () => {
-        const apiUrl = `${apiConfig.site.productListUrl}?${categoryKey}=${categoryId}&page=${currentPageNumber}&limit=${dataLimit}`;
+        let apiUrl = `${apiConfig.site.productListUrl}?page=${currentPageNumber}&limit=${dataLimit}`;
+        if (categoryKey && categoryId) {
+            apiUrl += `&${categoryKey}=${categoryId}`;
+        }
+        if (minPrice) apiUrl += `&minPrice=${encodeURIComponent(minPrice)}`;
+        if (maxPrice) apiUrl += `&maxPrice=${encodeURIComponent(maxPrice)}`;
+        if (inStockOnly) apiUrl += `&inStockOnly=${encodeURIComponent(inStockOnly)}`;
+        if (discountOnly) apiUrl += `&discountOnly=${encodeURIComponent(discountOnly)}`;
+        if (sortBy) apiUrl += `&sortBy=${encodeURIComponent(sortBy)}`;
         return apiUrl;
-    }
+    };
+
+    const currentApiUrl = getProductListApiUrl();
 
     const handlePagination = (paginationData: { selected: number }) => {
         const selectedPage = paginationData.selected + 1;
@@ -58,8 +73,8 @@ const Shop = () => {
         isFetching,
         isLoading
     } = usePaginatedQuery<Product>({
-        queryKey: [productListQueryKey, categoryKey, categoryId, String(currentPageNumber)],
-        url: getProductListApiUrl()
+        queryKey: [productListQueryKey, currentApiUrl],
+        url: currentApiUrl
     });
 
     const getCategoryBreadcrumb = (categories: any[]): string[] => {
@@ -116,7 +131,7 @@ const Shop = () => {
                 </div>
                 <div>
                     <div className="flex max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
-                        <div className="hidden lg:block">
+                        <div className="hidden lg:block self-start py-6">
                             <Sidebar selectedCategoryId={categoryId} />
                         </div>
 

@@ -98,7 +98,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:shadow-xl hover:shadow-neutral-100 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[460px]">
+            <div className="group rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[460px]">
 
                 {/* Product Image */}
                 <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">

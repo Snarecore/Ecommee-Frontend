@@ -627,7 +627,7 @@ import Link from "next/link";;
 
 import { useAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 // import Link from "next/link";
 import { isLoadingAtom, nestedCategoriesAtom } from "../../store/global-store";
 import ProductCategorySkeleton from "../skeleton/ProductCategorySkeleton";
@@ -656,7 +656,7 @@ const Chevron = ({ className = "" }: { className?: string }) => (
   <svg
     viewBox="0 0 20 20"
     fill="currentColor"
-    className={`w-4 h-4 transition-transform duration-200 ${className}`}
+    className={`w-4 h-4 transition-transform duration-200 text-gray-500 dark:text-gray-400 ${className}`}
     aria-hidden="true"
   >
     <path
@@ -806,7 +806,7 @@ const NestedMenuItem = ({
   return (
     <>
       <div
-        className="flex items-center justify-between w-full px-2 py-1 cursor-pointer group rounded-md hover:bg-gray-100 transition-colors"
+        className="flex items-center justify-between w-full px-2 py-1.5 cursor-pointer group rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
         style={{ paddingLeft: `${level * 16 + 8}px` }} // indent per level
         onClick={handleSelection}
       >
@@ -819,17 +819,17 @@ const NestedMenuItem = ({
             onClick={(e) => e.stopPropagation()}
             className={`w-4 h-4 cursor-pointer appearance-none rounded-full border ${
               isSelected
-                ? "border-[var(--color-green-primary)] bg-[var(--color-green-primary)]"
-                : "bg-[#EAEAEB] border-transparent"
+                ? "border-emerald-500 bg-emerald-500 dark:border-emerald-400 dark:bg-emerald-400"
+                : "bg-gray-200 dark:bg-gray-700 border-transparent"
             }`}
           />
           <p
-            className={`text-[12px]  transition-colors duration-200 ${
+            className={`text-[12px] transition-colors duration-200 ${
               isSelected
-                ? "text-[var(--color-green-primary)] font-semibold"
+                ? "text-emerald-700 dark:text-emerald-400 font-bold"
                 : level === 0
-                ? "text-black font-semibold"
-                : ""
+                ? "text-gray-900 dark:text-gray-100 font-semibold"
+                : "text-gray-700 dark:text-gray-300 font-medium"
             }`}
             title={item.name}
           >
@@ -842,7 +842,7 @@ const NestedMenuItem = ({
           <button
             type="button"
             onClick={toggleExpand}
-            className="p-1 rounded hover:bg-gray-200 focus:outline-none shrink-0"
+            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-300 focus:outline-none shrink-0"
             aria-label={isOpenAtThisLevel ? "Collapse" : "Expand"}
           >
             <Chevron className={isOpenAtThisLevel ? "rotate-90" : ""} />
@@ -878,7 +878,58 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) => {
+  const router = useRouter();
   const pathname = usePathname() || "/";
+  const searchParams = useSearchParams();
+
+  // Read URL filter state
+  const currentMinPrice = searchParams?.get("minPrice") || "";
+  const currentMaxPrice = searchParams?.get("maxPrice") || "";
+  const currentInStock = searchParams?.get("inStockOnly") === "true";
+  const currentDiscount = searchParams?.get("discountOnly") === "true";
+  const currentSortBy = searchParams?.get("sortBy") || "newest";
+
+  // Local state for Min/Max inputs (prevent API spamming per keystroke)
+  const [minPriceInput, setMinPriceInput] = useState(currentMinPrice);
+  const [maxPriceInput, setMaxPriceInput] = useState(currentMaxPrice);
+
+  useEffect(() => {
+    setMinPriceInput(currentMinPrice);
+    setMaxPriceInput(currentMaxPrice);
+  }, [currentMinPrice, currentMaxPrice]);
+
+  const updateParam = (paramsToUpdate: Record<string, string | null>) => {
+    const newParams = new URLSearchParams(searchParams ? searchParams.toString() : "");
+    newParams.set("pageNumber", "1"); // Always reset page to 1 on filter change
+
+    Object.entries(paramsToUpdate).forEach(([key, val]) => {
+      if (val === null || val === "" || val === "false") {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, val);
+      }
+    });
+    router.push(`${pathname}?${newParams.toString()}`);
+  };
+
+  const handleApplyPrice = () => {
+    updateParam({ minPrice: minPriceInput, maxPrice: maxPriceInput });
+  };
+
+  const handlePresetPrice = (min: string, max: string) => {
+    setMinPriceInput(min);
+    setMaxPriceInput(max);
+    updateParam({ minPrice: min, maxPrice: max });
+  };
+
+  const handleClearAll = () => {
+    setMinPriceInput("");
+    setMaxPriceInput("");
+    setSelectedCategoryId?.(null);
+    setOpenPath([]);
+    router.push(`${pathname}?pageNumber=1`);
+  };
+
   const [openPath, setOpenPath] = useState<string[]>([]);
   const [nestedCategories] = useAtom(nestedCategoriesAtom);
   const [isLoading] = useAtom(isLoadingAtom);
@@ -896,9 +947,6 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
     if (selectedCategoryId) {
       const path = findPathToId(clone as any[], String(selectedCategoryId));
       if (path && path.length) {
-        // bubble each ancestor (and the target) to the front of its level
-        // BUT: if the selected is a 3rd-level item (path length >= 4),
-        // skip bubbling the last (leaf) to keep 3rd level order intact.
         const limit = path.length >= 4 ? path.length - 1 : path.length;
         for (let i = 0; i < limit; i++) {
           clone = moveNodeToFront(clone, path[i]);
@@ -918,20 +966,18 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
     if (!selectedCategoryId || !tree?.length) return;
     const path = findPathToId(tree as any[], String(selectedCategoryId));
     if (path && path.length) {
-      setOpenPath(path); // [mainId, firstId, secondId, ...]
+      setOpenPath(path);
     }
   }, [selectedCategoryId, tree]);
 
   // Reorder callback passed to items (for clicks on this page)
   const handleReorder = (id: string, level: number) => {
-    // Do NOT reorder when clicking Third level (level === 3)
     if (level === 3) return;
 
     setOrderedCategories((prev) => {
       if (!prev) return prev;
       let next = moveNodeToFront(prev, id);
 
-      // Also bubble ancestors for non-third-level clicks
       const path = findPathToId(next as any[], id);
       if (path && path.length) {
         for (const ancestorId of path) {
@@ -949,63 +995,189 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
   };
 
   return (
-    <div className="w-82 bg-[#F8F8F8] border-l border-gray-300 shadow-lg h-full overflow-y-auto sticky top-0">
-      <div className="px-6 py-4 border-b border-gray-300">
-        <p className="text-lg text-center font-semibold">Product Category</p>
+    <div className="w-82 bg-[#F8F8F8] dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/80 rounded-2xl shadow-sm h-fit overflow-hidden sticky top-24 divide-y divide-gray-200 dark:divide-gray-700">
+      
+      {/* 1. Category Section */}
+      <div className="p-4">
+        <p className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-2 uppercase tracking-wider">
+          Categories
+        </p>
+
+        {isLoading ? (
+          <ProductCategorySkeleton />
+        ) : (
+          <nav className="mt-1 max-h-64 overflow-y-auto pr-1">
+            {/* All Categories row */}
+            <div
+              className="flex items-center justify-between w-full px-2 py-1.5 cursor-pointer rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
+              onClick={resetAll}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <input
+                  type="radio"
+                  checked={selectedCategoryId === null}
+                  onChange={resetAll}
+                  onClick={(e) => e.stopPropagation()}
+                  className={`w-4 h-4 cursor-pointer appearance-none rounded-full border ${
+                    selectedCategoryId === null
+                      ? "border-emerald-500 bg-emerald-500 dark:border-emerald-400 dark:bg-emerald-400"
+                      : "bg-gray-200 dark:bg-gray-700 border-transparent"
+                  }`}
+                />
+                <Link
+                  href={"/all-categories"}
+                  className={`text-xs sm:text-sm transition-colors duration-200 ${
+                    selectedCategoryId === null
+                      ? "text-emerald-700 dark:text-emerald-400 font-bold"
+                      : "text-gray-900 dark:text-gray-100 font-semibold"
+                  }`}
+                  title="All Categories"
+                >
+                  All Categories
+                </Link>
+              </div>
+            </div>
+
+            {/* Tree */}
+            {tree.map((category) => (
+              <NestedMenuItem
+                key={String((category as any).id)}
+                item={category}
+                activePath={pathname}
+                openPath={openPath}
+                setOpenPath={setOpenPath}
+                selectedCategoryId={selectedCategoryId}
+                setSelectedCategoryId={setSelectedCategoryId}
+                onReorder={handleReorder}
+              />
+            ))}
+          </nav>
+        )}
       </div>
 
-      {isLoading ? (
-        <ProductCategorySkeleton />
-      ) : (
-        <nav className="mt-2">
-          {/* All Categories row — same alignment and selected text turns green */}
-          <div
-            className="flex items-center justify-between w-full px-2 py-1 cursor-pointer rounded-md hover:bg-gray-100 transition-colors"
-            style={{ paddingLeft: `${0 * 16 + 8}px` }}
-            onClick={resetAll}
-          >
-            <div className="flex items-center gap-2 min-w-0">
-              <input
-                type="radio"
-                checked={selectedCategoryId === null}
-                onChange={resetAll}
-                onClick={(e) => e.stopPropagation()}
-                className={`w-4 h-4 cursor-pointer appearance-none ${
-                  selectedCategoryId === null
-                    ? "border-[var(--color-green-primary)] bg-[var(--color-green-primary)] rounded-full"
-                    : "bg-[#EAEAEB] border-transparent rounded-full"
-                }`}
-              />
-              <Link
-                href={"/all-categories"}
-                className={`text-sm transition-colors duration-200 ${
-                  selectedCategoryId === null
-                    ? "text-[var(--color-green-primary)] font-semibold"
-                    : "text-black font-semibold"
-                }`}
-                title="All Categories"
-              >
-                All Categories
-              </Link>
-            </div>
-            {/* No arrow for All Categories */}
-          </div>
+      {/* 2. Sort By Section */}
+      <div className="p-4">
+        <label className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider block mb-2">
+          Sort By
+        </label>
+        <select
+          value={currentSortBy}
+          onChange={(e) => updateParam({ sortBy: e.target.value })}
+          className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+        >
+          <option value="newest">Newest Arrivals</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="name_asc">Name: A - Z</option>
+          <option value="name_desc">Name: Z - A</option>
+        </select>
+      </div>
 
-          {/* Tree */}
-          {tree.map((category) => (
-            <NestedMenuItem
-              key={String((category as any).id)}
-              item={category}
-              activePath={pathname}
-              openPath={openPath}
-              setOpenPath={setOpenPath}
-              selectedCategoryId={selectedCategoryId}
-              setSelectedCategoryId={setSelectedCategoryId}
-              onReorder={handleReorder}
+      {/* 3. Price Filter Section (in ৳ Taka) */}
+      <div className="p-4">
+        <label className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider block mb-2">
+          Price Range (৳)
+        </label>
+        
+        {/* Min & Max Inputs */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="relative flex-1">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">৳</span>
+            <input
+              type="number"
+              placeholder="Min"
+              value={minPriceInput}
+              onChange={(e) => setMinPriceInput(e.target.value)}
+              className="w-full pl-6 pr-2 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-          ))}
-        </nav>
-      )}
+          </div>
+          <span className="text-xs text-gray-400 font-bold">-</span>
+          <div className="relative flex-1">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">৳</span>
+            <input
+              type="number"
+              placeholder="Max"
+              value={maxPriceInput}
+              onChange={(e) => setMaxPriceInput(e.target.value)}
+              className="w-full pl-6 pr-2 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+          <button
+            onClick={handleApplyPrice}
+            className="px-3 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors cursor-pointer"
+          >
+            Apply
+          </button>
+        </div>
+
+        {/* Presets */}
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { label: "Under ৳500", min: "", max: "500" },
+            { label: "৳500 - ৳1000", min: "500", max: "1000" },
+            { label: "৳1000 - ৳2000", min: "1000", max: "2000" },
+            { label: "৳2000+", min: "2000", max: "" },
+          ].map((preset, idx) => {
+            const isActive = currentMinPrice === preset.min && currentMaxPrice === preset.max;
+            return (
+              <button
+                key={idx}
+                onClick={() => handlePresetPrice(preset.min, preset.max)}
+                className={`text-[11px] font-medium px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-emerald-500 text-white border-emerald-500 font-bold"
+                    : "bg-white dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:border-emerald-400"
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Availability & Special Deals */}
+      <div className="p-4 space-y-3">
+        <label className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider block">
+          Filters
+        </label>
+        
+        {/* Availability: In Stock Only */}
+        <label className="flex items-center justify-between cursor-pointer group">
+          <span className="text-xs font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+            In Stock Only
+          </span>
+          <input
+            type="checkbox"
+            checked={currentInStock}
+            onChange={(e) => updateParam({ inStockOnly: e.target.checked ? "true" : null })}
+            className="w-4 h-4 accent-emerald-600 rounded cursor-pointer"
+          />
+        </label>
+
+        {/* Special Deals: On Sale */}
+        <label className="flex items-center justify-between cursor-pointer group">
+          <span className="text-xs font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+            On Sale (Discounted)
+          </span>
+          <input
+            type="checkbox"
+            checked={currentDiscount}
+            onChange={(e) => updateParam({ discountOnly: e.target.checked ? "true" : null })}
+            className="w-4 h-4 accent-emerald-600 rounded cursor-pointer"
+          />
+        </label>
+      </div>
+
+      {/* 5. Clear All Filters */}
+      <div className="p-3 bg-gray-50 dark:bg-gray-900/60">
+        <button
+          onClick={handleClearAll}
+          className="w-full text-xs font-semibold py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-lg transition-colors cursor-pointer"
+        >
+          Clear All Filters
+        </button>
+      </div>
     </div>
   );
 };

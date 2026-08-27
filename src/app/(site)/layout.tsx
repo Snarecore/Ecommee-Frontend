@@ -9,11 +9,11 @@ import FloatingChat from "@/component/chat/FloatingChat";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-[#fbf9f5] min-h-screen transition-colors duration-300">
+    <div className="bg-[#FBF9F5] dark:bg-slate-900 min-h-screen transition-colors duration-300">
       <InitialStateService />
       <NavBar />
       <Toaster position="top-right" reverseOrder={false} />
-      <main className="min-h-screen mx-auto bg-[#fbf9f5]">
+      <main className="min-h-screen mx-auto bg-[#FBF9F5] dark:bg-slate-900 transition-colors duration-300">
         {children}
       </main>
       <FloatingChat />

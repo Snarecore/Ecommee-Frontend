@@ -8,7 +8,7 @@ const Header = () => {
     const [headerFooterData] = useAtom(headerFooterAtom);
 
     return (
-        <header className="bg-[#fbf9f5] text-slate-700 border-b border-gray-200/80 text-xs py-2 w-full transition-colors duration-300">
+        <header className="bg-[#FBF9F5] dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-b border-gray-200/80 dark:border-gray-800 text-xs py-2 w-full transition-colors duration-300">
             <div className="max-w-screen-2xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between gap-4">
                     {/* Marquee Banner */}
