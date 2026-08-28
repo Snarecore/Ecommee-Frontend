@@ -66,14 +66,7 @@ const Login = () => {
                 const unpackedUser = resData?.data?.user || resData?.data?.data?.user || resData?.user || resData?.data;
 
                 if (unpackedUser && typeof unpackedUser === 'object') {
-                    const userToSave = {
-                        ...unpackedUser,
-                        token: unpackedUser.token || unpackedUser.accessToken || resData?.data?.token || resData?.token
-                    };
-                    setCookie("user", JSON.stringify(userToSave), 7);
-                    sessionStorage.setItem("user", JSON.stringify(userToSave));
-                    localStorage.setItem("user", JSON.stringify(userToSave));
-                    setUser(userToSave);
+                    setUser(unpackedUser);
                     router.push(from);
                     return;
                 }

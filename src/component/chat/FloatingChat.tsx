@@ -42,49 +42,33 @@ const isImageUrl = (text: string) => {
 const getOrCreateGuestUser = async () => {
     if (typeof window === 'undefined') return null;
     try {
-        const savedGuest = localStorage.getItem('guest_user_data');
-        if (savedGuest) {
-            const guest = JSON.parse(savedGuest);
-            if (guest?.token && guest?.id) return guest;
+        let guestSessionId = localStorage.getItem('guest_session_id');
+        if (!guestSessionId) {
+            guestSessionId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('guest_session_id', guestSessionId);
         }
 
-        const randomId = Math.random().toString(36).substring(2, 11);
-        const email = `guest_${randomId}@bazaarbound-visitor.com`;
-        const phone = `017${Math.floor(10000000 + Math.random() * 90000000)}`;
-        const password = `guestPassword_${randomId}`;
+        const email = `guest_${guestSessionId.slice(0, 8)}@bazaarbound-visitor.com`;
+        const password = `guestPass_${guestSessionId.slice(0, 12)}`;
 
         const regResponse = await fetch(`${BASE_URL}auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: 'Guest Visitor', email, phone, password, confirmPassword: password, role: 'customer' })
+            credentials: 'include',
+            body: JSON.stringify({ name: 'Guest Visitor', email, phone: '01700000000', password, confirmPassword: password, role: 'customer' })
         });
-
-        if (!regResponse.ok) {
-            const errBody = await regResponse.json().catch(() => ({}));
-            console.error('Silent guest registration failed:', regResponse.status, errBody);
-            return null;
-        }
 
         const loginResponse = await fetch(`${BASE_URL}auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ email, password })
         });
 
-        if (!loginResponse.ok) {
-            const errBody = await loginResponse.json().catch(() => ({}));
-            console.error('Silent guest login failed:', loginResponse.status, errBody);
-            return null;
-        }
-
-        const loginData = await loginResponse.json();
-        const guestToken = loginData?.data?.accessToken || loginData?.accessToken;
-        const guestId = loginData?.data?.user?.id || loginData?.user?.id;
-
-        if (guestToken) {
-            const guestInfo = { id: guestId, token: guestToken, name: 'Guest Visitor' };
-            localStorage.setItem('guest_user_data', JSON.stringify(guestInfo));
-            return guestInfo;
+        if (loginResponse.ok) {
+            const loginData = await loginResponse.json();
+            const guestId = loginData?.data?.user?.id || loginData?.user?.id;
+            return { id: guestId, name: 'Guest Visitor', sessionId: guestSessionId };
         }
     } catch (error) {
         console.error('Error in getOrCreateGuestUser:', error);
@@ -102,15 +86,14 @@ const FloatingChat = () => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [guestUser, setGuestUser] = useState<{ id: string; token: string; name: string } | null>(null);
+    const [guestUser, setGuestUser] = useState<{ id: string; name: string; sessionId?: string } | null>(null);
     const [isGuestLoading, setIsGuestLoading] = useState(false);
 
     // Image preview state
     const [pendingImage, setPendingImage] = useState<File | null>(null);
     const [pendingImagePreview, setPendingImagePreview] = useState<string | null>(null);
 
-    const token = userData?.token || getUserToken() || guestUser?.token;
-    const isLoggedIn = !!token;
+    const isLoggedIn = Boolean(userData?.id || guestUser?.id);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,8 +101,8 @@ const FloatingChat = () => {
 
     useEffect(() => {
         const checkAndCreateGuest = async () => {
-            const hasToken = userData?.token || getUserToken();
-            if (!hasToken && !guestUser && !isGuestLoading) {
+            const hasUser = Boolean(userData?.id);
+            if (!hasUser && !guestUser && !isGuestLoading) {
                 setIsGuestLoading(true);
                 const guest = await getOrCreateGuestUser();
                 if (guest) setGuestUser(guest);
@@ -130,14 +113,14 @@ const FloatingChat = () => {
     }, [userData, guestUser, isGuestLoading]);
 
     const fetchMyConversation = async (showLoading = true) => {
-        const currentToken = userData?.token || getUserToken() || guestUser?.token;
-        if (!currentToken) return;
+        if (!userData?.id && !guestUser?.id) return;
         if (showLoading) setIsLoading(true);
 
         try {
             const response = await fetch(`${BASE_URL}${apiConfig.messageLinks.myConversationUrl}`, {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` }
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
             });
             if (!response.ok) return;
             const data = await response.json();
@@ -161,14 +144,14 @@ const FloatingChat = () => {
     }, [isOpen, isLoggedIn]);
 
     // Upload image to backend, returns CDN URL
-    const uploadImage = async (file: File, currentToken: string): Promise<string | null> => {
+    const uploadImage = async (file: File): Promise<string | null> => {
         const formData = new FormData();
         formData.append('file', file);
 
         try {
             const response = await fetch(`${BASE_URL}message/upload`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${currentToken}` },
+                credentials: 'include',
                 body: formData
             });
             if (!response.ok) return null;
@@ -181,8 +164,7 @@ const FloatingChat = () => {
     };
 
     const sendMessage = async (messageText: string) => {
-        const currentToken = userData?.token || getUserToken() || guestUser?.token;
-        if (!messageText.trim() || isSending || !currentToken) return;
+        if (!messageText.trim() || isSending || (!userData?.id && !guestUser?.id)) return;
 
         const optimisticMsg: Message = {
             id: `temp-${Date.now()}`,
@@ -199,7 +181,8 @@ const FloatingChat = () => {
         try {
             const response = await fetch(`${BASE_URL}${apiConfig.messageLinks.sendMessageUrl}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ content: messageText })
             });
             const result = await response.json();
@@ -217,14 +200,13 @@ const FloatingChat = () => {
 
     const handleSendMessage = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        const currentToken = userData?.token || getUserToken() || guestUser?.token;
-        if (isSending || !currentToken) return;
+        if (isSending || (!userData?.id && !guestUser?.id)) return;
 
         setIsSending(true);
 
         // If there's a pending image, upload first then send its URL
         if (pendingImage) {
-            const uploadedUrl = await uploadImage(pendingImage, currentToken);
+            const uploadedUrl = await uploadImage(pendingImage);
             setPendingImage(null);
             setPendingImagePreview(null);
             if (uploadedUrl) {

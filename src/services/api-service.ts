@@ -28,23 +28,8 @@ async function refreshAccessToken(): Promise<string | null> {
             });
             if (response.ok) {
                 const resData = await response.json();
-                const newToken = resData?.accessToken || resData?.data?.accessToken;
-                if (newToken) {
-                    if (typeof window !== "undefined") {
-                        const rawUser = sessionStorage.getItem("user") || localStorage.getItem("user");
-                        if (rawUser) {
-                            const parsedUser = JSON.parse(rawUser);
-                            parsedUser.token = newToken;
-                            sessionStorage.setItem("user", JSON.stringify(parsedUser));
-                            localStorage.setItem("user", JSON.stringify(parsedUser));
-                        }
-                    }
-                    return newToken;
-                }
-            }
-            if (typeof window !== "undefined") {
-                sessionStorage.removeItem("user");
-                localStorage.removeItem("user");
+                const newToken = resData?.accessToken || resData?.data?.accessToken || "refreshed";
+                return newToken;
             }
             return null;
         } catch {

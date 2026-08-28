@@ -135,7 +135,7 @@ const Menu = () => {
           <Image
             src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
             alt="Bazaarbound Logo"
-            className="w-28 sm:w-36 h-8 sm:h-10 object-contain group-hover:scale-[1.02] transition-transform duration-200"
+            className="w-36 sm:w-48 md:w-56 h-10 sm:h-14 object-contain group-hover:scale-[1.02] transition-transform duration-200"
             width={240}
             height={60}
             priority
