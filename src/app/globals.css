@@ -83,3 +83,29 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Custom Green Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-green-primary, #1b4d3e);
+  border-radius: 5px;
+  border: 2px solid #f1f5f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-green-secondary, #2c6e49);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-green-primary, #1b4d3e) #f1f5f1;
+}
