@@ -4,6 +4,7 @@ import apiConfig from "../../config/api.json";
 import { useAPI } from "../../hooks/useApi";
 import { useAtomValue } from "jotai";
 import { metaDataAtom } from "../../store/global-store";
+import { sanitizeHTML } from "../../utils/sanitize-utils";
 
 export interface TermsConditionsCmsData {
 	id: string;
@@ -33,7 +34,7 @@ const TermsAndConditions = () => {
 				</p>
 				<div
 					className="prose prose-base"
-					dangerouslySetInnerHTML={{ __html: response?.description || "" }}
+					dangerouslySetInnerHTML={{ __html: sanitizeHTML(response?.description) }}
 				/>
 			</div>
 		</>

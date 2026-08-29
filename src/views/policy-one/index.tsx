@@ -4,6 +4,7 @@ import apiConfig from "../../config/api.json";
 import { useAPI } from "../../hooks/useApi";
 import { metaDataAtom } from "../../store/global-store";
 import { useAtomValue } from "jotai";
+import { sanitizeHTML } from "../../utils/sanitize-utils";
 
 export interface PrivacyPolicyCmsData {
 	id: string;
@@ -32,7 +33,7 @@ const PolicyOne = () => {
 					{response?.title}
 				</p>
 				<div className="dangerous-html"
-					dangerouslySetInnerHTML={{ __html: response?.description || "" }}
+					dangerouslySetInnerHTML={{ __html: sanitizeHTML(response?.description) }}
 				/>
 			</div>
 		</>

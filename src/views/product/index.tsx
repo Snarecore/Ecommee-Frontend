@@ -8,6 +8,7 @@ import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 import ProductImageZoom from "../../component/product-image-zoom";
 import { Product as ProductInterface } from "../../interface/product.interface";
 import apiConfig from "../../config/api.json";
+import { sanitizeHTML } from "../../utils/sanitize-utils";
 import { IoIosArrowDown, IoMdStar } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 import { FaHeart, FaRegHeart, FaRegMessage, FaStar, FaRegStar } from "react-icons/fa6";
@@ -678,7 +679,7 @@ const Product = ({ initialData }: ProductProps) => {
 
                     {activeTab === "description" && (
                         <div className="w-full text-justify font-medium text-[var(--color-black-primary)]">
-                            <div dangerouslySetInnerHTML={{ __html: product?.description || '' }} />
+                            <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(product?.description) }} />
                         </div>
                     )}
 
