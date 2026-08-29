@@ -1,5 +1,5 @@
-import PolicyFour from "@/views/policy-four";
+import PolicyView from "@/views/policy-view";
 
 export default function CommunityIpPolicyPage() {
-  return <PolicyFour />;
+  return <PolicyView apiUrl="policy-four-cms" />;
 }

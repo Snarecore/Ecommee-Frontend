@@ -1,5 +1,5 @@
-import PolicyTen from "@/views/policy-ten";
+import TermsAndConditions from "@/views/terms-conditions";
 
 export default function TermsConditionsPage() {
-  return <PolicyTen />;
+  return <TermsAndConditions />;
 }

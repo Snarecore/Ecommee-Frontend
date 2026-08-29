@@ -1,5 +1,5 @@
-import PolicyTwo from "@/views/policy-two";
+import PolicyView from "@/views/policy-view";
 
 export default function AccessibilityPage() {
-  return <PolicyTwo />;
+  return <PolicyView apiUrl="policy-two-cms" />;
 }

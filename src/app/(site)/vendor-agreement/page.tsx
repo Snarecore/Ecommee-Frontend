@@ -1,5 +1,5 @@
-import PolicyEleven from "@/views/policy-eleven";
+import PolicyView from "@/views/policy-view";
 
 export default function VendorAgreementPage() {
-  return <PolicyEleven />;
+  return <PolicyView apiUrl="policy-eleven-cms" />;
 }

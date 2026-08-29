@@ -1,5 +1,5 @@
-import PolicyEight from "@/views/policy-eight";
+import ExchangePolicy from "@/views/exchange-return-policy";
 
 export default function RefundReturnPolicyPage() {
-  return <PolicyEight />;
+  return <ExchangePolicy />;
 }

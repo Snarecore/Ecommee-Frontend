@@ -1,5 +1,5 @@
-import PolicyFive from "@/views/policy-five";
+import PolicyView from "@/views/policy-view";
 
 export default function FaqsPage() {
-  return <PolicyFive />;
+  return <PolicyView apiUrl="policy-five-cms" />;
 }

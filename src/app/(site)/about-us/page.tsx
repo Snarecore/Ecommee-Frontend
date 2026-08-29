@@ -1,5 +1,5 @@
-import PolicyOne from "@/views/policy-one";
+import PolicyView from "@/views/policy-view";
 
 export default function AboutUsPage() {
-  return <PolicyOne />;
+  return <PolicyView apiUrl="policy-one-cms" />;
 }

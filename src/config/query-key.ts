@@ -21,4 +21,3 @@ export const customerProfileQueryKey = "customer-profile";
 export const vendorProfileQueryKey = "vendor-profile";
 export const customerPasswordUpdateQueryKey = "customer-password";
 export const vendorPasswordUpdateQueryKey = "vendor-password";
-export const vendorPaymentQueryKey = "vendor-payment-request/payment-history";

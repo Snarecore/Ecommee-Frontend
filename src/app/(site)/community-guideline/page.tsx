@@ -1,5 +1,5 @@
-import PolicyThree from "@/views/policy-three";
+import PolicyView from "@/views/policy-view";
 
 export default function CommunityGuidelinePage() {
-  return <PolicyThree />;
+  return <PolicyView apiUrl="policy-three-cms" />;
 }

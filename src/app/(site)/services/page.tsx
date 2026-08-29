@@ -1,5 +1,5 @@
-import PolicySix from "@/views/policy-six";
+import PolicyView from "@/views/policy-view";
 
 export default function ServicesPage() {
-  return <PolicySix />;
+  return <PolicyView apiUrl="policy-six-cms" />;
 }

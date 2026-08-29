@@ -1,5 +1,5 @@
-import PolicySeven from "@/views/policy-seven";
+import PrivacyPolicy from "@/views/privacy-policy";
 
 export default function PrivacyPolicyPage() {
-  return <PolicySeven />;
+  return <PrivacyPolicy />;
 }

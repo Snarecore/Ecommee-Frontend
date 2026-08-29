@@ -18,18 +18,6 @@
         "commentCreateApiUrl": "product-comment",
         "getProductCommentsUrl": "product-comment/product",
         "blogUrl": "site/blog",
-        "policyOneUrl": "policy-one-cms",
-        "policyTwoUrl": "policy-two-cms",
-        "policyThreeUrl": "policy-three-cms",
-        "policyFourUrl": "policy-four-cms",
-        "policyFiveUrl": "policy-five-cms",
-        "policySixUrl": "policy-six-cms",
-        "policySevenUrl": "policy-seven-cms",
-        "policyEightUrl": "policy-eight-cms",
-        "policyNineUrl": "policy-nine-cms",
-        "policyTenUrl": "policy-ten-cms",
-        "policyElevenUrl": "policy-eleven-cms",
-        "policyTwelveUrl": "policy-twelve-cms",
         "notificationsUrl": "site/notifications"
     },
     "vendor": {
@@ -57,10 +45,7 @@
     "dashboard": {
         "adminDashboardUrl": "site/admin-dashboard",
         "vendorDashboardUrl": "site/vendor-dashboard",
-        "vendorSalesDashboardUrl": "vendor/sales-dashboard",
-        "vendorPaymentRequestUrl": "vendor-payment-request",
-        "vendorPaymentHistoryUrl": "vendor-payment-request/payment-history",
-        "vendorStatsticsUrl": "vendor-payment-request/statistics"
+        "vendorSalesDashboardUrl": "vendor/sales-dashboard"
     },
     "people": {
         "user": "user/customer",
@@ -85,10 +70,5 @@
         "threadUrl": "message/thread",
         "conversationUrl": "message/conversations",
         "converstionThreadUrl": "message/thread"
-    },
-    "subcriptionLinks": {
-        "subcriptionUrl": "vendor/subscription",
-        "activeSubcriptionUrl": "vendor/subscription/active",
-        "activeSingleSubcriptionUrl": "vendor/subscription/single"
     }
 }
