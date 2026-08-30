@@ -51,24 +51,24 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
     const elements = useElements();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    
-    const user = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem("user") || "{}") : {};
-    const token = user?.token || '';
 
     // Customer delivery info state
-    const [name, setName] = useState(user?.name || '');
-    const [phone, setPhone] = useState(user?.phone || '');
-    const [address, setAddress] = useState(user?.address || '');
-    const [city, setCity] = useState(user?.city || '');
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
+    const [city, setCity] = useState('');
 
     useEffect(() => {
-        if (user) {
-            if (user.name && !name) setName(user.name);
-            if (user.phone && !phone) setPhone(user.phone);
-            if (user.address && !address) setAddress(user.address);
-            if (user.city && !city) setCity(user.city);
+        if (typeof window !== 'undefined') {
+            try {
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                if (user?.name) setName(user.name);
+                if (user?.phone) setPhone(user.phone);
+                if (user?.address) setAddress(user.address);
+                if (user?.city) setCity(user.city);
+            } catch (e) {}
         }
-    }, [user]);
+    }, []);
 
     const discountedTotal = useMemo(() => {
         return products.reduce((sum, p) => {

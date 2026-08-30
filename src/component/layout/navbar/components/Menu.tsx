@@ -240,7 +240,7 @@ const Menu = () => {
             aria-label="Wishlist"
           >
             <FaRegHeart className="text-lg sm:text-xl group-hover:scale-110 transition-transform duration-200" />
-            {wishlistCount > 0 && (
+            {isMounted && wishlistCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-bold text-[10px] min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
                 {wishlistCount}
               </span>
@@ -255,7 +255,7 @@ const Menu = () => {
             aria-label="Shopping Cart"
           >
             <HiOutlineShoppingBag className="text-xl sm:text-2xl group-hover:scale-110 transition-transform duration-200" />
-            {cartItemCount > 0 && (
+            {isMounted && cartItemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-bold text-[10px] min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
                 {cartItemCount}
               </span>

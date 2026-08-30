@@ -28,7 +28,7 @@ import { buildOrganizationJsonLd, buildProductJsonLd, stripHtml } from "../../ut
 import CommentsSection from "./component/CommentsSection";
 import SimilarProducts from "./component/SimilarProducts";
 import { finalPrice, formatImageUrl } from "../../utils/product-utils";
-import { getProductSizes, isSizeOutOfStock, isProductOutOfStock } from "../../utils/stock-utils";
+import { getProductSizes, isSizeOutOfStock, isProductOutOfStock, getSizeStockQuantity } from "../../utils/stock-utils";
 
 const initialFieldValues = {
     name: "",
@@ -491,14 +491,40 @@ const Product = ({ initialData }: ProductProps) => {
                                         );
                                     })}
                                 </div>
-                                {(isProductOutOfStock(product) || (selectedSize && isSizeOutOfStock(product, selectedSize))) && (
-                                    <p className="mt-3 text-xs font-bold text-red-600 flex items-center gap-1.5 bg-red-50 border border-red-200 px-3 py-2 rounded-lg w-max">
-                                        <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
-                                        {isProductOutOfStock(product)
-                                            ? "This product is currently Out of Stock!"
-                                            : `Size ${selectedSize} is currently Out of Stock!`}
-                                    </p>
-                                )}
+                                {((): React.ReactNode => {
+                                    if (isProductOutOfStock(product)) {
+                                        return (
+                                            <p className="mt-3 text-xs font-bold text-red-600 flex items-center gap-1.5 bg-red-50 border border-red-200 px-3 py-2 rounded-lg w-max">
+                                                <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                                                This product is currently Out of Stock!
+                                            </p>
+                                        );
+                                    }
+
+                                    if (selectedSize && isSizeOutOfStock(product, selectedSize)) {
+                                        return (
+                                            <p className="mt-3 text-xs font-bold text-red-600 flex items-center gap-1.5 bg-red-50 border border-red-200 px-3 py-2 rounded-lg w-max">
+                                                <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                                                Size {selectedSize} is currently Out of Stock!
+                                            </p>
+                                        );
+                                    }
+
+                                    const currentStock = selectedSize ? getSizeStockQuantity(product, selectedSize) : (product?.quantity || 0);
+                                    const threshold = (product as any)?.quantityAlert ? Number((product as any).quantityAlert) : 10;
+                                    const lowStockLimit = Math.max(threshold, 10);
+
+                                    if (currentStock > 0 && currentStock <= lowStockLimit) {
+                                        return (
+                                            <p className="mt-3 text-xs font-bold text-amber-700 flex items-center gap-1.5 bg-amber-50 border border-amber-300 px-3 py-2 rounded-lg w-max">
+                                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                                Hurry! Only {currentStock} {currentStock === 1 ? "item" : "items"} left in stock!
+                                            </p>
+                                        );
+                                    }
+
+                                    return null;
+                                })()}
                             </div>
 
                             <div className="mb-4">

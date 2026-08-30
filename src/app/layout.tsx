@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -37,7 +37,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-[#FBF9F5] dark:bg-slate-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+      <body className="bg-[#FBF9F5] dark:bg-slate-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300" suppressHydrationWarning>
         <div id="root" className="bg-[#FBF9F5] dark:bg-slate-900 min-h-screen transition-colors duration-300">
           <Providers>{children}</Providers>
         </div>
