@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { nestedCategoriesAtom, megaDiscountAtom } from "../../../../store/global-store";
 import { MainCategory } from "../../../../interface/nested-category.interface";
 import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/user-store";
-import { FaRegUser, FaUser } from "react-icons/fa6";
+import { FaRegUser} from "react-icons/fa6";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { FiMenu, FiX, FiHome, FiMail, FiBookOpen, FiPackage, FiZap } from "react-icons/fi";
+import { FiMenu, FiX, FiHome, FiMail, FiPackage, FiZap } from "react-icons/fi";
 import NotificationDropdown from "./NotificationDropdown";
 
 const NavBar = () => {

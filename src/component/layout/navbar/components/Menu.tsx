@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { BiSearch } from "react-icons/bi";
 import Link from "next/link";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { useEffect, useState, useRef } from "react";
