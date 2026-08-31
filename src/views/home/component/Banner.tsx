@@ -73,11 +73,35 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                         ) : (
                             <>
                                 <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${activeSlideIndex * 100}%)` }}>
-                                    {heroSliderList.map((slide) => {
+                                {heroSliderList.map((slide, index) => {
                                         return (
                                             <div key={slide.id} className="w-full h-full flex-shrink-0">
                                                 <Link href={slide.link} className="block w-full h-full">
-                                                    <Image src={slide.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={`Slider image`} className="" width={1200} height={600} />
+                                                    {index === 0 ? (
+                                                        // First slide: priority preload for LCP
+                                                        <Image
+                                                            src={slide.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                                                            alt={`Slider image ${index + 1}`}
+                                                            className=""
+                                                            width={1200}
+                                                            height={600}
+                                                            priority
+                                                            sizes="(max-width: 768px) 100vw, 75vw"
+                                                            quality={85}
+                                                        />
+                                                    ) : (
+                                                        // Other slides: lazy load
+                                                        <Image
+                                                            src={slide.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                                                            alt={`Slider image ${index + 1}`}
+                                                            className=""
+                                                            width={1200}
+                                                            height={600}
+                                                            loading="lazy"
+                                                            sizes="(max-width: 768px) 100vw, 75vw"
+                                                            quality={80}
+                                                        />
+                                                    )}
                                                 </Link>
                                             </div>
                                         )

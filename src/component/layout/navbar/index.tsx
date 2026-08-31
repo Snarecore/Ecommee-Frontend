@@ -1,3 +1,5 @@
+'use client';
+
 import Header from "./components/Header";
 import Menu from "./components/Menu";
 import NavBar from "./components/NavBar";

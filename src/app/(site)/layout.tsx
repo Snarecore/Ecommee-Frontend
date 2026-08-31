@@ -1,5 +1,3 @@
-'use client';
-
 import React from "react";
 import NavBar from "@/component/layout/navbar/index";
 import Footer from "@/component/layout/Footer";

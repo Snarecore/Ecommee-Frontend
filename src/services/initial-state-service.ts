@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from "react";
 import { useAtom, useSetAtom } from 'jotai';
 import { mainCategoriesAtom, isLoadingAtom, nestedCategoriesAtom, faqAtom, headerFooterAtom, socialLinksAtom, metaDataAtom, megaDiscountAtom } from '../store/global-store';

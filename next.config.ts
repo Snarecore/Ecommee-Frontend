@@ -3,8 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true,
     formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    qualities: [80, 85],
     remotePatterns: [
       {
         protocol: "http",
@@ -16,15 +18,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
+  /* experimental: {
     optimizePackageImports: ["react-icons", "swiper", "jotai", "react-fast-marquee"],
-  },
+  }, */
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: false,
   },
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom", "html-encoding-sniffer", "@exodus/bytes"],
 };
 
 export default nextConfig;

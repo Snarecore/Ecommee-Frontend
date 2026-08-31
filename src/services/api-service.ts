@@ -42,7 +42,12 @@ async function refreshAccessToken(): Promise<string | null> {
     return refreshPromise;
 }
 
-async function apiRequest<T>(url: string, options: RequestInit, isRetry = false): Promise<T | ApiErrorResponse> {
+async function apiRequest<T>(
+    url: string,
+    options: RequestInit,
+    isRetry = false,
+    cacheStrategy: RequestCache = "default"
+): Promise<T | ApiErrorResponse> {
     try {
         const baseUrl = getApiBaseUrl();
         const fullUrl = url.startsWith("http://") || url.startsWith("https://")
@@ -52,13 +57,8 @@ async function apiRequest<T>(url: string, options: RequestInit, isRetry = false)
         const response = await fetch(fullUrl, {
             ...options,
             credentials: "include",
-            cache: "no-store",
-            headers: {
-                "Pragma": "no-cache",
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                ...options.headers,
-            },
-            next: { revalidate: 0 }
+            cache: cacheStrategy,
+            headers: { ...options.headers },
         } as RequestInit).catch((err) => {
             console.warn("API fetch error caught safely:", err?.message || err);
             return null;
@@ -73,7 +73,7 @@ async function apiRequest<T>(url: string, options: RequestInit, isRetry = false)
             if (newToken) {
                 const newHeaders = new Headers(options.headers || {});
                 newHeaders.set("Authorization", `Bearer ${newToken}`);
-                return apiRequest<T>(url, { ...options, headers: newHeaders }, true);
+                return apiRequest<T>(url, { ...options, headers: newHeaders }, true, cacheStrategy);
             }
         }
 
@@ -94,11 +94,13 @@ async function apiRequest<T>(url: string, options: RequestInit, isRetry = false)
     }
 }
 
-export async function getData<T>({ url, token }: GetDataProps): Promise<T | ApiErrorResponse> {
+// Public APIs (products, categories, homepage) → cached by default
+// User-specific APIs (profile, orders, cart) → pass noCache: true
+export async function getData<T>({ url, token, noCache }: GetDataProps): Promise<T | ApiErrorResponse> {
     const headers: HeadersInit = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    return apiRequest<T>(url, { headers, method: "GET" });
+    return apiRequest<T>(url, { headers, method: "GET" }, false, noCache ? "no-store" : "default");
 }
 
 export async function postData<T>({ url, token, body }: PostDataProps): Promise<T | ApiErrorResponse> {

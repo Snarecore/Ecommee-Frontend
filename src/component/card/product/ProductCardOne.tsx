@@ -124,6 +124,8 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                             }`}
                             width={500}
                             height={500}
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            quality={80}
                         />
 
                         {secondImage && (
@@ -133,6 +135,9 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                                 className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-2xl"
                                 width={500}
                                 height={500}
+                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                quality={80}
+                                loading="lazy"
                             />
                         )}
                     </Link>

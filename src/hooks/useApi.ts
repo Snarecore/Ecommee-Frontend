@@ -65,6 +65,7 @@ interface HandleDeleteProps {
 
 interface FetchDataProps {
     apiUrl: string;
+    noCache?: boolean; // true for user-specific endpoints (cart, orders, profile)
 }
 
 const isSuccessfulResponse = <T extends { statusCode: number }>(response: T): boolean => {
@@ -154,12 +155,12 @@ export const useAPI = () => {
         }
     });
 
-    const fetchData = async ({ apiUrl }: FetchDataProps) => {
+    const fetchData = async ({ apiUrl, noCache }: FetchDataProps) => {
         try {
             const response = await queryClient.fetchQuery({
                 queryKey: [apiUrl],
-                queryFn: () => getData({ url: apiUrl, token: getUserToken() }),
-                staleTime: 1000 * 60 * 5,
+                queryFn: () => getData({ url: apiUrl, token: getUserToken(), noCache }),
+                staleTime: noCache ? 0 : 1000 * 60 * 5,
             }) as ApiResponse<any>;
             return response?.data ?? response;
         } catch (e: any) {

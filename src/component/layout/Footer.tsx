@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import visaCard from "../../assets/visaCard.svg";
 import mastardCard from "../../assets/masterCard.svg";

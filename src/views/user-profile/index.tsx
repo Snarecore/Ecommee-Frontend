@@ -26,7 +26,7 @@ const UserProfile = () => {
 	} : null);
 
 	const fetchUserData = async () => {
-		const result = await fetchData({ apiUrl: `${apiConfig.people.user}` });
+		const result = await fetchData({ apiUrl: `${apiConfig.people.user}`, noCache: true });
 		if (result) {
 			setUserData(result);
 		}
