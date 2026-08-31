@@ -49,10 +49,8 @@ export const fetchNotificationsApi = async (): Promise<{
         const unreadCount =
           payload.unreadCount ?? list.filter((n: any) => !n.isRead).length;
 
-        if (list.length > 0) {
-          saveStoredNotifications(list, false);
-          return { notifications: list, unreadCount };
-        }
+        saveStoredNotifications(list, false);
+        return { notifications: list, unreadCount };
       }
     } catch (err) {
       console.warn("API fetch error for notifications, using fallback:", err);

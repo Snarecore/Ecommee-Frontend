@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { userAtom, User, userLoadedAtom } from "../store/user-store";
-import { getCookie } from "../utils/cookie-utils";
+import { getCookie, setCookie, deleteCookie } from "../utils/cookie-utils";
 
 const AppInitializer = () => {
     const setUser = useSetAtom(userAtom);
@@ -19,14 +19,20 @@ const AppInitializer = () => {
                     const data = await res.json();
                     const userData = data?.data || data?.user;
                     if (userData) {
-                        setUser(userData as User);
+                        const currentToken = getCookie("user") ? JSON.parse(getCookie("user") || "{}")?.token : "";
+                        const fullUserData = { ...userData, token: userData.token || currentToken };
+                        setCookie("user", JSON.stringify(fullUserData), 7);
+                        setUser(fullUserData as User);
                     } else {
+                        deleteCookie("user");
                         setUser(null);
                     }
                 } else {
+                    deleteCookie("user");
                     setUser(null);
                 }
             } catch {
+                deleteCookie("user");
                 setUser(null);
             } finally {
                 setUserLoaded(true);

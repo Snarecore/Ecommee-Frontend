@@ -271,18 +271,22 @@ const MyCart = () => {
                   </div>
 
                   {(() => {
-                    const hasOutOfStock = cartItems.some(
+                    const outOfStockItems = cartItems.filter(
                       (item) => isProductOutOfStock(item) || (item.selectedSize ? isSizeOutOfStock(item, item.selectedSize) : false)
                     );
-                    const isDisabled = hasOutOfStock || user?.role === "vendor" || user?.role === "admin";
+                    const hasOutOfStock = outOfStockItems.length > 0;
+                    const isDisabled = cartItems.length === 0 || hasOutOfStock;
                     return (
                       <>
                         <button
                           disabled={isDisabled}
                           onClick={() => {
-                            if (!isDisabled) {
-                              router.push("/checkout");
+                            if (isDisabled) return;
+                            if (!user) {
+                              setShowLoginRequiredModal(true);
+                              return;
                             }
+                            router.push("/checkout");
                           }}
                           className={`mt-10 block text-center w-full font-bold py-3 rounded-3xl transition-all duration-300 ${
                             isDisabled
@@ -290,12 +294,22 @@ const MyCart = () => {
                               : "bg-[var(--color-green-primary)] text-white hover:opacity-95 cursor-pointer shadow-md"
                           }`}
                         >
-                          {hasOutOfStock ? "Remove Out of Stock Items" : "Proceed to Checkout"}
+                          Proceed to Checkout
                         </button>
                         {hasOutOfStock && (
-                          <p className="text-xs text-red-600 font-bold text-center mt-2">
-                            Some items in your cart are Out of Stock. Please remove them to proceed.
-                          </p>
+                          <div className="mt-4 space-y-2">
+                            <p className="text-xs text-red-600 font-bold text-center">
+                              ⚠ Some items in your cart are Out of Stock. Please remove them to proceed.
+                            </p>
+                            <button
+                              onClick={() => {
+                                outOfStockItems.forEach((item) => removeFromCart(item));
+                              }}
+                              className="w-full text-xs bg-red-100 text-red-700 font-semibold py-2 rounded-lg hover:bg-red-200 transition cursor-pointer"
+                            >
+                              Remove {outOfStockItems.length} Out-of-Stock Item{outOfStockItems.length > 1 ? "s" : ""}
+                            </button>
+                          </div>
                         )}
                       </>
                     );

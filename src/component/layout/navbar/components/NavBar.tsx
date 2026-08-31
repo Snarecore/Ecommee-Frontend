@@ -52,7 +52,7 @@ const NavBar = () => {
 
     const handleLogout = () => {
         setIsDropdownOpen(false);
-        setLogout(() => router.push("/login"));
+        setLogout({ navigate: () => router.push("/login") });
     };
 
     const displayName = getUserDisplayName(user);

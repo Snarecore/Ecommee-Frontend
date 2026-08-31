@@ -28,12 +28,24 @@ export const getUserDisplayName = (user: User | null): string => {
 export const userAtom = atom<User | null>(null);
 export const userLoadedAtom = atom(false);
 
-export const logoutUserAtom = atom(null, (_get, set, navigate: () => void) => {
+export const logoutUserAtom = atom(null, (_get, set, action?: any) => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/"}auth/logout`, {
         method: "POST",
         credentials: "include"
     }).catch(() => null);
+    deleteCookie("user");
     set(userAtom, null);
     set(userLoadedAtom, true);
-    navigate();
+
+    if (typeof action === "function") {
+        try {
+            action();
+        } catch {
+            if (typeof window !== "undefined") window.location.href = "/login";
+        }
+    } else if (action && typeof action === "object" && typeof action.navigate === "function") {
+        action.navigate();
+    } else if (typeof window !== "undefined") {
+        window.location.href = "/login";
+    }
 });

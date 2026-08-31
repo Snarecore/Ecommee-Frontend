@@ -152,7 +152,7 @@ const VendorHeader = () => {
 	const userData = useAtomValue(userAtom);
 
 	const handleLogout = () => {
-		setLogout(() => router.push("/login"));
+		setLogout({ navigate: () => router.push("/login") });
 	};
 
 	return (

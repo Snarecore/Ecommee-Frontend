@@ -26,7 +26,8 @@ const requiredFields: any = [
 const Login = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const from = searchParams?.get("from") || "/";
+    const rawFrom = searchParams?.get("from") || "/";
+    const targetFrom = (rawFrom.startsWith("/") && !rawFrom.startsWith("//")) ? rawFrom : "/";
     const setUser = useSetAtom(userAtom);
     const { postMutation, handleApiMutation } = useAPI();
     const [showPassword, setShowPassword] = useState(false);
@@ -65,9 +66,13 @@ const Login = () => {
                 const resData: any = result.data;
                 const unpackedUser = resData?.data?.user || resData?.data?.data?.user || resData?.user || resData?.data;
 
+                const token = resData?.data?.accessToken || resData?.accessToken || resData?.data?.token || resData?.token;
+
                 if (unpackedUser && typeof unpackedUser === 'object') {
-                    setUser(unpackedUser);
-                    router.push(from);
+                    const fullUserData = { ...unpackedUser, token: token || unpackedUser.token };
+                    setCookie("user", JSON.stringify(fullUserData), 7);
+                    setUser(fullUserData);
+                    router.push(targetFrom);
                     return;
                 }
             }

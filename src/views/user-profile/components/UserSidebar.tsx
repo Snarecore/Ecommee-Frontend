@@ -26,7 +26,7 @@ const UserSidebar: React.FC<Props> = ({ activeTab, setActiveTab, userData }) => 
 	const setLogout = useSetAtom(logoutUserAtom);
 
 	const handleLogout = () => {
-		setLogout(() => router.push("/login"));
+		setLogout({ navigate: () => router.push("/login") });
 	};
 
 	return (
