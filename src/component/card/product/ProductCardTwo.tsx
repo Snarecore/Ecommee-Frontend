@@ -99,13 +99,13 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-2xl transition-all duration-300 overflow-hidden w-full h-[410px] md:h-[475px] lg:h-[505px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
-                <figure className="relative h-[250px] min-h-[250px] max-h-[250px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl flex-shrink-0">
-                    <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-2xl">
+            <div className="group rounded-xl sm:rounded-2xl transition-all duration-300 overflow-hidden w-full h-[355px] sm:h-[385px] md:h-[475px] lg:h-[505px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
+                <figure className="relative h-[230px] min-h-[230px] max-h-[230px] sm:h-[250px] sm:min-h-[250px] sm:max-h-[250px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
+                    <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-xl sm:rounded-t-2xl">
                         <Image
                             src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
                             alt={name}
-                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-2xl ${secondImage ? "opacity-100 group-hover:opacity-0" : ""}`}
+                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl ${secondImage ? "opacity-100 group-hover:opacity-0" : ""}`}
                             width={500}
                             height={500}
                         />
@@ -113,7 +113,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                             <Image
                                 src={secondImage}
                                 alt={`${name} hover`}
-                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-2xl"
+                                className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl"
                                 width={500}
                                 height={500}
                             />
@@ -146,7 +146,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     </button>
                 </figure>
 
-                <div className="flex-1 p-4 bg-white relative -mt-6 rounded-t-[24px] flex flex-col shadow-[0_-8px_20px_rgba(0,0,0,0.03)] border-t border-neutral-100/50">
+                <div className="flex-1 p-2.5 sm:p-4 bg-white relative -mt-6 rounded-t-[24px] flex flex-col justify-between shadow-[0_-8px_20px_rgba(0,0,0,0.03)] border-t border-neutral-100/50">
                     <div className="hidden md:block text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
                         {mainCategoryName || "Clothing"}
                     </div>
@@ -175,29 +175,30 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                         <div className="h-3 mb-3" />
                     )}
 
-                    <div className="pt-2 border-t border-neutral-100 flex items-center gap-2">
+                    {/* Action Buttons */}
+                    <div className="mt-1 pt-2 border-t border-neutral-100 flex items-center gap-1.5 sm:gap-2">
                         {isOutOfStock ? (
                             <button
                                 disabled
-                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-xs font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
+                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-[11px] sm:text-xs font-bold rounded-lg sm:rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
                             >
                                 Out of Stock
                             </button>
                         ) : (
                             <>
                                 <button
-                                    className="w-1/2 py-2 border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                                    className="w-1/2 py-2 px-1 sm:px-2 border border-neutral-200 text-neutral-700 text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
-                                    <FiShoppingCart className="w-3.5 h-3.5" />
-                                    Add
+                                    <FiShoppingCart className="w-3.5 h-3.5 flex-shrink-0" />
+                                    <span>Add</span>
                                 </button>
                                 <button
-                                    className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
+                                    className="w-1/2 py-2 px-1 sm:px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#428146] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
-                                    Buy Now
-                                    <FiArrowRight className="w-3.5 h-3.5" />
+                                    <span>Buy Now</span>
+                                    <FiArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
                                 </button>
                             </>
                         )}
