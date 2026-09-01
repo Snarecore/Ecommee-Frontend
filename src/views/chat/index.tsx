@@ -37,7 +37,7 @@ const Chat = () => {
                 setMessages(res.messages);
             }
         } catch (error) {
-            console.error("Error fetching conversation:", error);
+            // console.error("Error fetching conversation:", error);
         } finally {
             setIsLoading(false);
         }
@@ -76,7 +76,7 @@ const Chat = () => {
                 await loadConversation();
             }
         } catch (error) {
-            console.error("Error sending message:", error);
+            // console.error("Error sending message:", error);
             setInputContent(textToSend);
         } finally {
             setIsSending(false);

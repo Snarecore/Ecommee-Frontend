@@ -191,11 +191,11 @@ const Menu = () => {
         {/* Top / Main Navigation Row */}
         <div className="flex items-center justify-between gap-2 sm:gap-6">
           {/* Brand Logo */}
-          <Link href={"/"} className="flex items-center flex-shrink-0 group -ml-0.5 sm:ml-0">
+          <Link href={"/"} className="flex flex-shrink-0 group -ml-0.5 sm:ml-0">
             <Image
               src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
-              alt="Bazaarbound Logo"
-              className="w-28 sm:w-44 md:w-52 h-8 sm:h-12 object-contain group-hover:scale-[1.02] transition-transform duration-200"
+              alt="Logo"
+              className="w-28 sm:w-44 md:w-52 h-8 sm:h-12 object-contain -ml-3 md:-ml-8 lg:-ml-8"
               width={240}
               height={60}
               priority

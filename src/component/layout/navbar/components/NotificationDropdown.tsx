@@ -24,6 +24,8 @@ import {
   markAllNotificationsReadApi
 } from "../../../../services/notification-service";
 import { NotificationItem, NotificationType } from "../../../../interface/notification.interface";
+import { useAtomValue } from "jotai";
+import { userAtom } from "../../../../store/user-store";
 
 interface Props {
   variant?: "light" | "green";
@@ -34,12 +36,14 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const user = useAtomValue(userAtom);
 
   const { data, refetch } = useQuery({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", user?.id || user?._id],
     queryFn: fetchNotificationsApi,
-    refetchInterval: 10000, // Poll every 10s for fast live updates
-    staleTime: 2000
+    enabled: Boolean(user),
+    refetchInterval: user ? 15000 : false,
+    staleTime: 5000
   });
 
   const notifications = data?.notifications || [];
@@ -106,14 +110,14 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
 
   const iconClass =
     variant === "green"
-      ? "text-white hover:bg-white/10"
-      : "text-[var(--color-icon)] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800";
+      ? "text-white hover:bg-white/10 rounded-md sm:rounded-lg"
+      : "text-[var(--color-icon)] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full";
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 rounded-full transition-colors focus:outline-none flex items-center justify-center cursor-pointer ${iconClass}`}
+        className={`relative p-2 transition-colors focus:outline-none flex items-center justify-center cursor-pointer ${iconClass}`}
         title="Notifications"
         aria-label="Notifications"
       >

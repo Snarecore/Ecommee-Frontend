@@ -17,7 +17,7 @@ async function getProductData(slug: string) {
       }
     }
   } catch (error) {
-    console.error("Failed to fetch product data on server:", error);
+    // console.error("Failed to fetch product data on server:", error);
   }
   return null;
 }
@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (product) {
     return {
-      title: `${product.name || "Product"} | Bazaarbound`,
-      description: product.summary || product.description || `Buy ${product.name || "this product"} on Bazaarbound.`,
+      title: `${product.name || "Product"} | Fashion Time`,
+      description: product.summary || product.description || `Buy ${product.name || "this product"} on Fashion Time.`,
       openGraph: {
         title: product.name,
         description: product.summary || product.description,
@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: "Product Details | Bazaarbound",
-    description: "View product details on Bazaarbound.",
+    title: "Product Details | Fashion Time",
+    description: "View product details on Fashion Time.",
   };
 }
 

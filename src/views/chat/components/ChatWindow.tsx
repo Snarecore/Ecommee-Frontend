@@ -116,7 +116,7 @@ const ChatWindow = ({ selectedUser }: { selectedUser: SelectedUser }) => {
                 setFieldValues(initialFieldValues);
             }
         } catch (error) {
-            console.error("Error sending message:", error);
+            // console.error("Error sending message:", error);
         } finally {
             setIsMessageLoading(false);
         }

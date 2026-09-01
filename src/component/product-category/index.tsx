@@ -1,3 +1,6 @@
+'use client';
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mainCategoriesAtom, isLoadingAtom } from '../../store/global-store';
@@ -13,18 +16,24 @@ interface ProductCategoryProps {
 const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featuredCategories }) => {
     const [mainCategories] = useAtom(mainCategoriesAtom);
     const [isLoading] = useAtom(isLoadingAtom);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const categoriesToRender = featuredCategories && featuredCategories.length > 0 ? featuredCategories : mainCategories;
+    const showSkeleton = !isMounted || isLoading;
 
     return (
         <div className="max-w-screen-2xl mx-auto px-4 py-8 my-4">
             <div className="text-center mb-8 relative">
                 <h2 className="text-3xl md:text-4xl font-bold mb-3 text-[var(--color-green-primary)] dark:text-green-400">
-                    {contentData?.categorySectionTitle}
+                    {contentData?.categorySectionTitle || "Product Categories"}
                 </h2>
                 <div className="w-16 h-1 bg-[var(--color-green-primary)] dark:bg-green-400 mx-auto rounded-full"></div>
             </div>
-            {isLoading ? (
+            {showSkeleton ? (
                 <MainCategorySkeleton />
             ) : categoriesToRender?.length > 0 ? (
                 <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-center sm:flex-wrap gap-3 sm:gap-6 md:gap-8">
@@ -44,7 +53,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
                                 <div className="absolute inset-0 w-full h-full">
                                     <Image 
                                         src={imgSource || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} 
-                                        alt={category?.name} 
+                                        alt={category?.name || "Category"} 
                                         className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105" 
                                         width={300} 
                                         height={400} 

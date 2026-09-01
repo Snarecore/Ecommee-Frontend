@@ -1,4 +1,4 @@
-Sitemap: https://bazaarbound.com/sitemap.xml
+Sitemap: https://fashiontime.com/sitemap.xml
 
 # Default search engines (SEO OK)
 User-agent: *

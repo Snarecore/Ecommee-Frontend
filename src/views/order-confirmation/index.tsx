@@ -50,7 +50,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           setOrder(apiOrder);
         }
       } catch (err) {
-        console.error("Failed to load order from API:", err);
+        // console.error("Failed to load order from API:", err);
       } finally {
         setLoading(false);
       }

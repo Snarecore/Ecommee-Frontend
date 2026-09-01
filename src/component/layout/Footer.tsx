@@ -39,7 +39,7 @@ const Footer = () => {
                 <div className="flex flex-wrap lg:flex-nowrap gap-10 lg:gap-20">
                     <div className="w-full lg:w-1/4">
                         <div className="flex items-center mb-6">
-                            <Image src={headerFooterData?.footerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="BazarBound" className="w-64 object-contain" width={256} height={64} />
+                            <Image src={headerFooterData?.footerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Fashion Time" className="w-64 object-contain" width={256} height={64} />
                         </div>
                         <p className="mb-6 leading-relaxed text-justify">
                             {headerFooterData?.footerDescription}

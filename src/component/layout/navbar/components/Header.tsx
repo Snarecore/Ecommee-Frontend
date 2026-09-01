@@ -23,7 +23,7 @@ const Header = () => {
                             className="text-xs font-medium text-slate-700 dark:text-slate-300"
                         >
                             <span className="text-emerald-800 dark:text-emerald-300 font-semibold px-4">
-                                {headerFooterData?.bannerText || "Welcome to Bazaarbound - Special Discounts Available Today!"}
+                                {headerFooterData?.bannerText || "Welcome to Fashion Time - Special Discounts Available Today!"}
                             </span>
                         </Marquee>
                     </div>

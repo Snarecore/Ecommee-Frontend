@@ -2,7 +2,7 @@ import { SitemapStream, streamToPromise } from 'sitemap';
 import { createWriteStream } from 'fs';
 
 (async () => {
-  const sitemap = new SitemapStream({ hostname: 'https://bazaarbound.com' });
+  const sitemap = new SitemapStream({ hostname: 'https://fashiontime.com' });
   const writeStream = createWriteStream('./public/sitemap.xml');
   sitemap.pipe(writeStream);
 
@@ -61,5 +61,5 @@ import { createWriteStream } from 'fs';
   sitemap.end();
   await streamToPromise(sitemap);
 
-  console.log('✅ Sitemap generated at public/sitemap.xml');
+  // console.log('✅ Sitemap generated at public/sitemap.xml');
 })();

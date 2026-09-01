@@ -3,8 +3,8 @@ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "Bazaarbound",
-  description: "Bazaarbound E-Commerce Platform",
+  title: "Fashion Time",
+  description: "Fashion Time E-Commerce Platform",
   icons: {
     icon: "/favicon.ico",
   },

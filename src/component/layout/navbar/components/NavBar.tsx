@@ -75,15 +75,15 @@ const NavBar = () => {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-full transition-all focus:outline-none flex items-center gap-2 cursor-pointer shadow-xs"
+                            className="lg:hidden px-2.5 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-md sm:rounded-lg transition-all focus:outline-none flex items-center gap-1.5 cursor-pointer shadow-xs"
                             aria-label="Open navigation menu"
                         >
-                            <FiMenu className="text-xl" />
+                            <FiMenu className="text-lg" />
                             <span className="text-xs font-bold uppercase tracking-wider">Menu</span>
                         </button>
 
                         {/* Categories & Main Menu Links (Desktop) */}
-                        <div className="hidden lg:flex items-center justify-start gap-x-2 md:gap-x-3 flex-1">
+                        <div className="hidden lg:flex items-center justify-start gap-x-2 md:gap-x-3 flex-1 -ml-3 md:-ml-2">
                             {/* Static Home Link */}
                             <Link 
                                 href="/" 
@@ -168,7 +168,7 @@ const NavBar = () => {
                             {/* User Profile Pill / Dropdown */}
                             <div className="relative" ref={dropdownRef}>
                                 <div
-                                    className="flex items-center gap-2 text-white cursor-pointer py-1.5 px-3 rounded-full hover:bg-white/20 bg-white/10 border border-white/20 transition-all duration-200 shadow-xs active:scale-95"
+                                    className="flex items-center gap-2 text-white cursor-pointer py-1.5 px-2.5 rounded-md sm:rounded-lg hover:bg-white/20 bg-white/10 border border-white/20 transition-all duration-200 shadow-xs active:scale-95"
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 >
                                     {isMounted && user ? (

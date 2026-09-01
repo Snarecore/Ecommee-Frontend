@@ -93,7 +93,7 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
                     setClientSecret(response.clientSecret || response.data.clientSecret);
                 }
             } catch (error) {
-                console.error('Failed to create payment intent: ', error);
+                // console.error('Failed to create payment intent: ', error);
             }
         };
 
@@ -179,7 +179,7 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
                 onSuccess();
             }
         } catch (err: any) {
-            console.error("Payment submission error:", err);
+            // console.error("Payment submission error:", err);
             showErrorToast(err?.response?.data?.message || err?.message || "Payment process failed.");
         } finally {
             setLoading(false);

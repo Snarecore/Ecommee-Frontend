@@ -208,7 +208,7 @@ export const useAPI = () => {
             if (showToast) {
                 showErrorToast(errorMessage);
             } else {
-                console.error(errorMessage);
+                // console.error(errorMessage);
             }
         }
 

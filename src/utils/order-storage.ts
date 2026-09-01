@@ -153,7 +153,7 @@ export const getStoredOrders = (): Order[] => {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
-    console.error("Error reading stored orders:", err);
+    // console.error("Error reading stored orders:", err);
     return [];
   }
 };
@@ -283,7 +283,7 @@ export const updateOrderStatusInStorage = (params: {
         params.note || `Order status updated to "${params.newStatus}"`
       );
     } catch (err) {
-      console.error("Error triggering notification in storage:", err);
+      // console.error("Error triggering notification in storage:", err);
     }
   }
 

@@ -60,7 +60,7 @@ async function apiRequest<T>(
             cache: cacheStrategy,
             headers: { ...options.headers },
         } as RequestInit).catch((err) => {
-            console.warn("API fetch error caught safely:", err?.message || err);
+            // console.warn("API fetch error caught safely:", err?.message || err);
             return null;
         });
 
@@ -78,7 +78,7 @@ async function apiRequest<T>(
         }
 
         if (!response.ok) {
-            console.error(`API Error: ${response.status} - ${response.statusText}`);
+            // console.warn(`API HTTP ${response.status}: ${response.statusText} for ${url}`);
             const errData = await response.json().catch(() => null);
             return {
                 error: true,
@@ -89,7 +89,7 @@ async function apiRequest<T>(
 
         return await response.json().catch(() => ({ error: true, message: "Invalid JSON response" }));
     } catch (error) {
-        console.warn("Fetch exception handled: ", error);
+        // console.warn("Fetch exception handled: ", error);
         return { error: true, message: "An error occurred while making the request." };
     }
 }

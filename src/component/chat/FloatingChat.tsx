@@ -48,7 +48,7 @@ const getOrCreateGuestUser = async () => {
             localStorage.setItem('guest_session_id', guestSessionId);
         }
 
-        const email = `guest_${guestSessionId.slice(0, 8)}@bazaarbound-visitor.com`;
+        const email = `guest_${guestSessionId.slice(0, 8)}@fashiontime-visitor.com`;
         const password = `guestPass_${guestSessionId.slice(0, 12)}`;
 
         // 1. Try login first (in case already created)
@@ -92,7 +92,7 @@ const getOrCreateGuestUser = async () => {
             }
         }
     } catch (error) {
-        console.error('Error in getOrCreateGuestUser:', error);
+        // console.error('Error in getOrCreateGuestUser:', error);
     }
     return null;
 };
@@ -143,7 +143,7 @@ const FloatingChat = () => {
                 setHasGuestError(true);
             }
         } catch (err) {
-            console.error('Guest init error:', err);
+            // console.error('Guest init error:', err);
             setHasGuestError(true);
         } finally {
             setIsGuestLoading(false);
@@ -175,7 +175,7 @@ const FloatingChat = () => {
                 if (showLoading) setTimeout(scrollToBottom, 100);
             }
         } catch (error) {
-            console.error('Error fetching conversation:', error);
+            // console.error('Error fetching conversation:', error);
         } finally {
             if (showLoading) setIsLoading(false);
         }
@@ -203,7 +203,7 @@ const FloatingChat = () => {
             const data = await response.json();
             return data?.data?.url || null;
         } catch (error) {
-            console.error('Error uploading image:', error);
+            // console.error('Error uploading image:', error);
             return null;
         }
     };
@@ -238,7 +238,7 @@ const FloatingChat = () => {
                 setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
             }
         } catch (error) {
-            console.error('Error sending message:', error);
+            // console.error('Error sending message:', error);
             setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
         }
     };

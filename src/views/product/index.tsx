@@ -170,7 +170,7 @@ const Product = ({ initialData }: ProductProps) => {
                     setProduct(null);
                 }
             } catch (error) {
-                console.error("Failed to fetch product data:", error);
+                // console.error("Failed to fetch product data:", error);
                 setProduct(null);
             } finally {
                 setIsLoading(false);

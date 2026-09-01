@@ -25,7 +25,7 @@ export const saveStoredNotifications = (notifications: NotificationItem[], emitE
       window.dispatchEvent(new Event("notifications_updated"));
     }
   } catch (err) {
-    console.error("Error saving notifications:", err);
+    // console.error("Error saving notifications:", err);
   }
 };
 
@@ -53,7 +53,7 @@ export const fetchNotificationsApi = async (): Promise<{
         return { notifications: list, unreadCount };
       }
     } catch (err) {
-      console.warn("API fetch error for notifications, using fallback:", err);
+      // console.warn("API fetch error for notifications, using fallback:", err);
     }
   }
 
@@ -70,7 +70,7 @@ export const markNotificationReadApi = async (id: string): Promise<void> => {
     try {
       await patchData({ url: `${notifUrl}/${id}/read`, token, body: {} });
     } catch (err) {
-      console.warn("API markNotificationReadApi error:", err);
+      // console.warn("API markNotificationReadApi error:", err);
     }
   }
 
@@ -87,7 +87,7 @@ export const markAllNotificationsReadApi = async (): Promise<void> => {
     try {
       await patchData({ url: `${notifUrl}/read-all`, token, body: {} });
     } catch (err) {
-      console.warn("API markAllNotificationsReadApi error:", err);
+      // console.warn("API markAllNotificationsReadApi error:", err);
     }
   }
 

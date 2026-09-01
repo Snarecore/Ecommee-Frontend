@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { deleteCookie } from "../utils/cookie-utils";
+import { logoutFirebaseUser } from "../services/firebase-auth.service";
 
 export interface User {
     id?: string;
@@ -29,6 +30,7 @@ export const userAtom = atom<User | null>(null);
 export const userLoadedAtom = atom(false);
 
 export const logoutUserAtom = atom(null, (_get, set, action?: any) => {
+    logoutFirebaseUser().catch(() => null);
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/"}auth/logout`, {
         method: "POST",
         credentials: "include"

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Home from "@/views/home/Home";
 
 export const metadata: Metadata = {
-  title: "Bazaarbound | Online Shopping for Clothing & Fashion",
-  description: "Explore the latest fashion, clothing, and accessories on Bazaarbound. Fast delivery and quality guaranteed.",
+  title: "Fashion Time | Online Shopping for Clothing & Fashion",
+  description: "Explore the latest fashion, clothing, and accessories on Fashion Time. Fast delivery and quality guaranteed.",
 };
 
 export const revalidate = 300; // ISR: 5 minutes cache
@@ -25,7 +25,7 @@ async function getHomePageData() {
       return json?.data || json;
     }
   } catch (err) {
-    console.error("Failed to pre-fetch Home page data on server (falling back to client fetch):", err);
+    // console.error("Failed to pre-fetch Home page data on server (falling back to client fetch):", err);
   }
   return null;
 }

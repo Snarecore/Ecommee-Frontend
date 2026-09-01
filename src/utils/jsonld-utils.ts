@@ -51,7 +51,7 @@ export type MinimalProduct = {
     ].filter(Boolean);
   
     const here =
-      typeof window !== "undefined" ? window.location.href : "https://bazaarbound.com/product";
+      typeof window !== "undefined" ? window.location.href : "https://fashiontime.com/product";
   
     const node: any = {
       "@context": "https://schema.org",
@@ -62,7 +62,7 @@ export type MinimalProduct = {
       sku: p.sku || `PROD-${p.id}`,
       brand: {
         "@type": "Brand",
-        name: p?.vendor?.profile?.shopName || "BazaarBound",
+        name: p?.vendor?.profile?.shopName || "Fashion Time",
       },
       category: buildCategoryString(p),
       image: images,
@@ -93,11 +93,11 @@ export type MinimalProduct = {
     const base =
       typeof window !== "undefined"
         ? `${location.protocol}//${location.host}`
-        : "https://bazaarbound.com";
+        : "https://fashiontime.com";
     return {
       "@context": "https://schema.org",
       "@type": "Organization",
-      name: "BazaarBound",
+      name: "Fashion Time",
       url: base,
       logo: base + "/logo.png",
     };

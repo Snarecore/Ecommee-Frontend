@@ -51,7 +51,7 @@ const MyCart = () => {
         const res = await fetchData({ apiUrl: `${apiConfig.site.cartPageUrl}` });
         setResponse(res.recommendedProducts);
       } catch (error) {
-        console.error("Failed to fetch data:", error);
+        // console.error("Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }

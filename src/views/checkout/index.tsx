@@ -314,7 +314,7 @@ const CheckoutView = () => {
       const targetOrderId = newOrder.id || newOrder.orderId || createdOrderId;
       router.push(`/order-confirmation/${targetOrderId}`);
     } catch (err: any) {
-      console.error("Order payment error:", err);
+      // console.error("Order payment error:", err);
       setPaymentError(err?.message || "Payment process failed. Please check your card details or try again.");
     } finally {
       setIsSubmitting(false);

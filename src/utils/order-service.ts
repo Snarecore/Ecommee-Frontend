@@ -182,7 +182,7 @@ export const createOrderInService = (params: {
       localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(existing));
       localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(existing));
     } catch (e) {
-      console.error("Failed to store order in localStorage:", e);
+      // console.error("Failed to store order in localStorage:", e);
     }
     window.dispatchEvent(new Event("orders_updated"));
   }
@@ -213,7 +213,7 @@ export const acceptOrderInService = async (params: {
     if (err?.message?.includes("409")) {
       throw err;
     }
-    console.warn("NestJS accept API endpoint fallback to local persistence:", err?.message || err);
+    // console.warn("NestJS accept API endpoint fallback to local persistence:", err?.message || err);
   }
 
   const orders = getStoredOrders();
@@ -283,7 +283,7 @@ export const acceptOrderInService = async (params: {
         `🎉 Your order #${target.orderId || target.id} has been accepted and is now being prepared.`
       );
     } catch (err) {
-      console.error("Error triggering notification:", err);
+      // console.error("Error triggering notification:", err);
     }
   }
 
@@ -322,7 +322,7 @@ export const rejectOrderInService = async (params: {
     if (err?.message?.includes("409")) {
       throw err;
     }
-    console.warn("NestJS reject API endpoint fallback to local persistence:", err?.message || err);
+    // console.warn("NestJS reject API endpoint fallback to local persistence:", err?.message || err);
   }
 
   const orders = getStoredOrders();
@@ -404,7 +404,7 @@ export const rejectOrderInService = async (params: {
         `Your order #${target.orderId || target.id} was not accepted (${params.rejectionReason}).`
       );
     } catch (err) {
-      console.error("Error triggering notification:", err);
+      // console.error("Error triggering notification:", err);
     }
   }
 
@@ -442,7 +442,7 @@ export const updateOrderStatusInService = (params: {
     params.newStatus !== "Rejected" &&
     params.newStatus !== "Cancelled"
   ) {
-    console.error(`Invalid status transition from Pending to ${params.newStatus}. Must be Accepted or Rejected first.`);
+    // console.error(`Invalid status transition from Pending to ${params.newStatus}. Must be Accepted or Rejected first.`);
     return null;
   }
 
@@ -499,7 +499,7 @@ export const updateOrderStatusInService = (params: {
         params.note || `Order status updated to "${params.newStatus}"`
       );
     } catch (err) {
-      console.error("Error triggering notification:", err);
+      // console.error("Error triggering notification:", err);
     }
   }
 

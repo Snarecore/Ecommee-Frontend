@@ -71,7 +71,7 @@ const PromotionPopupModal: React.FC = () => {
                     }, 400);
                 }
             } catch (err) {
-                console.error("Failed to load active popup banner:", err);
+                // console.error("Failed to load active popup banner:", err);
             }
         };
 
