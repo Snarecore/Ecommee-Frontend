@@ -99,13 +99,8 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-2xl transition-all duration-300 overflow-hidden w-full h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
-                <figure className="relative h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
-                    {isOutOfStock && (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md z-10">
-                            Out of Stock
-                        </span>
-                    )}
+            <div className="group rounded-2xl transition-all duration-300 overflow-hidden w-full h-[410px] md:h-[475px] lg:h-[505px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
+                <figure className="relative h-[250px] min-h-[250px] max-h-[250px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl flex-shrink-0">
                     <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-2xl">
                         <Image
                             src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
@@ -152,7 +147,7 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                 </figure>
 
                 <div className="flex-1 p-4 bg-white relative -mt-6 rounded-t-[24px] flex flex-col shadow-[0_-8px_20px_rgba(0,0,0,0.03)] border-t border-neutral-100/50">
-                    <div className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
+                    <div className="hidden md:block text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
                         {mainCategoryName || "Clothing"}
                     </div>
 

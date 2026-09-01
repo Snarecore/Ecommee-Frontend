@@ -98,15 +98,10 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[460px]">
+            <div className="group rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[395px] md:h-[455px] lg:h-[485px]">
 
                 {/* Product Image */}
-                <figure className="relative h-[320px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl">
-                    {isOutOfStock && (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md z-10">
-                            Out of Stock
-                        </span>
-                    )}
+                <figure className="relative h-[250px] min-h-[250px] max-h-[250px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-2xl flex-shrink-0">
                     <Link
                         href={`/product/${product.slug || product.id || (product as any)._id || ''}`}
                         className="block w-full h-full rounded-t-2xl"
@@ -180,7 +175,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                 <div className="flex-1 p-4 bg-white flex flex-col">
 
                     {/* Category */}
-                    <div className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
+                    <div className="hidden md:block text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
                         {mainCategoryName || "Clothing"}
                     </div>
 
