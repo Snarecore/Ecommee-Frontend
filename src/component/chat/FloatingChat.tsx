@@ -51,13 +51,7 @@ const getOrCreateGuestUser = async () => {
         const email = `guest_${guestSessionId.slice(0, 8)}@bazaarbound-visitor.com`;
         const password = `guestPass_${guestSessionId.slice(0, 12)}`;
 
-        const regResponse = await fetch(`${BASE_URL}auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ name: 'Guest Visitor', email, phone: '01700000000', password, confirmPassword: password, role: 'customer' })
-        });
-
+        // 1. Try login first (in case already created)
         const loginResponse = await fetch(`${BASE_URL}auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -68,7 +62,34 @@ const getOrCreateGuestUser = async () => {
         if (loginResponse.ok) {
             const loginData = await loginResponse.json();
             const guestId = loginData?.data?.user?.id || loginData?.user?.id;
-            return { id: guestId, name: 'Guest Visitor', sessionId: guestSessionId };
+            if (guestId) {
+                return { id: guestId, name: 'Guest Visitor', sessionId: guestSessionId };
+            }
+        }
+
+        // 2. If login failed, register then login
+        const regResponse = await fetch(`${BASE_URL}auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ name: 'Guest Visitor', email, phone: '01700000000', password, confirmPassword: password, role: 'customer' })
+        });
+
+        if (regResponse.ok) {
+            const regLoginResponse = await fetch(`${BASE_URL}auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ email, password })
+            });
+
+            if (regLoginResponse.ok) {
+                const loginData = await regLoginResponse.json();
+                const guestId = loginData?.data?.user?.id || loginData?.user?.id;
+                if (guestId) {
+                    return { id: guestId, name: 'Guest Visitor', sessionId: guestSessionId };
+                }
+            }
         }
     } catch (error) {
         console.error('Error in getOrCreateGuestUser:', error);
@@ -78,6 +99,7 @@ const getOrCreateGuestUser = async () => {
 
 const FloatingChat = () => {
     const userData = useAtomValue(userAtom);
+    const [isMounted, setIsMounted] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [content, setContent] = useState('');
@@ -88,6 +110,12 @@ const FloatingChat = () => {
 
     const [guestUser, setGuestUser] = useState<{ id: string; name: string; sessionId?: string } | null>(null);
     const [isGuestLoading, setIsGuestLoading] = useState(false);
+    const [hasGuestError, setHasGuestError] = useState(false);
+    const isCreatingGuestRef = useRef(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Image preview state
     const [pendingImage, setPendingImage] = useState<File | null>(null);
@@ -99,18 +127,35 @@ const FloatingChat = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(() => {
-        const checkAndCreateGuest = async () => {
-            const hasUser = Boolean(userData?.id);
-            if (!hasUser && !guestUser && !isGuestLoading) {
-                setIsGuestLoading(true);
-                const guest = await getOrCreateGuestUser();
-                if (guest) setGuestUser(guest);
-                setIsGuestLoading(false);
+    // Lazily initialize guest user ONLY when chat is opened and user is not logged in
+    const initializeGuest = useCallback(async () => {
+        if (userData?.id || guestUser?.id || isCreatingGuestRef.current) return;
+        isCreatingGuestRef.current = true;
+        setIsGuestLoading(true);
+        setHasGuestError(false);
+
+        try {
+            const guest = await getOrCreateGuestUser();
+            if (guest) {
+                setGuestUser(guest);
+                setHasGuestError(false);
+            } else {
+                setHasGuestError(true);
             }
-        };
-        checkAndCreateGuest();
-    }, [userData, guestUser, isGuestLoading]);
+        } catch (err) {
+            console.error('Guest init error:', err);
+            setHasGuestError(true);
+        } finally {
+            setIsGuestLoading(false);
+            isCreatingGuestRef.current = false;
+        }
+    }, [userData?.id, guestUser?.id]);
+
+    useEffect(() => {
+        if (isOpen && !userData?.id && !guestUser?.id) {
+            initializeGuest();
+        }
+    }, [isOpen, userData?.id, guestUser?.id, initializeGuest]);
 
     const fetchMyConversation = async (showLoading = true) => {
         if (!userData?.id && !guestUser?.id) return;
@@ -269,22 +314,28 @@ const FloatingChat = () => {
         setPendingImagePreview(null);
     };
 
+    if (!isMounted) return null;
+
     return (
         <>
-            {/* Floating Action Button */}
-            <div className="fixed bottom-6 right-6 z-50">
+            {/* Floating Action Button - High Z-index & Responsive on Mobile */}
+            <div 
+                className="fixed bottom-6 right-4 sm:bottom-6 sm:right-6 z-[9999] pointer-events-auto"
+                style={{ zIndex: 9999 }}
+            >
                 {!isOpen && (
                     <button
                         onClick={() => setIsOpen(true)}
                         aria-label="Open Chat with Support"
-                        className="group relative flex items-center justify-center w-14 h-14 bg-[var(--color-green-primary)] hover:bg-[#428146] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-green-100"
+                        className="group relative flex items-center justify-center w-14 h-14 bg-[#1b4d3e] hover:bg-[#428146] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-green-100"
+                        style={{ backgroundColor: 'var(--color-green-primary, #1b4d3e)' }}
                     >
-                        <IoChatbubbleEllipsesSharp className="w-7 h-7 transition-transform group-hover:rotate-6" />
-                        <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                        <IoChatbubbleEllipsesSharp className="w-7 h-7 transition-transform group-hover:rotate-6 text-white" />
+                        <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
                         </span>
-                        <span className="absolute right-16 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
+                        <span className="hidden md:block absolute right-16 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
                             Need help? Chat with us!
                         </span>
                     </button>
@@ -293,7 +344,10 @@ const FloatingChat = () => {
 
             {/* Floating Chat Modal */}
             {isOpen && (
-                <div className="fixed bottom-6 right-4 sm:right-6 z-50 w-[92vw] sm:w-[380px] h-[560px] max-h-[85vh] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div 
+                    className="fixed bottom-3 right-3 left-3 sm:left-auto sm:bottom-6 sm:right-6 z-[9999] sm:w-[380px] w-auto h-[520px] sm:h-[560px] max-h-[85vh] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                    style={{ zIndex: 9999 }}
+                >
 
                     {/* Header */}
                     <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[#428146] px-4 py-3.5 text-white flex items-center justify-between shadow-md flex-shrink-0">
@@ -336,8 +390,22 @@ const FloatingChat = () => {
                     {/* Chat Body */}
                     {!isLoggedIn ? (
                         <div className="flex-1 p-6 flex flex-col items-center justify-center text-center bg-gray-50/50">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-green-primary)] mb-4"></div>
-                            <p className="text-xs text-gray-500">Connecting to secure chat...</p>
+                            {hasGuestError ? (
+                                <div className="space-y-3">
+                                    <p className="text-xs text-red-500 font-medium">Unable to connect to chat support.</p>
+                                    <button
+                                        onClick={() => initializeGuest()}
+                                        className="px-4 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-colors cursor-pointer shadow-sm"
+                                    >
+                                        Retry Connection
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-green-primary)] mb-4"></div>
+                                    <p className="text-xs text-gray-500">Connecting to secure chat...</p>
+                                </>
+                            )}
                         </div>
                     ) : (
                         <div className="flex-1 p-4 overflow-y-auto bg-gray-50/70 space-y-3">
