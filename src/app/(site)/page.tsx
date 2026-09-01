@@ -9,17 +9,23 @@ export const metadata: Metadata = {
 export const revalidate = 300; // ISR: 5 minutes cache
 
 async function getHomePageData() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/";
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
   try {
-    const res = await fetch(`${baseUrl}site/home-page`, {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout for fast response
+
+    const res = await fetch(`${baseUrl}/site/home-page`, {
       next: { revalidate: 300 },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const json = await res.json();
       return json?.data || json;
     }
   } catch (err) {
-    console.error("Failed to pre-fetch Home page data on server:", err);
+    console.error("Failed to pre-fetch Home page data on server (falling back to client fetch):", err);
   }
   return null;
 }

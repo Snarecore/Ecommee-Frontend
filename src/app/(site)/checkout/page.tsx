@@ -10,6 +10,8 @@ const stripePromise = loadStripe(
   'pk_test_51RnvzXBVnYSmQrwaX27nyzY5fVkPDmiMTAOqA7qgI5KlyF4MN7y36bkb5ny0gadpnBYnvmGCUPiN4E4x4fIeySyL00xzqFL7TF'
 );
 
+export const dynamic = 'force-dynamic';
+
 export default function CheckoutPage() {
   return (
     <Elements stripe={stripePromise}>

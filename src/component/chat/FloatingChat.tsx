@@ -327,8 +327,7 @@ const FloatingChat = () => {
                     <button
                         onClick={() => setIsOpen(true)}
                         aria-label="Open Chat with Support"
-                        className="group relative flex items-center justify-center w-14 h-14 bg-[#1b4d3e] hover:bg-[#428146] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-green-100"
-                        style={{ backgroundColor: 'var(--color-green-primary, #1b4d3e)' }}
+                        className="group relative flex items-center justify-center w-14 h-14 bg-[var(--color-green-primary)] hover:bg-[#428146] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-green-100"
                     >
                         <IoChatbubbleEllipsesSharp className="w-7 h-7 transition-transform group-hover:rotate-6 text-white" />
                         <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">

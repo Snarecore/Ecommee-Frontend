@@ -126,33 +126,174 @@ const Menu = () => {
   const router = useRouter();
   const setLogout = useSetAtom(logoutUserAtom);
 
-  return (
-    <nav className="relative z-50 bg-[#FBF9F5] dark:bg-slate-900 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800 transition-colors duration-300 py-3 sm:py-4">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-6">
-        {/* Brand Logo */}
-        <Link href={"/"} className="flex items-center flex-shrink-0 group">
-          <Image
-            src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
-            alt="Bazaarbound Logo"
-            className="w-36 sm:w-48 md:w-56 h-10 sm:h-14 object-contain group-hover:scale-[1.02] transition-transform duration-200"
-            width={240}
-            height={60}
-            priority
-          />
-        </Link>
+  const renderSuggestionsDropdown = () => (
+    <div
+      className={`absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-2xl rounded-2xl z-[9999] overflow-hidden backdrop-blur-md transition-all duration-200 ${
+        filteredSuggestions.length >= 4 ? "max-h-80" : "h-auto"
+      }`}
+    >
+      {isFetching ? (
+        <div className="px-4 py-8 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center flex flex-col items-center justify-center gap-2">
+          <FiLoader className="text-2xl text-[var(--color-green-primary)] animate-spin" />
+          <span>Searching catalog...</span>
+        </div>
+      ) : (
+        <div className="divide-y divide-gray-100 dark:divide-gray-700/60 overflow-y-auto max-h-80">
+          {filteredSuggestions.map((item, index) =>
+            item.name === "No product found" ? (
+              <div
+                key={index}
+                className="px-4 py-8 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center flex flex-col items-center justify-center gap-2"
+              >
+                <FiSearch className="text-3xl text-gray-300 dark:text-gray-600 bg-gray-100 dark:bg-gray-700 w-12 h-12 rounded-full p-2.5" />
+                <span>No products matching &ldquo;{searchText}&rdquo;</span>
+              </div>
+            ) : (
+              <Link
+                href={`/product/${item.slug}`}
+                onClick={() => {
+                  setSearchText("");
+                  setFilteredSuggestions([]);
+                }}
+                key={index}
+                className="flex items-center gap-3.5 px-4 py-3 hover:bg-emerald-50/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer group"
+              >
+                <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0 border border-gray-200/60 dark:border-gray-600/60">
+                  <Image
+                    src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    width={100}
+                    height={100}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs sm:text-sm truncate group-hover:text-[var(--color-green-primary)] transition-colors">
+                    {item.name}
+                  </p>
+                  {item.price !== undefined && (
+                    <span className="inline-block mt-0.5 font-bold text-xs text-[var(--color-green-primary)] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      ${item.price}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
 
-        {/* Live Search Bar */}
-        <div className="relative flex-1 max-w-2xl mx-auto" ref={dropdownRef}>
+  return (
+    <nav className="relative z-50 bg-[#FBF9F5] dark:bg-slate-900 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800 transition-colors duration-300 py-2 sm:py-3.5" ref={dropdownRef}>
+      <div className="max-w-screen-2xl mx-auto px-3 sm:px-6">
+        {/* Top / Main Navigation Row */}
+        <div className="flex items-center justify-between gap-2 sm:gap-6">
+          {/* Brand Logo */}
+          <Link href={"/"} className="flex items-center flex-shrink-0 group -ml-0.5 sm:ml-0">
+            <Image
+              src={headerFooterData?.headerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+              alt="Bazaarbound Logo"
+              className="w-28 sm:w-44 md:w-52 h-8 sm:h-12 object-contain group-hover:scale-[1.02] transition-transform duration-200"
+              width={240}
+              height={60}
+              priority
+            />
+          </Link>
+
+          {/* Desktop Search Bar (Hidden on mobile < md) */}
+          <div className="hidden md:block relative flex-1 max-w-2xl mx-auto">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="Search products, categories..."
+                className="w-full pl-11 pr-10 py-2.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/80 text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/15 focus:border-[var(--color-green-primary)] transition-all duration-300 shadow-xs"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-emerald-600 dark:text-emerald-400">
+                <FiSearch className="text-lg" />
+              </div>
+
+              {searchText && (
+                <button
+                  onClick={() => {
+                    setSearchText("");
+                    setFilteredSuggestions([]);
+                  }}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full transition-colors cursor-pointer"
+                  title="Clear search"
+                >
+                  <FiX className="text-base" />
+                </button>
+              )}
+            </div>
+
+            {/* Desktop Suggestions */}
+            {searchText && renderSuggestionsDropdown()}
+          </div>
+
+          {/* Action Icon Buttons: Wishlist, Cart, Theme Toggle */}
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            {/* Wishlist Button */}
+            <Link
+              href="/wishlist"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-emerald-500/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[var(--color-green-primary)] dark:hover:text-emerald-400 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
+              title="Wishlist"
+              aria-label="Wishlist"
+            >
+              <FaRegHeart className="text-base sm:text-xl group-hover:scale-110 transition-transform duration-200" />
+              {isMounted && wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Cart Button */}
+            <Link
+              href="/cart"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-emerald-500/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[var(--color-green-primary)] dark:hover:text-emerald-400 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
+              title="Shopping Cart"
+              aria-label="Shopping Cart"
+            >
+              <HiOutlineShoppingBag className="text-lg sm:text-2xl group-hover:scale-110 transition-transform duration-200" />
+              {isMounted && cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-emerald-500/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[var(--color-green-primary)] dark:hover:text-emerald-400 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              aria-label="Toggle Theme"
+            >
+              {theme === "light" ? (
+                <FiMoon className="text-base sm:text-xl group-hover:rotate-12 transition-transform duration-200" />
+              ) : (
+                <FiSun className="text-base sm:text-xl text-amber-400 group-hover:rotate-45 transition-transform duration-200" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Dedicated Mobile Search Bar (Visible on mobile screens < md) */}
+        <div className="block md:hidden mt-2 relative">
           <div className="relative flex items-center">
             <input
               type="text"
               placeholder="Search products, categories..."
-              className="w-full pl-11 pr-10 py-2.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/80 text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/15 focus:border-[var(--color-green-primary)] transition-all duration-300 shadow-xs"
+              className="w-full pl-9 pr-8 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white/95 dark:bg-gray-800/90 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-[var(--color-green-primary)] transition-all shadow-xs"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-emerald-600 dark:text-emerald-400">
-              <FiSearch className="text-lg" />
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-emerald-600 dark:text-emerald-400">
+              <FiSearch className="text-sm" />
             </div>
 
             {searchText && (
@@ -161,120 +302,16 @@ const Menu = () => {
                   setSearchText("");
                   setFilteredSuggestions([]);
                 }}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full transition-colors cursor-pointer"
                 title="Clear search"
               >
-                <FiX className="text-base" />
+                <FiX className="text-xs" />
               </button>
             )}
           </div>
 
-          {/* Search Suggestions Dropdown */}
-          {searchText && (
-            <div
-              className={`absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-2xl rounded-2xl z-[9999] overflow-hidden backdrop-blur-md transition-all duration-200 ${
-                filteredSuggestions.length >= 4 ? "max-h-80" : "h-auto"
-              }`}
-            >
-              {isFetching ? (
-                <div className="px-4 py-8 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center flex flex-col items-center justify-center gap-2">
-                  <FiLoader className="text-2xl text-[var(--color-green-primary)] animate-spin" />
-                  <span>Searching catalog...</span>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100 dark:divide-gray-700/60 overflow-y-auto max-h-80">
-                  {filteredSuggestions.map((item, index) =>
-                    item.name === "No product found" ? (
-                      <div
-                        key={index}
-                        className="px-4 py-8 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center flex flex-col items-center justify-center gap-2"
-                      >
-                        <FiSearch className="text-3xl text-gray-300 dark:text-gray-600 bg-gray-100 dark:bg-gray-700 w-12 h-12 rounded-full p-2.5" />
-                        <span>No products matching &ldquo;{searchText}&rdquo;</span>
-                      </div>
-                    ) : (
-                      <Link
-                        href={`/product/${item.slug}`}
-                        onClick={() => {
-                          setSearchText("");
-                          setFilteredSuggestions([]);
-                        }}
-                        key={index}
-                        className="flex items-center gap-3.5 px-4 py-3 hover:bg-emerald-50/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer group"
-                      >
-                        <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0 border border-gray-200/60 dark:border-gray-600/60">
-                          <Image
-                            src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
-                            alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-800 dark:text-gray-100 text-xs sm:text-sm truncate group-hover:text-[var(--color-green-primary)] transition-colors">
-                            {item.name}
-                          </p>
-                          {item.price !== undefined && (
-                            <span className="inline-block mt-0.5 font-bold text-xs text-[var(--color-green-primary)] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                              ${item.price}
-                            </span>
-                          )}
-                        </div>
-                      </Link>
-                    )
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Action Icon Buttons: Wishlist, Cart, Theme Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-          {/* Wishlist Button */}
-          <Link
-            href="/wishlist"
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-emerald-500/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[var(--color-green-primary)] dark:hover:text-emerald-400 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
-            title="Wishlist"
-            aria-label="Wishlist"
-          >
-            <FaRegHeart className="text-lg sm:text-xl group-hover:scale-110 transition-transform duration-200" />
-            {isMounted && wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-bold text-[10px] min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
-
-          {/* Cart Button */}
-          <Link
-            href="/cart"
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-emerald-500/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[var(--color-green-primary)] dark:hover:text-emerald-400 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
-            title="Shopping Cart"
-            aria-label="Shopping Cart"
-          >
-            <HiOutlineShoppingBag className="text-xl sm:text-2xl group-hover:scale-110 transition-transform duration-200" />
-            {isMounted && cartItemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-bold text-[10px] min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
-                {cartItemCount}
-              </span>
-            )}
-          </Link>
-
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-emerald-500/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[var(--color-green-primary)] dark:hover:text-emerald-400 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
-            title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-            aria-label="Toggle Theme"
-          >
-            {theme === "light" ? (
-              <FiMoon className="text-lg sm:text-xl group-hover:rotate-12 transition-transform duration-200" />
-            ) : (
-              <FiSun className="text-lg sm:text-xl text-amber-400 group-hover:rotate-45 transition-transform duration-200" />
-            )}
-          </button>
+          {/* Mobile Suggestions */}
+          {searchText && renderSuggestionsDropdown()}
         </div>
       </div>
     </nav>

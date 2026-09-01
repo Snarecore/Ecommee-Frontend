@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { nestedCategoriesAtom, megaDiscountAtom } from "../../../../store/global-store";
 import { MainCategory } from "../../../../interface/nested-category.interface";
 import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/user-store";
-import { FaRegUser} from "react-icons/fa6";
+import { FaRegUser } from "react-icons/fa6";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { FiMenu, FiX, FiHome, FiMail, FiPackage, FiZap } from "react-icons/fi";
+import { FiMenu, FiHome, FiPackage, FiZap, FiShoppingBag, FiChevronRight } from "react-icons/fi";
 import NotificationDropdown from "./NotificationDropdown";
+import MobileNavDrawer from "./MobileNavDrawer";
 
 const NavBar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -73,12 +74,12 @@ const NavBar = () => {
                     <div className="flex items-center justify-between py-2 w-full">
                         {/* Mobile Menu Button */}
                         <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="lg:hidden p-2 text-white hover:bg-white/15 rounded-lg transition-colors focus:outline-none flex items-center gap-2 cursor-pointer"
-                            aria-label="Toggle navigation menu"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-full transition-all focus:outline-none flex items-center gap-2 cursor-pointer shadow-xs"
+                            aria-label="Open navigation menu"
                         >
-                            {isMobileMenuOpen ? <FiX className="text-2xl" /> : <FiMenu className="text-2xl" />}
-                            <span className="text-xs font-semibold uppercase tracking-wider">Menu</span>
+                            <FiMenu className="text-xl" />
+                            <span className="text-xs font-bold uppercase tracking-wider">Menu</span>
                         </button>
 
                         {/* Categories & Main Menu Links (Desktop) */}
@@ -99,46 +100,53 @@ const NavBar = () => {
                                 return (
                                     <div key={main.id || idx} className="relative group">
                                         {hasDropdown ? (
-                                            <div className="flex items-center gap-1 px-3.5 py-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/15 text-[13px] font-bold uppercase tracking-wider cursor-pointer transition-all duration-200">
+                                            <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-white/90 group-hover:text-white group-hover:bg-white/20 text-[13px] font-bold uppercase tracking-wider cursor-pointer transition-all duration-200">
                                                 <span>{main.name}</span>
-                                                <RiArrowDropDownLine size={20} className="transition-transform duration-300 group-hover:rotate-180 opacity-80" />
+                                                <RiArrowDropDownLine size={20} className="transition-transform duration-300 group-hover:rotate-180 opacity-80 group-hover:opacity-100" />
                                             </div>
                                         ) : (
                                             <Link 
                                                 href={`/shop?mainCategoryId=${main.id}&pageNumber=1`} 
-                                                className="block px-3.5 py-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/15 text-[13px] font-bold uppercase tracking-wider transition-all duration-200"
+                                                className="block px-3.5 py-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/20 text-[13px] font-bold uppercase tracking-wider transition-all duration-200"
                                             >
                                                 {main.name}
                                             </Link>
                                         )}
 
                                         {hasDropdown && (
-                                            <div className="absolute top-full left-0 mt-1.5 w-52 bg-[#396c3c]/95 backdrop-blur-md shadow-2xl rounded-2xl border border-white/20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden p-1.5">
-                                                <div className="py-1">
-                                                    {main.firstCategories.map((first, fIdx) => (
-                                                        <Link
-                                                            key={first.id || fIdx}
-                                                            href={`/shop?firstCategoryId=${first.id}&pageNumber=1`}
-                                                            className="block px-3.5 py-2 text-[12px] font-semibold text-white/90 hover:text-white hover:bg-white/20 rounded-xl transition-all duration-150 hover:translate-x-1"
-                                                        >
-                                                            {first.name}
-                                                        </Link>
-                                                    ))}
+                                            <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-1 group-hover:translate-y-0 transition-all duration-200 ease-out z-50">
+                                                <div className="w-64 bg-white dark:bg-slate-900 shadow-2xl rounded-2xl border border-gray-100 dark:border-slate-800 p-2 text-slate-800 dark:text-slate-100 overflow-hidden ring-1 ring-black/5">
+                                                    {/* Header: Explore All in this Category */}
+                                                    <Link
+                                                        href={`/shop?mainCategoryId=${main.id}&pageNumber=1`}
+                                                        className="flex items-center justify-between px-3.5 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/60 rounded-xl text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-colors mb-1.5 group/header"
+                                                    >
+                                                        <span className="flex items-center gap-2">
+                                                            <FiShoppingBag className="text-emerald-600 dark:text-emerald-400 text-sm" />
+                                                            <span>Explore All {main.name}</span>
+                                                        </span>
+                                                        <FiChevronRight className="text-xs group-hover/header:translate-x-1 transition-transform" />
+                                                    </Link>
+
+                                                    {/* Subcategories list */}
+                                                    <div className="space-y-0.5 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+                                                        {main.firstCategories.map((first, fIdx) => (
+                                                            <Link
+                                                                key={first.id || fIdx}
+                                                                href={`/shop?firstCategoryId=${first.id}&pageNumber=1`}
+                                                                className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 dark:hover:bg-emerald-950/30 rounded-xl transition-all group/item"
+                                                            >
+                                                                <span className="truncate">{first.name}</span>
+                                                                <FiChevronRight className="text-xs text-slate-300 dark:text-slate-600 group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 group-hover/item:translate-x-0.5 transition-all flex-shrink-0" />
+                                                            </Link>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
                                 );
                             })}
-
-                            {/* Static Contact Us Link */}
-                            <Link 
-                                href="/contact-us" 
-                                className="px-3.5 py-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/15 transition-all duration-200 text-[13px] font-bold uppercase tracking-wider flex items-center gap-1.5"
-                            >
-                                <FiMail className="text-sm opacity-80" />
-                                <span>Contact</span>
-                            </Link>
 
                             {/* Dynamic Mega Discount Promotional Link */}
                             {megaDiscount?.isActive && (
@@ -160,7 +168,7 @@ const NavBar = () => {
                             {/* User Profile Pill / Dropdown */}
                             <div className="relative" ref={dropdownRef}>
                                 <div
-                                    className="flex items-center gap-2.5 text-white cursor-pointer py-1.5 px-3 rounded-full hover:bg-white/20 transition-all duration-200 border border-white/20 shadow-xs"
+                                    className="flex items-center gap-2 text-white cursor-pointer py-1.5 px-3 rounded-full hover:bg-white/20 bg-white/10 border border-white/20 transition-all duration-200 shadow-xs active:scale-95"
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 >
                                     {isMounted && user ? (
@@ -240,69 +248,18 @@ const NavBar = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Mobile Navigation Drawer Overlay */}
-                    {isMobileMenuOpen && (
-                        <div className="lg:hidden py-3 border-t border-white/20 animate-in slide-in-from-top-2 duration-200">
-                            <div className="flex flex-col gap-1">
-                                <Link
-                                    href="/"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-4 py-2 text-xs font-bold text-white uppercase hover:bg-white/15 rounded-lg flex items-center gap-2"
-                                >
-                                    <FiHome /> Home
-                                </Link>
-
-                                {mainCategories.map((main, idx) => (
-                                    <div key={main.id || idx} className="flex flex-col">
-                                        <Link
-                                            href={`/shop?mainCategoryId=${main.id}&pageNumber=1`}
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                            className="px-4 py-2 text-xs font-bold text-white uppercase hover:bg-white/15 rounded-lg"
-                                        >
-                                            {main.name}
-                                        </Link>
-                                        {main.firstCategories && main.firstCategories.length > 0 && (
-                                            <div className="pl-6 flex flex-col gap-1 py-1">
-                                                {main.firstCategories.map((first, fIdx) => (
-                                                    <Link
-                                                        key={first.id || fIdx}
-                                                        href={`/shop?firstCategoryId=${first.id}&pageNumber=1`}
-                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                        className="px-3 py-1.5 text-[11px] font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-md"
-                                                    >
-                                                        • {first.name}
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-
-                                <Link
-                                    href="/contact-us"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-4 py-2 text-xs font-bold text-white uppercase hover:bg-white/15 rounded-lg flex items-center gap-2"
-                                >
-                                    <FiMail /> Contact
-                                </Link>
-
-                                {megaDiscount?.isActive && (
-                                    <Link
-                                        href="/shop?discountOnly=true&pageNumber=1"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="px-4 py-2 text-xs font-extrabold text-amber-300 uppercase bg-amber-400/20 hover:bg-amber-400/30 rounded-lg flex items-center gap-2"
-                                    >
-                                        <FiZap className="text-amber-300" /> {megaDiscount.menuText || "Mega Sale"}
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
+
+            {/* Modern Off-Canvas Mobile Navigation Drawer */}
+            <MobileNavDrawer
+                isOpen={isMobileMenuOpen}
+                onClose={() => setIsMobileMenuOpen(false)}
+                mainCategories={mainCategories}
+            />
         </div>
     );
 };
 
 export default NavBar;
+

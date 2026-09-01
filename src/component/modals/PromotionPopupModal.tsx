@@ -34,14 +34,19 @@ const PromotionPopupModal: React.FC = () => {
         const fetchActivePopup = async () => {
             try {
                 const baseUrl = getApiBaseUrl().replace(/\/$/, "");
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000);
+
                 const res = await fetch(`${baseUrl}/popups/active`, {
                     method: "GET",
                     cache: "no-store",
+                    signal: controller.signal,
                     headers: {
                         "Pragma": "no-cache",
                         "Cache-Control": "no-cache, no-store"
                     }
                 });
+                clearTimeout(timeoutId);
 
                 if (!res.ok) return;
 

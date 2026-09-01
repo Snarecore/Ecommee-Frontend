@@ -18,9 +18,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  /* experimental: {
-    optimizePackageImports: ["react-icons", "swiper", "jotai", "react-fast-marquee"],
-  }, */
+  experimental: {
+    optimizePackageImports: [
+      "react-icons",
+      "react-icons/fi",
+      "react-icons/io5",
+      "react-icons/ri",
+      "react-icons/fa6",
+      "react-icons/hi2",
+      "react-icons/md",
+      "swiper",
+      "jotai",
+      "react-fast-marquee"
+    ],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
