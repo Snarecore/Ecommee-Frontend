@@ -327,12 +327,12 @@ const FloatingChat = () => {
                     <button
                         onClick={() => setIsOpen(true)}
                         aria-label="Open Chat with Support"
-                        className="group relative flex items-center justify-center w-14 h-14 bg-[var(--color-green-primary)] hover:bg-[#428146] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-green-100"
+                        className="group relative flex items-center justify-center w-14 h-14 bg-[var(--color-green-primary)] hover:bg-[#1D7693] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-sky-100"
                     >
                         <IoChatbubbleEllipsesSharp className="w-7 h-7 transition-transform group-hover:rotate-6 text-white" />
                         <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500 border-2 border-white"></span>
                         </span>
                         <span className="hidden md:block absolute right-16 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
                             Need help? Chat with us!
@@ -349,7 +349,7 @@ const FloatingChat = () => {
                 >
 
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[#428146] px-4 py-3.5 text-white flex items-center justify-between shadow-md flex-shrink-0">
+                    <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[#1D7693] px-4 py-3.5 text-white flex items-center justify-between shadow-md flex-shrink-0">
                         <div className="flex items-center space-x-3">
                             <div className="relative">
                                 <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white text-xl border border-white/30">
@@ -394,7 +394,7 @@ const FloatingChat = () => {
                                     <p className="text-xs text-red-500 font-medium">Unable to connect to chat support.</p>
                                     <button
                                         onClick={() => initializeGuest()}
-                                        className="px-4 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-colors cursor-pointer shadow-sm"
+                                        className="px-4 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#1D7693] transition-colors cursor-pointer shadow-sm"
                                     >
                                         Retry Connection
                                     </button>
@@ -520,7 +520,7 @@ const FloatingChat = () => {
                                     type="submit"
                                     disabled={isSending || (!content.trim() && !pendingImage)}
                                     aria-label="Send Message"
-                                    className="w-9 h-9 bg-[var(--color-green-primary)] hover:bg-[#428146] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-colors cursor-pointer shadow-sm shrink-0"
+                                    className="w-9 h-9 bg-[var(--color-green-primary)] hover:bg-[#1D7693] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-colors cursor-pointer shadow-sm shrink-0"
                                 >
                                     {isSending ? (
                                         <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

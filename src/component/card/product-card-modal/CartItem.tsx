@@ -21,7 +21,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
         >
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
                 <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <FaShoppingBag className="text-[#064490]" />
+                    <FaShoppingBag className="text-[#218DAE]" />
                     {title}
                 </h2>
                 <button
@@ -32,7 +32,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
                 </button>
             </div>
 
-            {/* <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-[#064490]/20 scrollbar-track-gray-100 hover:scrollbar-thumb-[#064490]/30">
+            {/* <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-[#218DAE]/20 scrollbar-track-gray-100 hover:scrollbar-thumb-[#218DAE]/30">
                 <div className="flex items-center justify-between">
                     <p className="text-gray-800 font-semibold">
                         Your Items ({cart.length})
@@ -52,7 +52,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
                         <p className="text-center text-gray-400 font-medium">Your shopping cart is empty!</p>
                         <button
                             onClick={onClose}
-                            className="text-[#064490] hover:text-[#064490]/80 font-medium transition-colors"
+                            className="text-[#218DAE] hover:text-[#218DAE]/80 font-medium transition-colors"
                         >
                             Continue Shopping
                         </button>
@@ -71,7 +71,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium text-gray-800 truncate">{item.name}</p>
-                                        <p className="text-[#064490] font-semibold mt-0.5">
+                                        <p className="text-[#218DAE] font-semibold mt-0.5">
                                             ${(item.price * item.quantity).toFixed(2)}
                                         </p>
                                         <div className="flex items-center gap-2 mt-2">
@@ -106,10 +106,10 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
             {/* <div className="p-6 border-t border-gray-100 bg-white">
                 <div className="flex justify-between items-center mb-4">
                     <span className="text-gray-600 font-medium">Subtotal:</span>
-                    <span className="text-xl font-bold text-[#064490]">${totalPrice.toFixed(2)}</span>
+                    <span className="text-xl font-bold text-[#218DAE]">${totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="space-y-2">
-                    <button className="w-full bg-[#064490] text-white font-medium py-2.5 rounded-lg hover:bg-[#064490]/90 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30">
+                    <button className="w-full bg-[#218DAE] text-white font-medium py-2.5 rounded-lg hover:bg-[#218DAE]/90 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30">
                         Checkout Now
                     </button>
                     <button

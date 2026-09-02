@@ -179,7 +179,7 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
                         className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200
                             ${isActionDisabled
                                 ? "bg-red-100 text-red-500 border border-red-200 cursor-not-allowed font-bold"
-                                : "bg-[var(--color-green-primary)] text-white hover:bg-[#428146] shadow-sm hover:shadow-md cursor-pointer"
+                                : "bg-[var(--color-green-primary)] text-white hover:bg-[#1D7693] shadow-sm hover:shadow-md cursor-pointer"
                             }`}
                     >
                         {selectedSizeIsOutOfStock || productOutOfStock ? (

@@ -347,11 +347,11 @@ const Product = ({ initialData }: ProductProps) => {
                         border-radius: 10px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-thumb {
-                        background: #064490;
+                        background: #218DAE;
                         border-radius: 10px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                        background: #053979;
+                        background: #1D7693;
                     }
                 `}
                 </style>
@@ -571,7 +571,7 @@ const Product = ({ initialData }: ProductProps) => {
                                                 className={`px-4 sm:px-6 py-2 font-semibold transition ${
                                                     isSelectedOut
                                                         ? "bg-red-100 border border-red-300 text-red-600 cursor-not-allowed font-bold"
-                                                        : "bg-[var(--color-green-primary)] text-white hover:bg-[#428146] cursor-pointer"
+                                                        : "bg-[var(--color-green-primary)] text-white hover:bg-[#1D7693] cursor-pointer"
                                                 }`}
                                                 onClick={(e) => {
                                                     e.preventDefault();

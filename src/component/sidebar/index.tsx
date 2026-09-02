@@ -819,14 +819,14 @@ const NestedMenuItem = ({
             onClick={(e) => e.stopPropagation()}
             className={`w-4 h-4 cursor-pointer appearance-none rounded-full border ${
               isSelected
-                ? "border-emerald-500 bg-emerald-500 dark:border-emerald-400 dark:bg-emerald-400"
+                ? "border-[#218DAE] bg-[#218DAE] dark:border-[#218DAE] dark:bg-[#218DAE]"
                 : "bg-gray-200 dark:bg-gray-700 border-transparent"
             }`}
           />
           <p
             className={`text-[12px] transition-colors duration-200 ${
               isSelected
-                ? "text-emerald-700 dark:text-emerald-400 font-bold"
+                ? "text-[#218DAE] dark:text-[#218DAE] font-bold"
                 : level === 0
                 ? "text-gray-900 dark:text-gray-100 font-semibold"
                 : "text-gray-700 dark:text-gray-300 font-medium"
@@ -1020,7 +1020,7 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
                   onClick={(e) => e.stopPropagation()}
                   className={`w-4 h-4 cursor-pointer appearance-none rounded-full border ${
                     selectedCategoryId === null
-                      ? "border-emerald-500 bg-emerald-500 dark:border-emerald-400 dark:bg-emerald-400"
+                      ? "border-[#218DAE] bg-[#218DAE] dark:border-[#218DAE] dark:bg-[#218DAE]"
                       : "bg-gray-200 dark:bg-gray-700 border-transparent"
                   }`}
                 />
@@ -1028,7 +1028,7 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
                   href={"/all-categories"}
                   className={`text-xs sm:text-sm transition-colors duration-200 ${
                     selectedCategoryId === null
-                      ? "text-emerald-700 dark:text-emerald-400 font-bold"
+                      ? "text-[#218DAE] dark:text-[#218DAE] font-bold"
                       : "text-gray-900 dark:text-gray-100 font-semibold"
                   }`}
                   title="All Categories"
@@ -1063,7 +1063,7 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
         <select
           value={currentSortBy}
           onChange={(e) => updateParam({ sortBy: e.target.value })}
-          className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+          className="w-full text-xs font-medium px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#218DAE] cursor-pointer"
         >
           <option value="newest">Newest Arrivals</option>
           <option value="price_asc">Price: Low to High</option>
@@ -1088,7 +1088,7 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
               placeholder="Min"
               value={minPriceInput}
               onChange={(e) => setMinPriceInput(e.target.value)}
-              className="w-full pl-6 pr-2 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-6 pr-2 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#218DAE]"
             />
           </div>
           <span className="text-xs text-gray-400 font-bold">-</span>
@@ -1099,12 +1099,12 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
               placeholder="Max"
               value={maxPriceInput}
               onChange={(e) => setMaxPriceInput(e.target.value)}
-              className="w-full pl-6 pr-2 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-6 pr-2 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#218DAE]"
             />
           </div>
           <button
             onClick={handleApplyPrice}
-            className="px-3 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors cursor-pointer"
+            className="px-3 py-1.5 text-xs font-bold bg-[#218DAE] hover:bg-[#1D7693] text-white rounded-lg transition-colors cursor-pointer"
           >
             Apply
           </button>
@@ -1125,8 +1125,8 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
                 onClick={() => handlePresetPrice(preset.min, preset.max)}
                 className={`text-[11px] font-medium px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
                   isActive
-                    ? "bg-emerald-500 text-white border-emerald-500 font-bold"
-                    : "bg-white dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:border-emerald-400"
+                    ? "bg-[#218DAE] text-white border-[#218DAE] font-bold"
+                    : "bg-white dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:border-[#218DAE]"
                 }`}
               >
                 {preset.label}
@@ -1144,27 +1144,27 @@ const Sidebar = ({ selectedCategoryId, setSelectedCategoryId }: SidebarProps) =>
         
         {/* Availability: In Stock Only */}
         <label className="flex items-center justify-between cursor-pointer group">
-          <span className="text-xs font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+          <span className="text-xs font-medium text-gray-800 dark:text-gray-200 group-hover:text-[#218DAE] dark:group-hover:text-[#218DAE]">
             In Stock Only
           </span>
           <input
             type="checkbox"
             checked={currentInStock}
             onChange={(e) => updateParam({ inStockOnly: e.target.checked ? "true" : null })}
-            className="w-4 h-4 accent-emerald-600 rounded cursor-pointer"
+            className="w-4 h-4 accent-[#218DAE] rounded cursor-pointer"
           />
         </label>
 
         {/* Special Deals: On Sale */}
         <label className="flex items-center justify-between cursor-pointer group">
-          <span className="text-xs font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+          <span className="text-xs font-medium text-gray-800 dark:text-gray-200 group-hover:text-[#218DAE] dark:group-hover:text-[#218DAE]">
             On Sale (Discounted)
           </span>
           <input
             type="checkbox"
             checked={currentDiscount}
             onChange={(e) => updateParam({ discountOnly: e.target.checked ? "true" : null })}
-            className="w-4 h-4 accent-emerald-600 rounded cursor-pointer"
+            className="w-4 h-4 accent-[#218DAE] rounded cursor-pointer"
           />
         </label>
       </div>

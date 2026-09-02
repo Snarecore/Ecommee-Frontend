@@ -23,10 +23,10 @@
 }
 
 :root {
-  --color-green-primary: #1b4d3e;
-  --color-green-secondary: #2c6e49;
+  --color-green-primary: #218DAE;
+  --color-green-secondary: #1D7693;
   --color-active: #fff7f0;
-  --color-primary: #1b4d3e;
+  --color-primary: #218DAE;
   --color-black-primary: #1a1a1a;
   --color-white-primary: #FBF9F5;
 }
@@ -95,17 +95,17 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-green-primary, #1b4d3e);
+  background: var(--color-green-primary, #218DAE);
   border-radius: 5px;
   border: 2px solid #f1f5f1;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-green-secondary, #2c6e49);
+  background: var(--color-green-secondary, #1D7693);
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-green-primary, #1b4d3e) #f1f5f1;
+  scrollbar-color: var(--color-green-primary, #218DAE) #f1f5f1;
 }

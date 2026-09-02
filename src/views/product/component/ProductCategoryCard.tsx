@@ -106,7 +106,7 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
                         Add to Cart
                     </button>
                     <button 
-                        className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#428146] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
+                        className="w-1/2 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#1D7693] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md"
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

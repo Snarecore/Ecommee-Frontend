@@ -13,8 +13,8 @@ const Header = () => {
                 <div className="flex items-center justify-between gap-4">
                     {/* Marquee Banner */}
                     <div className="hidden sm:flex items-center gap-2 flex-1 overflow-hidden">
-                        <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 flex-shrink-0">
-                            <FiZap className="text-emerald-600 dark:text-emerald-400 animate-pulse" /> Offer
+                        <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-[#218DAE]/10 dark:bg-[#218DAE]/20 text-[#218DAE] dark:text-[#218DAE] px-2 py-0.5 rounded-full border border-[#218DAE]/30 flex-shrink-0">
+                            <FiZap className="text-[#218DAE] animate-pulse" /> Offer
                         </span>
                         <Marquee
                             speed={65}
@@ -22,7 +22,7 @@ const Header = () => {
                             pauseOnHover={true}
                             className="text-xs font-medium text-slate-700 dark:text-slate-300"
                         >
-                            <span className="text-emerald-800 dark:text-emerald-300 font-semibold px-4">
+                            <span className="text-[#218DAE] dark:text-[#218DAE] font-semibold px-4">
                                 {headerFooterData?.bannerText || "Welcome to Fashion Time - Special Discounts Available Today!"}
                             </span>
                         </Marquee>
@@ -32,9 +32,9 @@ const Header = () => {
                     <div className="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto text-xs font-medium">
                         <Link
                             href="/login"
-                            className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors duration-200 py-0.5 group"
+                            className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
                         >
-                            <FiUser className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-200" />
+                            <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
                             <span>Sign In / Register</span>
                         </Link>
 
@@ -43,9 +43,9 @@ const Header = () => {
                         {headerFooterData?.contactPhone && (
                             <a
                                 href={`tel:${headerFooterData.contactPhone}`}
-                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors duration-200 py-0.5 group"
+                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
                             >
-                                <FiPhoneCall className="text-emerald-600 dark:text-emerald-400 group-hover:rotate-12 transition-transform duration-200" />
+                                <FiPhoneCall className="text-[#218DAE] group-hover:rotate-12 transition-transform duration-200" />
                                 <span><strong className="font-semibold text-slate-800 dark:text-slate-400">Helpline:</strong> {headerFooterData?.contactPhone}</span>
                             </a>
                         )}

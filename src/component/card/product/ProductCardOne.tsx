@@ -229,7 +229,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
                                 {/* Buy Now */}
                                 <button
-                                    className="w-1/2 py-2 px-1 sm:px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#428146] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="w-1/2 py-2 px-1 sm:px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
                                     <span>Buy Now</span>

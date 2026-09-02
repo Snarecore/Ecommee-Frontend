@@ -98,19 +98,19 @@ const CouponInput: React.FC<CouponInputProps> = ({
   return (
     <div className="w-full space-y-2">
       {appliedCouponCode ? (
-        <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs">
+        <div className="flex items-center justify-between bg-[#218DAE]/10 border border-[#218DAE]/30 rounded-xl p-3 text-xs">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+            <span className="font-mono font-bold text-[#218DAE] bg-[#218DAE]/15 px-2 py-0.5 rounded border border-[#218DAE]/30">
               {appliedCouponCode}
             </span>
-            <span className="font-semibold text-emerald-800">
+            <span className="font-semibold text-[#218DAE]">
               -৳{appliedDiscountAmount.toFixed(2)} Discount Applied
             </span>
           </div>
           <button
             type="button"
             onClick={handleRemove}
-            className="text-emerald-700 hover:text-red-600 font-bold px-2 py-1 transition cursor-pointer"
+            className="text-[#218DAE] hover:text-red-600 font-bold px-2 py-1 transition cursor-pointer"
             title="Remove Coupon"
           >
             ✕ Remove
