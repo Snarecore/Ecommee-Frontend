@@ -179,9 +179,6 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
               className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-sm active:scale-[0.99] transition-all group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-slate-950">
-                  <FiZap className="text-base animate-bounce" />
-                </div>
                 <div>
                   <p className="text-xs font-black uppercase tracking-wider text-slate-950 leading-tight">
                     {megaDiscount.menuText || 'Special Sale'}

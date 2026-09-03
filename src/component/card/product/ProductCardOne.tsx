@@ -101,7 +101,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-xl sm:rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[345px] sm:h-[370px] md:h-[440px] lg:h-[470px]">
+            <div className="group rounded-xl sm:rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-auto min-h-[345px] sm:h-[370px] md:h-[425px] lg:h-[445px]">
 
                 {/* Product Image */}
                 <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[275px] md:min-h-[275px] md:max-h-[275px] lg:h-[300px] lg:min-h-[300px] lg:max-h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
@@ -163,7 +163,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                             <FaHeart className="text-red-500 fill-current" />
                         ) : (
                             <FiHeart
-                                className="text-neutral-700"
+                                className="text-[var(--color-green-primary)]"
                                 size={16}
                             />
                         )}
@@ -220,11 +220,11 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                                 <button
                                     title="Add to Cart"
                                     aria-label="Add to Cart"
-                                    className="w-10 sm:w-1/2 py-2 px-1 sm:px-2 border border-neutral-200 text-neutral-700 text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
+                                    className="w-10 sm:w-1/2 py-2 px-1 sm:px-2 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
                                     <span className="hidden sm:inline">Add to Cart</span>
-                                    <FiShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                                    <FiShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[var(--color-green-primary)] flex-shrink-0" />
                                 </button>
 
                                 {/* Buy Now */}

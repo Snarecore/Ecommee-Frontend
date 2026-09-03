@@ -9,7 +9,7 @@ import { TbLayoutGrid, TbListDetails, TbTablePlus } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaTags, FaUniversity } from "react-icons/fa";
-import companyLogo from "../../assets/BazaarBound_Landscap_Logo.svg";
+import companyLogo from "../../assets/logo.svg";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { BiCube } from "react-icons/bi";

@@ -34,20 +34,20 @@ const Footer = () => {
                                 : [];
 
     return (
-        <div className="bg-[var(--color-green-secondary)] py-12 mt-8 text-black">
+        <div className="bg-black py-12 mt-8 text-white">
             <footer className="max-w-screen-2xl mx-auto px-4">
                 <div className="flex flex-wrap lg:flex-nowrap gap-10 lg:gap-20">
                     <div className="w-full lg:w-1/4">
                         <div className="flex items-center mb-6">
                             <Image src={headerFooterData?.footerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Fashion Time" className="w-64 object-contain" width={256} height={64} />
                         </div>
-                        <p className="mb-6 leading-relaxed text-justify">
+                        <p className="mb-6 leading-relaxed text-justify text-slate-200 text-sm">
                             {headerFooterData?.footerDescription}
                         </p>
                         <div className="flex gap-5">
                             {
                                 Array.isArray(socialLinksData) && socialLinksData?.map((social: Social) => (
-                                    <Link key={social.link} href={social.link} target="_blank">
+                                    <Link key={social.link} href={social.link} target="_blank" className="hover:opacity-80 transition-opacity">
                                         <Image src={social.icon || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={social.link} width={30} height={500} />
                                     </Link>
                                 ))
@@ -55,14 +55,14 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    <div className="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-4">
+                    <div className="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-4 gap-8">
                         <div>
-                            <p className="font-bold text-lg mb-6">{headerFooterData?.footerSectionTwoTitle}</p>
+                            <p className="font-bold text-lg mb-6 text-white">{headerFooterData?.footerSectionTwoTitle}</p>
                             <ul className="flex flex-col gap-3">
                                 {
                                     footerSectionTwo.map((sec: any, idx: number) => (
                                         <li key={sec.link || idx}>
-                                            <Link href={`${sec.link}`} className="hover:underline text-sm">
+                                            <Link href={`${sec.link}`} className="hover:underline text-slate-200 hover:text-white text-sm transition-colors">
                                                 {sec.value}
                                             </Link>
                                         </li>
@@ -72,12 +72,12 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h6 className="font-bold text-lg mb-6">{headerFooterData?.footerSectionThreeTitle}</h6>
+                            <h6 className="font-bold text-lg mb-6 text-white">{headerFooterData?.footerSectionThreeTitle}</h6>
                             <ul className="flex flex-col gap-3">
                                 {
                                     footerSectionThree?.map((sec :any, idx: number) => (
                                         <li key={sec.link || idx}>
-                                            <Link href={`${sec.link}`} className="hover:underline text-sm">
+                                            <Link href={`${sec.link}`} className="hover:underline text-slate-200 hover:text-white text-sm transition-colors">
                                                 {sec.value}
                                             </Link>
                                         </li>
@@ -87,9 +87,9 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <p className="font-bold text-lg mb-6">Contact Us</p>
-                            <div className="flex flex-col gap-3">
-                                <a href={`mailto:${headerFooterData?.contactEmail}`} target="_blank" rel="noopener noreferrer">
+                            <p className="font-bold text-lg mb-6 text-white">Contact Us</p>
+                            <div className="flex flex-col gap-3 text-slate-200 text-sm">
+                                <a href={`mailto:${headerFooterData?.contactEmail}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                                     Email: {headerFooterData?.contactEmail}
                                 </a>
                                 <p>Phone: {headerFooterData?.contactPhone}</p>
@@ -98,7 +98,7 @@ const Footer = () => {
                         </div>
 
                         <div className="flex flex-col flex-wrap lg:ml-10">
-                            <p className="font-bold text-lg mb-6">Download it from</p>
+                            <p className="font-bold text-lg mb-6 text-white">Download it from</p>
                             <div className="flex flex-col gap-4">
                                 <Image src={playStore} alt="Play Store" className="w-36" width={144} height={44} />
                                 <Image src={appleStore} alt="App Store" className="w-36" width={144} height={44} />
@@ -107,8 +107,8 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-[var(--color-green-primary)] mt-12 pt-8 flex sm:flex-row flex-col-reverse items-center justify-between">
-                    <p className="text-sm text-center">
+                <div className="border-t border-slate-700/80 mt-12 pt-8 flex sm:flex-row flex-col-reverse items-center justify-between">
+                    <p className="text-sm text-center text-slate-300">
                         {headerFooterData?.copyrightText}
                     </p>
 

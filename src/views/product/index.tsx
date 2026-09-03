@@ -12,6 +12,7 @@ import { sanitizeHTML } from "../../utils/sanitize-utils";
 import { IoIosArrowDown, IoMdStar } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 import { FaHeart, FaRegHeart, FaRegMessage, FaStar, FaRegStar } from "react-icons/fa6";
+import { FiShoppingCart, FiShoppingBag } from "react-icons/fi";
 import { FaPencilAlt, FaStarHalfAlt } from "react-icons/fa";
 //@ts-ignore
 import 'swiper/css';
@@ -527,80 +528,100 @@ const Product = ({ initialData }: ProductProps) => {
                                 })()}
                             </div>
 
-                            <div className="mb-4">
-                                <p className="font-bold mb-2 text-[var(--color-black-primary)]">Quantity:</p>
-                                <div className="flex items-center border border-[var(--color-black-secondary)] w-max overflow-hidden">
-                                    <button
-                                        onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                                        className="px-3 py-1 text-lg text-[var(--color-black-primary)] border-r border-[var(--color-black-primary)] font-bold cursor-pointer"
-                                    >
-                                        -
-                                    </button>
-                                    <div className="px-5 py-1 text-lg text-[var(--color-black-primary)]">{quantity}</div>
-                                    <button
-                                        onClick={() => setQuantity(quantity + 1)}
-                                        className="px-3 py-1 text-lg text-[var(--color-black-primary)] font-bold border-l border-[var(--color-black-primary)] cursor-pointer"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="flex justify-start space-x-4 mb-4">
-                                {(() => {
-                                    const isSelectedOut = !selectedSize || isSizeOutOfStock(product, selectedSize) || isProductOutOfStock(product);
+                            {/* Quantity Selector & Action Buttons */}
+                            {(() => {
+                                const isSelectedOut = !selectedSize || isSizeOutOfStock(product, selectedSize) || isProductOutOfStock(product);
+
+                                if (isSelectedOut) {
                                     return (
-                                        <>
+                                        <div className="flex items-center gap-3 mb-6 mt-4">
                                             <button
-                                                disabled={isSelectedOut}
-                                                className={`px-4 sm:px-6 py-2 font-semibold transition border ${
-                                                    isSelectedOut
-                                                        ? "border-red-300 bg-red-100 text-red-600 cursor-not-allowed font-bold"
-                                                        : "border-[var(--color-green-primary)] text-[var(--color-black-primary)] hover:bg-[var(--color-green-primary)] hover:text-white cursor-pointer"
-                                                }`}
+                                                className="w-12 h-12 rounded-xl border border-neutral-200 hover:border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md active:scale-95 flex-shrink-0 group"
+                                                title="Add to Wishlist"
+                                                aria-label="Add to Wishlist"
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
-                                                    if (!isSelectedOut) handleAddToCart();
+                                                    handleWishlistToggle();
                                                 }}
                                             >
-                                                {isSelectedOut ? "Out of Stock" : "Add to Cart"}
+                                                {product && (isInWishlist(product) ? <FaHeart className="text-red-500 fill-current text-xl" /> : <FaRegHeart className="text-xl group-hover:scale-110 transition-transform" />)}
+                                            </button>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <>
+                                        {/* Quantity Selector */}
+                                        <div className="mb-5">
+                                            <p className="font-bold mb-2 text-neutral-800 text-sm">Quantity:</p>
+                                            <div className="flex items-center border border-neutral-200 rounded-xl w-max overflow-hidden bg-neutral-50/50 shadow-xs">
+                                                <button
+                                                    onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                                                    className="px-3.5 py-1.5 text-base text-neutral-700 hover:bg-neutral-200/60 font-bold transition-all cursor-pointer"
+                                                >
+                                                    -
+                                                </button>
+                                                <div className="px-4 py-1.5 text-base font-bold text-neutral-900 bg-white border-x border-neutral-200/80 min-w-[40px] text-center">
+                                                    {quantity}
+                                                </div>
+                                                <button
+                                                    onClick={() => setQuantity(quantity + 1)}
+                                                    className="px-3.5 py-1.5 text-base text-neutral-700 hover:bg-neutral-200/60 font-bold transition-all cursor-pointer"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex flex-wrap items-center gap-3 mb-6">
+                                            <button
+                                                className="flex-1 sm:flex-none px-6 py-3 border-2 border-[var(--color-green-primary)] text-[var(--color-green-primary)] font-bold text-sm sm:text-base rounded-xl hover:bg-[var(--color-green-primary)] hover:text-white transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.98] flex items-center justify-center gap-2 group"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleAddToCart();
+                                                }}
+                                            >
+                                                <FiShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                                <span>Add to Cart</span>
                                             </button>
 
                                             <button
-                                                disabled={isSelectedOut}
-                                                className={`px-4 sm:px-6 py-2 font-semibold transition ${
-                                                    isSelectedOut
-                                                        ? "bg-red-100 border border-red-300 text-red-600 cursor-not-allowed font-bold"
-                                                        : "bg-[var(--color-green-primary)] text-white hover:bg-[#1D7693] cursor-pointer"
-                                                }`}
+                                                className="flex-1 sm:flex-none px-6 py-3 bg-[var(--color-green-primary)] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#1D7693] transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 group"
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
-                                                    if (!isSelectedOut) {
-                                                        if (product && isInCart(product)) {
-                                                            router.push('/cart');
-                                                        } else {
-                                                            handleAddToCart();
-                                                            router.push('/cart');
-                                                        }
+                                                    if (product && isInCart(product)) {
+                                                        router.push('/cart');
+                                                    } else {
+                                                        handleAddToCart();
+                                                        router.push('/cart');
                                                     }
                                                 }}
                                             >
-                                                {isSelectedOut ? "Out of Stock" : "Buy Now"}
+                                                <span>Buy Now</span>
+                                                <FiShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                             </button>
-                                        </>
-                                    );
-                                })()}
-                                <button className="border border-[var(--color-green-secondary)] text-[var(--color-green-primary)] p-2 cursor-pointer"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleWishlistToggle();
-                                    }}
-                                >
-                                    {product && (isInWishlist(product) ? <FaHeart size={22} /> : <FaRegHeart size={22} />)}
-                                </button>
-                            </div>
+
+                                            <button
+                                                className="w-12 h-12 rounded-xl border border-neutral-200 hover:border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md active:scale-95 flex-shrink-0 group"
+                                                title="Wishlist"
+                                                aria-label="Wishlist"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleWishlistToggle();
+                                                }}
+                                            >
+                                                {product && (isInWishlist(product) ? <FaHeart className="text-red-500 fill-current text-xl" /> : <FaRegHeart className="text-xl group-hover:scale-110 transition-transform" />)}
+                                            </button>
+                                        </div>
+                                    </>
+                                );
+                            })()}
                             <div className="mb-4">
                                 <p className="text-lg sm:text-xl font-semibold mb-4 text-[var(--color-black-primary)]">Specification:</p>
                                 <ul className="list-decimal list-inside space-y-1 text-[var(--color-black-primary)]">

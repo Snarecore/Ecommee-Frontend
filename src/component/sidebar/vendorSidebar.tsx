@@ -8,7 +8,7 @@ import { RiArrowDropRightLine, RiArrowDropDownLine } from "react-icons/ri";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { GoDotFill } from "react-icons/go";
-import logo from "../../assets/BazaarBound_Landscap_Logo.svg";
+import logo from "../../assets/logo.svg";
 import { FiShoppingCart } from "react-icons/fi";
 import { FaFacebookMessenger } from "react-icons/fa6";
 import { FaHandHoldingUsd } from "react-icons/fa";

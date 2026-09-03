@@ -239,11 +239,11 @@ const Menu = () => {
             {/* Wishlist Button */}
             <Link
               href="/wishlist"
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[#1D7693] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
               title="Wishlist"
               aria-label="Wishlist"
             >
-              <FaRegHeart className="text-base sm:text-xl group-hover:scale-110 transition-transform duration-200" />
+              <FaRegHeart className="text-base sm:text-xl text-[var(--color-green-primary)] group-hover:scale-110 transition-transform duration-200" />
               {isMounted && wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#218DAE] text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
                   {wishlistCount}
@@ -254,11 +254,11 @@ const Menu = () => {
             {/* Cart Button */}
             <Link
               href="/cart"
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[#1D7693] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
               title="Shopping Cart"
               aria-label="Shopping Cart"
             >
-              <HiOutlineShoppingBag className="text-lg sm:text-2xl group-hover:scale-110 transition-transform duration-200" />
+              <HiOutlineShoppingBag className="text-lg sm:text-2xl text-[var(--color-green-primary)] group-hover:scale-110 transition-transform duration-200" />
               {isMounted && cartItemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#218DAE] text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
                   {cartItemCount}
@@ -269,12 +269,12 @@ const Menu = () => {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-gray-700 dark:text-gray-200 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[#1D7693] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
               title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
               aria-label="Toggle Theme"
             >
               {theme === "light" ? (
-                <FiMoon className="text-base sm:text-xl group-hover:rotate-12 transition-transform duration-200" />
+                <FiMoon className="text-base sm:text-xl text-[var(--color-green-primary)] group-hover:rotate-12 transition-transform duration-200" />
               ) : (
                 <FiSun className="text-base sm:text-xl text-amber-400 group-hover:rotate-45 transition-transform duration-200" />
               )}

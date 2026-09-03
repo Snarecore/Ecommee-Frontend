@@ -3,7 +3,7 @@ import Image from "next/image";
 import { FiPhone, FiUser } from "react-icons/fi";
 import { LuMail, LuLock, LuShieldCheck, LuArrowRight } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
-import companyLogo from "../../../../assets/BazaarBound Logo.svg";
+import companyLogo from "../../../../assets/logo.svg";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChangeEvent, useState } from "react";

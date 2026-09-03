@@ -94,8 +94,8 @@ export interface OrderLike {
   date?: string | Date;
 }
 
-const STORAGE_KEY_V2 = "bazaarbound_orders_v2";
-const STORAGE_KEY_V1 = "bazaarbound_orders";
+const STORAGE_KEY_V2 = "fashiontime_orders_v2";
+const STORAGE_KEY_V1 = "fashiontime_orders";
 
 export const calculateDeliveryZoneAndFee = (city: string) => {
   const normalizedCity = (city || "").trim().toLowerCase();

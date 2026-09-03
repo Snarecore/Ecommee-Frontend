@@ -9,7 +9,7 @@ import { FcGoogle } from "react-icons/fc";
 import { LuMail, LuLock, LuShieldCheck, LuArrowRight } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 
-import companyLogo from "../../../assets/BazaarBound Logo.svg";
+import companyLogo from "../../../assets/logo.svg";
 import { userAtom, User } from "../../../store/user-store";
 import { setCookie } from "../../../utils/cookie-utils";
 import { useAPI } from "../../../hooks/useApi";

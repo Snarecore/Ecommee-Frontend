@@ -1,7 +1,7 @@
 'use client';
 import Image from "next/image";
 import { LuMail, LuShieldCheck, LuArrowRight } from "react-icons/lu";
-import companyLogo from "../../../assets/BazaarBound Logo.svg";
+import companyLogo from "../../../assets/logo.svg";
 import Link from "next/link";
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json";

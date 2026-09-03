@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { LuLock, LuShieldCheck, LuArrowRight } from "react-icons/lu";
-import companyLogo from "../../../assets/BazaarBound Logo.svg";
+import companyLogo from "../../../assets/logo.svg";
 
 type FieldValues = { password: string; confirm: string };
 

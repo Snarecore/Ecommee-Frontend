@@ -62,7 +62,7 @@ export interface Order {
   statusHistory: OrderStatusHistoryItem[];
 }
 
-const STORAGE_KEY = "bazaarbound_orders_v2";
+const STORAGE_KEY = "fashiontime_orders_v2";
 
 export const calculateDeliveryZoneAndFee = (city: string) => {
   const normalizedCity = (city || "").trim().toLowerCase();
