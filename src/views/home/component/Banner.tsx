@@ -68,9 +68,9 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                 onMouseLeave={() => setIsSliderPaused(false)}
             >
                 <div className="relative w-full md:w-8/12 lg:w-9/12">
-                    <div className="h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg shadow-lg relative">
+                    <div className="h-[200px] sm:h-[350px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg shadow-lg relative">
                         {heroSliderList.length === 1 ? (
-                            <Image src={formatImageUrl(heroSliderList[0].image)} alt="Slider image" className="" width={1200} height={600} />
+                            <Image src={formatImageUrl(heroSliderList[0].image)} alt="Slider image" className="w-full h-full object-cover" width={1200} height={600} />
                         ) : (
                             <>
                                 <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${activeSlideIndex * 100}%)` }}>
@@ -83,7 +83,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                                         <Image
                                                             src={formatImageUrl(slide.image)}
                                                             alt={`Slider image ${index + 1}`}
-                                                            className=""
+                                                            className="w-full h-full object-cover"
                                                             width={1200}
                                                             height={600}
                                                             priority
@@ -94,7 +94,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                                         <Image
                                                             src={formatImageUrl(slide.image)}
                                                             alt={`Slider image ${index + 1}`}
-                                                            className=""
+                                                            className="w-full h-full object-cover"
                                                             width={1200}
                                                             height={600}
                                                             loading="lazy"

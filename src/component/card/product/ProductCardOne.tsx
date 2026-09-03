@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
-import { FiHeart, FiShoppingCart, FiArrowRight } from "react-icons/fi";
+import { FiHeart, FiShoppingCart, FiShoppingBag } from "react-icons/fi";
 import useWishlist from "../../../hooks/useWishlist";
 import Link from "next/link";
 import { Product } from "../../../interface/product.interface";
@@ -101,10 +101,10 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-xl sm:rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[345px] sm:h-[370px] md:h-[455px] lg:h-[485px]">
+            <div className="group rounded-xl sm:rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[340px] sm:h-[365px] md:h-[440px] lg:h-[470px]">
 
                 {/* Product Image */}
-                <figure className="relative h-[230px] min-h-[230px] max-h-[230px] sm:h-[250px] sm:min-h-[250px] sm:max-h-[250px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
+                <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
                     <Link
                         href={`/product/${product.slug || product.id || (product as any)._id || ''}`}
                         className="block w-full h-full rounded-t-xl sm:rounded-t-2xl"
@@ -206,7 +206,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="mt-1 pt-2 border-t border-neutral-100 flex items-center gap-1.5 sm:gap-2">
+                    <div className="mt-0.5 pt-1.5 border-t border-neutral-100 flex items-center gap-1.5 sm:gap-2">
                         {isOutOfStock ? (
                             <button
                                 disabled
@@ -218,20 +218,24 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                             <>
                                 {/* Add to Cart */}
                                 <button
-                                    className="w-1/2 py-2 px-1 sm:px-2 border border-neutral-200 text-neutral-700 text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs"
+                                    className="group/btn flex-1 py-2 px-2 border border-neutral-200 text-neutral-700 text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs overflow-hidden"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
-                                    <FiShoppingCart className="w-3.5 h-3.5 flex-shrink-0" />
-                                    <span>Add</span>
+                                    <FiShoppingCart className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-hover/btn:scale-110" />
+                                    <span className="max-w-0 opacity-0 group-hover/btn:max-w-[90px] group-hover/btn:opacity-100 sm:max-w-none sm:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden">
+                                        Add to Cart
+                                    </span>
                                 </button>
 
                                 {/* Buy Now */}
                                 <button
-                                    className="w-1/2 py-2 px-1 sm:px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="group/btn flex-1 py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs hover:shadow-md overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
-                                    <span>Buy Now</span>
-                                    <FiArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
+                                    <FiShoppingBag className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-hover/btn:scale-110" />
+                                    <span className="max-w-0 opacity-0 group-hover/btn:max-w-[70px] group-hover/btn:opacity-100 sm:max-w-none sm:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden">
+                                        Buy Now
+                                    </span>
                                 </button>
                             </>
                         )}
