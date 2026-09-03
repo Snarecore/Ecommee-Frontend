@@ -179,11 +179,11 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="mt-0.5 pt-1.5 border-t border-neutral-100 flex items-center gap-1.5 sm:gap-2">
+                    <div className="mt-0.5 pt-1.5 border-t border-[var(--color-green-primary)]/30 flex items-center gap-1.5 sm:gap-2">
                         {isOutOfStock ? (
                             <button
                                 disabled
-                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-[11px] sm:text-xs font-bold rounded-lg sm:rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
+                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-[11px] sm:text-xs font-bold rounded-md sm:rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5"
                             >
                                 Out of Stock
                             </button>
@@ -192,13 +192,14 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                                 <button
                                     title="Add to Cart"
                                     aria-label="Add to Cart"
-                                    className="w-10 sm:w-11 py-2 border border-neutral-200 text-neutral-700 hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer shadow-xs transition-all duration-200"
+                                    className="w-10 sm:w-1/2 py-2 px-1 sm:px-2 border border-neutral-200 text-neutral-700 text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
-                                    <FiShoppingCart className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Add to Cart</span>
+                                    <FiShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
                                 </button>
                                 <button
-                                    className="flex-1 py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="flex-1 sm:w-1/2 py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
                                     <span>Buy Now</span>
