@@ -69,11 +69,16 @@ async function apiRequest<T>(
         }
 
         if (response.status === 401 && !isRetry && !url.includes("auth/login") && !url.includes("auth/refresh-token")) {
-            const newToken = await refreshAccessToken();
-            if (newToken) {
-                const newHeaders = new Headers(options.headers || {});
-                newHeaders.set("Authorization", `Bearer ${newToken}`);
-                return apiRequest<T>(url, { ...options, headers: newHeaders }, true, cacheStrategy);
+            const hasTokenOrSession = typeof window !== "undefined" && (
+                sessionStorage.getItem("user") || localStorage.getItem("user") || document.cookie.includes("user")
+            );
+            if (hasTokenOrSession) {
+                const newToken = await refreshAccessToken();
+                if (newToken) {
+                    const newHeaders = new Headers(options.headers || {});
+                    newHeaders.set("Authorization", `Bearer ${newToken}`);
+                    return apiRequest<T>(url, { ...options, headers: newHeaders }, true, cacheStrategy);
+                }
             }
         }
 

@@ -35,6 +35,22 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
         }
     }, [isOpen, product]);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && isOpen) {
+                handleClose();
+            }
+        };
+        if (isOpen) {
+            window.addEventListener("keydown", handleKeyDown);
+            document.body.style.overflow = "hidden";
+        }
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+            document.body.style.overflow = "";
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const { name, featuredImage, price, discountType, discountAmount } = product;

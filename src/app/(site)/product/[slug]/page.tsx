@@ -6,9 +6,9 @@ interface Props {
 }
 
 async function getProductData(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/";
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
   try {
-    const res = await fetch(`${baseUrl}site/product/${slug}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/site/product/${slug}`, { next: { revalidate: 60 } });
     if (res.ok) {
       const json = await res.json();
       const product = json?.data || json;

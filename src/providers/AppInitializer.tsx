@@ -10,6 +10,14 @@ const AppInitializer = () => {
     useEffect(() => {
         const fetchSession = async () => {
             try {
+                const storedUser = getCookie("user");
+                const hasSession = storedUser || (typeof window !== "undefined" && (localStorage.getItem("user") || sessionStorage.getItem("user")));
+                if (!hasSession) {
+                    setUser(null);
+                    setUserLoaded(true);
+                    return;
+                }
+
                 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/";
                 const res = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/customer/me`, {
                     method: "GET",
@@ -19,7 +27,7 @@ const AppInitializer = () => {
                     const data = await res.json();
                     const userData = data?.data || data?.user;
                     if (userData) {
-                        const currentToken = getCookie("user") ? JSON.parse(getCookie("user") || "{}")?.token : "";
+                        const currentToken = storedUser ? JSON.parse(storedUser)?.token : "";
                         const fullUserData = { ...userData, token: userData.token || currentToken };
                         setCookie("user", JSON.stringify(fullUserData), 7);
                         setUser(fullUserData as User);

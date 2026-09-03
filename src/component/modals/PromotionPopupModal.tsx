@@ -31,6 +31,10 @@ const PromotionPopupModal: React.FC = () => {
     useEffect(() => {
         let isMounted = true;
 
+        if (sessionStorage.getItem("dismissed_popup_global") === "true") {
+            return;
+        }
+
         const fetchActivePopup = async () => {
             try {
                 const baseUrl = getApiBaseUrl().replace(/\/$/, "");
@@ -39,12 +43,7 @@ const PromotionPopupModal: React.FC = () => {
 
                 const res = await fetch(`${baseUrl}/popups/active`, {
                     method: "GET",
-                    cache: "no-store",
                     signal: controller.signal,
-                    headers: {
-                        "Pragma": "no-cache",
-                        "Cache-Control": "no-cache, no-store"
-                    }
                 });
                 clearTimeout(timeoutId);
 
@@ -57,7 +56,6 @@ const PromotionPopupModal: React.FC = () => {
                     return;
                 }
 
-                // Check sessionStorage for this specific popup ID
                 const dismissed = sessionStorage.getItem(`dismissed_popup_${activePopup.id}`);
                 if (dismissed === "true") {
                     return;
@@ -65,10 +63,7 @@ const PromotionPopupModal: React.FC = () => {
 
                 if (isMounted) {
                     setPopup(activePopup);
-                    // Small delay to ensure smooth entry animation
-                    setTimeout(() => {
-                        if (isMounted) setIsOpen(true);
-                    }, 400);
+                    setIsOpen(true);
                 }
             } catch (err) {
                 // console.error("Failed to load active popup banner:", err);
@@ -82,10 +77,34 @@ const PromotionPopupModal: React.FC = () => {
         };
     }, []);
 
+    // Handle Escape key
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && isOpen) {
+                handleClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isOpen]);
+
+    // Lock body scroll when popup is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [isOpen]);
+
     const handleClose = () => {
         if (popup?.id) {
             sessionStorage.setItem(`dismissed_popup_${popup.id}`, "true");
         }
+        sessionStorage.setItem("dismissed_popup_global", "true");
         setIsOpen(false);
     };
 
