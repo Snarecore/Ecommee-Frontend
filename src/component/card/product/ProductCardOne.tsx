@@ -117,10 +117,10 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                                     ? "opacity-100 group-hover:opacity-0"
                                     : ""
                             }`}
-                            width={500}
-                            height={500}
+                            width={400}
+                            height={400}
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            quality={80}
+                            quality={75}
                             priority={false}
                         />
 
@@ -129,10 +129,10 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                                 src={secondImage}
                                 alt={`${name} hover`}
                                 className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl"
-                                width={500}
-                                height={500}
+                                width={400}
+                                height={400}
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                quality={80}
+                                quality={75}
                                 loading="lazy"
                             />
                         )}
