@@ -4,6 +4,7 @@ import useCart from "../../hooks/useCart";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TbArrowBackUp } from "react-icons/tb";
+import { FiTrash2, FiArrowRight } from "react-icons/fi";
 import { useAPI } from "../../hooks/useApi";
 import { useEffect, useState } from "react";
 import apiConfig from "../../config/api.json";
@@ -70,11 +71,11 @@ const MyCart = () => {
   }, 0);
 
   return (
-    <div className="py-8 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto sm:px-2">
-        <div className="rounded-2xl p-6 ">
-          <p className="text-3xl font-bold pb-4 text-[var(--color-green-primary)]">
+    <div className="py-2 sm:py-8 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto sm:px-2">
+        <div className="rounded-2xl px-2 sm:px-4 py-2 sm:py-6">
+          <h1 className="text-xl sm:text-3xl font-bold pb-2 sm:pb-4 text-[var(--color-green-primary)]">
             Shopping Cart
-          </p>
+          </h1>
 
           {cartItems.length === 0 ? (
             <div className="text-center p-16 rounded-2xl">
@@ -101,18 +102,15 @@ const MyCart = () => {
             <>
               <div className="flex flex-col lg:flex-row gap-6">
                 {/* Cart List */}
-                <div className="flex-1 rounded-lg mt-4 lg:mt-0">
-                  <div className="hidden lg:grid grid-cols-12 font-semibold text-lg pb-2 mb-4 px-2">
-                    <span className="col-span-8"></span>
-                    <span className="col-span-2 text-center text-[var(--color-green-primary)]">
-                      Quantity
-                    </span>
-                    <span className="col-span-2 text-center text-[var(--color-green-primary)]">
-                      Subtotal
-                    </span>
+                <div className="flex-1 rounded-lg mt-2 lg:mt-0">
+                  <div className="hidden lg:grid grid-cols-12 font-semibold text-sm text-neutral-400 uppercase tracking-wider pb-3 mb-2 px-3 border-b border-neutral-100">
+                    <span className="col-span-6">Product Details</span>
+                    <span className="col-span-2 text-center">Price</span>
+                    <span className="col-span-2 text-center">Quantity</span>
+                    <span className="col-span-2 text-center">Subtotal</span>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3.5">
                     {cartItems.map((item) => {
                       const original = Number(item.price) || 0;
                       const unitPrice = finalPrice({
@@ -127,114 +125,112 @@ const MyCart = () => {
                       return (
                         <div
                           key={item.id + (item.selectedSize || "")}
-                          className="flex flex-col md:grid md:grid-cols-12 items-start gap-4 pb-4 shadow-sm"
+                          className="bg-white rounded-2xl border border-neutral-200/80 p-3.5 sm:p-4 shadow-xs flex flex-col md:grid md:grid-cols-12 items-start md:items-center gap-3 sm:gap-4 transition-all duration-200 hover:border-neutral-300"
                         >
-                          {/* Product & unit price */}
-                          <div className="w-full md:col-span-8 flex flex-row gap-4 sm:gap-8 p-4">
-                            <div className="relative">
-                              <Image src={formatImageUrl(item.featuredImage)} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
+                          {/* Product Details */}
+                          <div className="w-full md:col-span-6 flex flex-row items-center gap-3 sm:gap-4">
+                            <div className="relative flex-shrink-0">
+                              <Image
+                                src={formatImageUrl(item.featuredImage)}
+                                alt={item.name}
+                                className="w-20 h-20 sm:w-22 sm:h-22 object-cover rounded-xl border border-neutral-100 shadow-xs"
+                                width={88}
+                                height={88}
+                              />
                               {isItemOutOfStock && (
-                                <span className="absolute top-0 left-0 bg-red-600 text-white text-[9px] font-bold px-1 rounded">Out of Stock</span>
+                                <span className="absolute top-1 left-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-xs">
+                                  Out of Stock
+                                </span>
                               )}
                             </div>
-                            <div>
-                              <p className="font-bold text-[var(--color-green-primary)]">
+
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm sm:text-base text-neutral-800 line-clamp-2 leading-snug">
                                 {item.name}
-                              </p>
+                              </h3>
+
                               {item.selectedSize && (
-                                <p className="text-xs text-gray-600 font-semibold mt-0.5">
-                                  Size: <span className="text-black">{item.selectedSize}</span>
-                                </p>
+                                <div className="mt-1">
+                                  <span className="inline-flex items-center text-xs bg-neutral-100 text-neutral-600 font-medium px-2 py-0.5 rounded-md">
+                                    Size: {item.selectedSize}
+                                  </span>
+                                </div>
                               )}
+
                               {isItemOutOfStock && (
                                 <p className="text-xs text-red-600 font-bold mt-1">
                                   Out of Stock! Please remove to proceed.
                                 </p>
                               )}
 
-                              {/* Unit price (desktop) */}
-                              <p className="text-sm text-[var(--color-green-primary)] font-medium hidden md:block">
-                                {hasDiscount ? (
-                                  <>
-                                    <span className="line-through text-gray-400 mr-2">
-                                      ${original.toFixed(2)}
-                                    </span>
-                                    <span>${unitPrice.toFixed(2)}</span>
-                                  </>
-                                ) : (
-                                  <>${unitPrice.toFixed(2)}</>
+                              {/* Mobile Price */}
+                              <div className="mt-1.5 flex items-baseline gap-2 md:hidden">
+                                <span className="text-base font-bold text-neutral-900">
+                                  ${lineSubtotal.toFixed(2)}
+                                </span>
+                                {hasDiscount && (
+                                  <span className="text-xs text-neutral-400 line-through">
+                                    ${(original * (item.quantity ?? 1)).toFixed(2)}
+                                  </span>
                                 )}
-                              </p>
-
-                              {/* Subtotal (mobile) */}
-                              <p className="text-sm font-bold md:hidden">
-                                ${lineSubtotal.toFixed(2)}
-                              </p>
-
-                              <div className="hidden md:flex gap-8 text-sm mt-4">
-                                <button
-                                  onClick={() => removeFromCart(item)}
-                                  className="text-red-500 hover:underline cursor-pointer font-bold"
-                                >
-                                  Delete
-                                </button>
                               </div>
                             </div>
                           </div>
 
-                          {/* Quantity (desktop) */}
-                          <div className="hidden col-span-2 md:flex items-center justify-center place-self-center">
-                            <div className="flex border border-[var(--color-green-primary)] rounded overflow-hidden">
+                          {/* Unit Price (Desktop) */}
+                          <div className="hidden md:block col-span-2 text-center text-sm font-semibold text-neutral-700">
+                            {hasDiscount ? (
+                              <div className="flex flex-col items-center">
+                                <span className="text-base font-bold text-neutral-900">${unitPrice.toFixed(2)}</span>
+                                <span className="text-xs text-neutral-400 line-through">${original.toFixed(2)}</span>
+                              </div>
+                            ) : (
+                              <span className="text-base font-bold text-neutral-900">${unitPrice.toFixed(2)}</span>
+                            )}
+                          </div>
+
+                          {/* Quantity Controls (Both Mobile & Desktop) */}
+                          <div className="w-full md:col-span-2 flex items-center justify-between md:justify-center pt-2 md:pt-0 border-t md:border-t-0 border-neutral-100">
+                            <div className="flex items-center border border-neutral-200 rounded-xl overflow-hidden bg-neutral-50/50 shadow-xs">
                               <button
                                 onClick={() => decreaseQuantity(item.id)}
-                                className="px-3 py-1 hover:bg-gray-100 border-r border-[var(--color-green-primary)] cursor-pointer text-[var(--color-green-primary)]"
+                                className="px-3 py-1.5 hover:bg-neutral-200/60 active:scale-95 text-neutral-700 font-bold text-sm transition-all cursor-pointer"
                               >
                                 -
                               </button>
-                              <span className="px-4 py-1 flex items-center justify-center text-[var(--color-green-primary)]">
+                              <span className="px-3.5 py-1.5 font-bold text-neutral-900 text-sm min-w-[32px] text-center bg-white border-x border-neutral-200/80">
                                 {item.quantity}
                               </span>
                               <button
                                 onClick={() => increaseQuantity(item.id)}
-                                className="px-3 py-1 hover:bg-gray-100 border-l border-[var(--color-green-primary)] cursor-pointer text-[var(--color-green-primary)]"
+                                className="px-3 py-1.5 hover:bg-neutral-200/60 active:scale-95 text-neutral-700 font-bold text-sm transition-all cursor-pointer"
                               >
                                 +
                               </button>
                             </div>
+
+                            {/* Delete Button (Mobile) */}
+                            <button
+                              onClick={() => removeFromCart(item)}
+                              className="md:hidden flex items-center gap-1.5 text-xs text-red-500 hover:text-red-600 font-semibold py-1.5 px-2.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                            >
+                              <FiTrash2 className="w-3.5 h-3.5" />
+                              <span>Delete</span>
+                            </button>
                           </div>
 
-                          {/* Line subtotal (desktop) */}
-                          <div className="hidden md:block col-span-2 font-bold place-self-center text-[var(--color-green-primary)]">
-                            ${lineSubtotal.toFixed(2)}
-                          </div>
-
-                          {/* Quantity + Actions (mobile) */}
-                          <div className="md:hidden flex items-center justify-between w-full px-4">
-                            <div className="flex border border-gray-200 rounded overflow-hidden">
-                              <button
-                                onClick={() => decreaseQuantity(item.id)}
-                                className="px-4 py-2 bg-white hover:bg-gray-100 border-r border-gray-200 text-lg"
-                              >
-                                -
-                              </button>
-                              <span className="px-4 py-2 bg-white flex items-center justify-center text-base">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => increaseQuantity(item.id)}
-                                className="px-4 py-2 bg-white hover:bg-gray-100 border-l border-gray-200 text-lg"
-                              >
-                                +
-                              </button>
-                            </div>
-                            <div className="flex flex-row items-center justify-center gap-8 text-sm">
-                              <button
-                                onClick={() => removeFromCart(item)}
-                                className="text-red-500 hover:underline cursor-pointer font-bold"
-                              >
-                                Delete
-                              </button>
-                            </div>
+                          {/* Line Subtotal (Desktop) & Delete */}
+                          <div className="hidden md:flex col-span-2 flex-col items-center justify-center gap-1">
+                            <span className="font-bold text-base text-[var(--color-green-primary)]">
+                              ${lineSubtotal.toFixed(2)}
+                            </span>
+                            <button
+                              onClick={() => removeFromCart(item)}
+                              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 font-semibold hover:underline cursor-pointer transition-colors"
+                            >
+                              <FiTrash2 className="w-3 h-3" />
+                              <span>Remove</span>
+                            </button>
                           </div>
                         </div>
                       );
@@ -243,31 +239,31 @@ const MyCart = () => {
 
                   <div className="py-4 hidden lg:inline-flex">
                     <Link
-                      href={"/shop"}
-                      className="bg-[var(--color-green-primary)] px-4 py-3 text-white cursor-pointer"
+                      href="/shop"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-neutral-200 text-neutral-700 text-sm font-semibold rounded-xl hover:bg-neutral-50 transition-all duration-200 cursor-pointer shadow-xs"
                     >
-                      <div className="flex items-center gap-2 font-semibold">
-                        <TbArrowBackUp size={20} />
-                        Back to Shop
-                      </div>
+                      <TbArrowBackUp className="w-4 h-4 text-neutral-500" />
+                      <span>Back to Shop</span>
                     </Link>
                   </div>
                 </div>
 
                 {/* Order Summary */}
-                <div className="w-full lg:w-1/4 p-4 rounded-lg shadow-md h-fit lg:self-start lg:mt-13">
-                  <p className="text-2xl font-bold mb-6 text-[var(--color-green-primary)]">
+                <div className="w-full lg:w-4/12 xl:w-3/12 p-4 sm:p-6 bg-white rounded-2xl border border-neutral-200/80 shadow-xs h-fit lg:self-start">
+                  <h3 className="text-lg sm:text-xl font-bold text-neutral-900 pb-3 mb-4 border-b border-neutral-100">
                     Order Summary
-                  </p>
+                  </h3>
 
-                  <div className="flex justify-between mb-2 font-semibold text-[var(--color-green-primary)]">
-                    <span>Subtotal ({cartItems.length})</span>
-                    <span className="font-bold">${cartSubtotal.toFixed(2)}</span>
+                  <div className="space-y-2.5 text-sm text-neutral-600 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span>Subtotal ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})</span>
+                      <span className="font-semibold text-neutral-900">${cartSubtotal.toFixed(2)}</span>
+                    </div>
                   </div>
 
-                  <div className="flex justify-between text-lg text-[var(--color-green-primary)] pt-2">
-                    <span className="font-bold">Total</span>
-                    <span className="font-bold">${cartSubtotal.toFixed(2)}</span>
+                  <div className="flex justify-between items-center text-base sm:text-lg font-bold text-neutral-900 pt-3 border-t border-neutral-100">
+                    <span>Total</span>
+                    <span className="text-[var(--color-green-primary)] text-lg sm:text-xl font-bold">${cartSubtotal.toFixed(2)}</span>
                   </div>
 
                   {(() => {
@@ -288,16 +284,17 @@ const MyCart = () => {
                             }
                             router.push("/checkout");
                           }}
-                          className={`mt-10 block text-center w-full font-bold py-3 rounded-3xl transition-all duration-300 ${
+                          className={`mt-6 w-full py-3.5 px-4 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md ${
                             isDisabled
-                              ? "bg-gray-300 text-gray-500 opacity-70 cursor-not-allowed"
-                              : "bg-[var(--color-green-primary)] text-white hover:opacity-95 cursor-pointer shadow-md"
+                              ? "bg-gray-200 text-gray-400 opacity-80 cursor-not-allowed shadow-none"
+                              : "bg-[var(--color-green-primary)] text-white hover:bg-[#1D7693] active:scale-[0.99] cursor-pointer"
                           }`}
                         >
-                          Proceed to Checkout
+                          <span>Proceed to Checkout</span>
+                          <FiArrowRight className="w-4 h-4" />
                         </button>
                         {hasOutOfStock && (
-                          <div className="mt-4 space-y-2">
+                          <div className="mt-4 space-y-2 p-3 bg-red-50 rounded-xl border border-red-100">
                             <p className="text-xs text-red-600 font-bold text-center">
                               ⚠ Some items in your cart are Out of Stock. Please remove them to proceed.
                             </p>
@@ -305,7 +302,7 @@ const MyCart = () => {
                               onClick={() => {
                                 outOfStockItems.forEach((item) => removeFromCart(item));
                               }}
-                              className="w-full text-xs bg-red-100 text-red-700 font-semibold py-2 rounded-lg hover:bg-red-200 transition cursor-pointer"
+                              className="w-full text-xs bg-red-600 text-white font-semibold py-2 rounded-lg hover:bg-red-700 transition cursor-pointer shadow-xs"
                             >
                               Remove {outOfStockItems.length} Out-of-Stock Item{outOfStockItems.length > 1 ? "s" : ""}
                             </button>
@@ -317,15 +314,13 @@ const MyCart = () => {
                 </div>
               </div>
 
-              <div className="py-4 inline-flex lg:hidden">
+              <div className="py-3 flex lg:hidden">
                 <Link
-                  href={"/shop"}
-                  className="bg-[var(--color-green-primary)] px-4 py-3 text-white cursor-pointer"
+                  href="/shop"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-neutral-200 text-neutral-700 text-sm font-semibold rounded-xl hover:bg-neutral-50 transition-all duration-200 cursor-pointer shadow-xs"
                 >
-                  <div className="flex items-center gap-2 font-semibold">
-                    <TbArrowBackUp size={20} />
-                    Back to Shop
-                  </div>
+                  <TbArrowBackUp className="w-4 h-4 text-neutral-500" />
+                  <span>Back to Shop</span>
                 </Link>
               </div>
 
@@ -369,20 +364,20 @@ const MyCart = () => {
 
         {/* Recommended Products */}
         <div>
-          <div className="mt-10 mb-4 px-4 flex items-center justify-between">
-            <p className="text-4xl font-bold text-[var(--color-green-primary)] uppercase">
+          <div className="mt-8 sm:mt-12 mb-2 sm:mb-4 px-2 sm:px-4 flex items-center justify-between gap-3">
+            <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-[var(--color-green-primary)] uppercase tracking-tight">
               Product You May Also Like
-            </p>
+            </h2>
             <button
               onClick={() => router.push("/shop")}
-              className="hover:bg-[var(--color-green-primary)] text-[var(--color-green-primary)] hover:text-white border border-[var(--color-green-primary)] px-8 py-2 rounded-full cursor-pointer transition-all ease-in-out duration-300"
+              className="hover:bg-[var(--color-green-primary)] text-[var(--color-green-primary)] text-xs sm:text-sm font-semibold hover:text-white border border-[var(--color-green-primary)] px-3 sm:px-6 py-1.5 sm:py-2 rounded-full cursor-pointer transition-all ease-in-out duration-300 whitespace-nowrap flex-shrink-0"
             >
               See More
             </button>
           </div>
 
           <div className="mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6 p-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 px-2 sm:px-4 py-2">
               {isLoading ? (
                 <ProductCardSkeletonOne />
               ) : response?.length > 0 ? (

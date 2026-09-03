@@ -1,6 +1,6 @@
 const ProductCardSkeletonTwo = () => {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {[...Array(8)].map((_, index) => (
                 <div key={index} className="rounded-3xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden w-fit mx-auto sm:w-full sm:max-w-xs">
                     <figure className="relative h-40 sm:h-48 md:h-52 lg:h-56 xl:h-60 w-full overflow-hidden">

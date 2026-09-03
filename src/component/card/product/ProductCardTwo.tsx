@@ -102,8 +102,8 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-xl sm:rounded-2xl transition-all duration-300 overflow-hidden w-full h-[350px] sm:h-[375px] md:h-[450px] lg:h-[480px] bg-white flex flex-col border border-neutral-100 hover:border-neutral-200">
-                <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
+            <div className="group rounded-xl sm:rounded-2xl transition-all duration-300 overflow-hidden w-full h-[345px] sm:h-[370px] md:h-[440px] lg:h-[470px] bg-white flex flex-col border border-neutral-200 hover:border-neutral-300">
+                <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[275px] md:min-h-[275px] md:max-h-[275px] lg:h-[300px] lg:min-h-[300px] lg:max-h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
                     <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-xl sm:rounded-t-2xl">
                         <Image
                             src={formattedFeaturedImage}
@@ -149,12 +149,12 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     </button>
                 </figure>
 
-                <div className="flex-1 p-2.5 sm:p-4 bg-white relative -mt-6 rounded-t-[24px] flex flex-col justify-between shadow-[0_-8px_20px_rgba(0,0,0,0.03)] border-t border-neutral-100/50">
+                <div className="flex-1 p-2.5 sm:p-4 bg-white flex flex-col justify-between">
                     <div className="hidden md:block text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
                         {mainCategoryName || "Clothing"}
                     </div>
 
-                    <h2 className="text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 min-h-[36px] mb-1 leading-snug">
+                    <h2 className="text-xs sm:text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 mb-1 leading-snug">
                         <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`}>{name}</Link>
                     </h2>
 
@@ -169,13 +169,11 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                         )}
                     </div>
 
-                    {rating && rating > 0 ? (
-                        <div className="flex items-center gap-1 mb-3">
+                    {rating && rating > 0 && (
+                        <div className="flex items-center gap-1 mb-1">
                             <div className="flex items-center text-[10px] gap-0.5">{renderStars(rating)}</div>
                             <span className="text-[11px] text-neutral-500 font-medium ml-0.5">({rating.toFixed(1)})</span>
                         </div>
-                    ) : (
-                        <div className="h-3 mb-3" />
                     )}
 
                     {/* Action Buttons */}

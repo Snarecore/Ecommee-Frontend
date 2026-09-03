@@ -101,10 +101,10 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-xl sm:rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[340px] sm:h-[365px] md:h-[440px] lg:h-[470px]">
+            <div className="group rounded-xl sm:rounded-2xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 overflow-hidden w-full flex flex-col h-[345px] sm:h-[370px] md:h-[440px] lg:h-[470px]">
 
                 {/* Product Image */}
-                <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
+                <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[275px] md:min-h-[275px] md:max-h-[275px] lg:h-[300px] lg:min-h-[300px] lg:max-h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
                     <Link
                         href={`/product/${product.slug || product.id || (product as any)._id || ''}`}
                         className="block w-full h-full rounded-t-xl sm:rounded-t-2xl"
