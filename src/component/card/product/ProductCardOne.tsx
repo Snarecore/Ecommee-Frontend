@@ -216,26 +216,23 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                             </button>
                         ) : (
                             <>
-                                {/* Add to Cart */}
+                                {/* Add to Cart - Icon Only */}
                                 <button
-                                    className="group/btn flex-1 py-2 px-2 border border-neutral-200 text-neutral-700 text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs overflow-hidden"
+                                    title="Add to Cart"
+                                    aria-label="Add to Cart"
+                                    className="w-10 sm:w-11 py-2 border border-neutral-200 text-neutral-700 hover:border-[var(--color-green-primary)] hover:text-[var(--color-green-primary)] hover:bg-neutral-50/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer shadow-xs transition-all duration-200"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
-                                    <FiShoppingCart className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-hover/btn:scale-110" />
-                                    <span className="max-w-0 opacity-0 group-hover/btn:max-w-[90px] group-hover/btn:opacity-100 sm:max-w-none sm:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden">
-                                        Add to Cart
-                                    </span>
+                                    <FiShoppingCart className="w-4 h-4" />
                                 </button>
 
-                                {/* Buy Now */}
+                                {/* Buy Now - Text + Right Icon */}
                                 <button
-                                    className="group/btn flex-1 py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs hover:shadow-md overflow-hidden"
+                                    className="flex-1 py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
-                                    <FiShoppingBag className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-hover/btn:scale-110" />
-                                    <span className="max-w-0 opacity-0 group-hover/btn:max-w-[70px] group-hover/btn:opacity-100 sm:max-w-none sm:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden">
-                                        Buy Now
-                                    </span>
+                                    <span>Buy Now</span>
+                                    <FiShoppingBag className="w-3.5 h-3.5 flex-shrink-0" />
                                 </button>
                             </>
                         )}
