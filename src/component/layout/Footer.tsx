@@ -1,123 +1,249 @@
 'use client';
 
 import Image from "next/image";
+import Link from "next/link";
+import { useAtom } from "jotai";
+import { headerFooterAtom, socialLinksAtom, nestedCategoriesAtom } from "../../store/global-store";
+import { MainCategory } from "../../interface/nested-category.interface";
 import visaCard from "../../assets/visaCard.svg";
 import mastardCard from "../../assets/masterCard.svg";
 import americanCard from "../../assets/dls-logo-bluebox-solid.svg";
-import playStore from "../../assets/google-playStore.svg";
-import appleStore from "../../assets/apple-playStore.svg";
 import discoveLog from "../../assets/discover-logo.png";
 import paypal from "../../assets/paypal-svgrepo-com.svg";
-import { useAtom } from "jotai";
-import { headerFooterAtom, socialLinksAtom } from "../../store/global-store";
-import Link from "next/link";;
 
-type Social = {
-    icon: string;
-    link: string;
-}
+import { 
+    FaFacebookF, 
+    FaTwitter, 
+    FaInstagram, 
+    FaLinkedinIn, 
+    FaYoutube, 
+    FaPhone, 
+    FaEnvelope, 
+    FaLocationDot, 
+    FaGlobe,
+    FaAngleRight,
+    FaWhatsapp
+} from "react-icons/fa6";
+
+const defaultPolicyLinks = [
+    { value: "Privacy Policy", link: "/privacy-policy" },
+    { value: "Refund & Return Policy", link: "/refund-return-policy" },
+    { value: "Shipping & Delivery Policy", link: "/shipping-delivery-policy" },
+    { value: "Terms & Conditions", link: "/terms-conditions" },
+    { value: "Vendor Agreement", link: "/vendor-agreement" },
+    { value: "About Us", link: "/about-us" },
+    { value: "FAQs", link: "/faqs" },
+];
+
+const defaultSocials = [
+    { name: "Facebook", link: "https://facebook.com" },
+    { name: "Instagram", link: "https://instagram.com" },
+    { name: "Twitter", link: "https://twitter.com" },
+    { name: "LinkedIn", link: "https://linkedin.com" },
+    { name: "YouTube", link: "https://youtube.com" },
+];
+
+const getSocialIcon = (linkStr?: string) => {
+    const l = (linkStr || "").toLowerCase();
+    if (l.includes("facebook")) return <FaFacebookF className="w-4 h-4" />;
+    if (l.includes("instagram")) return <FaInstagram className="w-4 h-4" />;
+    if (l.includes("twitter") || l.includes("x.com")) return <FaTwitter className="w-4 h-4" />;
+    if (l.includes("linkedin")) return <FaLinkedinIn className="w-4 h-4" />;
+    if (l.includes("youtube")) return <FaYoutube className="w-4 h-4" />;
+    if (l.includes("whatsapp")) return <FaWhatsapp className="w-4 h-4" />;
+    return <FaGlobe className="w-4 h-4" />;
+};
 
 const Footer = () => {
     const [headerFooterData] = useAtom(headerFooterAtom);
     const [socialLinksData] = useAtom(socialLinksAtom);
-    
-    const footerSectionTwo = Array.isArray(headerFooterData?.footerSectionTwo)
-                                ? headerFooterData.footerSectionTwo
-                                : headerFooterData?.footerSectionTwo
-                                ? JSON.parse(headerFooterData.footerSectionTwo)
-                                : [];
+    const [nestedCategories] = useAtom(nestedCategoriesAtom);
+    const mainCategories = (nestedCategories ?? []) as unknown as MainCategory[];
 
-    const footerSectionThree = Array.isArray(headerFooterData?.footerSectionThree)
-                                ? headerFooterData.footerSectionThree
-                                : headerFooterData?.footerSectionThree
-                                ? JSON.parse(headerFooterData.footerSectionThree)
-                                : [];
+    const contactEmail = "majba.web@gmail.com";
+    const contactPhone = "01317020309";
+    const contactAddress = headerFooterData?.contactAddress || "30 N Gould St Ste R, Sheridan, WY 82801, USA";
+
+    const socialsList = Array.isArray(socialLinksData) && socialLinksData.length > 0 
+        ? socialLinksData 
+        : defaultSocials;
+
+    // Build main category menu list (only main categories)
+    const getCategoryMenuList = () => {
+        if (Array.isArray(mainCategories) && mainCategories.length > 0) {
+            const list = mainCategories.map((main) => ({
+                value: main.name,
+                link: `/shop?mainCategoryId=${main.id}&pageNumber=1`,
+            }));
+            list.push({ value: "All Categories", link: "/all-categories" });
+            return list;
+        }
+        return [
+            { value: "Women's Collection", link: "/shop?category=women" },
+            { value: "Men's Clothing", link: "/shop?category=men" },
+            { value: "Kids & Baby", link: "/shop?category=kids" },
+            { value: "Accessories", link: "/shop?category=accessories" },
+            { value: "All Categories", link: "/all-categories" },
+        ];
+    };
+
+    const categoryMenuList = getCategoryMenuList();
 
     return (
-        <div className="bg-black py-12 mt-8 text-white">
-            <footer className="max-w-screen-2xl mx-auto px-4">
-                <div className="flex flex-wrap lg:flex-nowrap gap-10 lg:gap-20">
-                    <div className="w-full lg:w-1/4">
-                        <div className="flex items-center mb-6">
-                            <Image src={headerFooterData?.footerLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Fashion Time" className="w-64 object-contain" width={256} height={64} />
+        <div className="bg-slate-950 text-slate-300 pt-16 pb-8 border-t border-slate-800 relative overflow-hidden transition-colors duration-300">
+            {/* Ambient Background Gradient Accent */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#218DAE]/5 rounded-full blur-3xl pointer-events-none" />
+
+            <footer className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                {/* Main Grid Layout */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-8 lg:gap-10 pb-12">
+                    
+                    {/* Brand & Description Column */}
+                    <div className="sm:col-span-2 md:col-span-2 lg:col-span-4 flex flex-col justify-between">
+                        <div>
+                            <Link href="/" className="inline-block mb-4">
+                                {headerFooterData?.footerLogo ? (
+                                    <Image 
+                                        src={headerFooterData.footerLogo} 
+                                        alt="Fashion Time" 
+                                        className="h-14 w-auto object-contain brightness-110" 
+                                        width={240} 
+                                        height={60} 
+                                    />
+                                ) : (
+                                    <span className="text-2xl font-black text-white tracking-wider uppercase flex items-center gap-2">
+                                        <span className="bg-[#218DAE] text-white px-2 py-0.5 rounded-md">Fashion</span> Time
+                                    </span>
+                                )}
+                            </Link>
+
+                            <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-md">
+                                {headerFooterData?.footerDescription || "A digital product marketplace covering all your needs. Quality products, seamless shopping experience, and dedicated customer support."}
+                            </p>
+
+                            {/* Social Media Channels */}
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Follow Us</p>
+                                <div className="flex flex-wrap gap-2.5">
+                                    {socialsList.map((social: any, idx: number) => {
+                                        const link = social.link || "#";
+                                        return (
+                                            <Link
+                                                key={link || idx}
+                                                href={link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-[#218DAE] border border-slate-800 hover:border-[#218DAE] text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs hover:-translate-y-1"
+                                                aria-label={social.name || social.link || "Social link"}
+                                            >
+                                                {getSocialIcon(link)}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
-                        <p className="mb-6 leading-relaxed text-justify text-slate-200 text-sm">
-                            {headerFooterData?.footerDescription}
-                        </p>
-                        <div className="flex gap-5">
-                            {
-                                Array.isArray(socialLinksData) && socialLinksData?.map((social: Social) => (
-                                    <Link key={social.link} href={social.link} target="_blank" className="hover:opacity-80 transition-opacity">
-                                        <Image src={social.icon || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={social.link} width={30} height={500} />
+                    </div>
+
+                    {/* Main Categories Column */}
+                    <div className="sm:col-span-1 md:col-span-1 lg:col-span-3">
+                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#218DAE]">
+                            Categories
+                        </h3>
+                        <ul className="space-y-2.5">
+                            {categoryMenuList.map((item, idx) => (
+                                <li key={item.link || idx}>
+                                    <Link 
+                                        href={item.link} 
+                                        className="text-slate-400 hover:text-white hover:translate-x-1.5 transition-all duration-200 inline-flex items-center gap-1.5 group text-sm"
+                                    >
+                                        <FaAngleRight className="text-xs text-[#218DAE] opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
+                                        <span>{item.value}</span>
                                     </Link>
-                                ))
-                            }
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Policies Column */}
+                    <div className="sm:col-span-1 md:col-span-1 lg:col-span-2">
+                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#218DAE]">
+                            Policy & Info
+                        </h3>
+                        <ul className="space-y-2.5">
+                            {defaultPolicyLinks.map((sec, idx) => (
+                                <li key={sec.link || idx}>
+                                    <Link 
+                                        href={sec.link} 
+                                        className="text-slate-400 hover:text-white hover:translate-x-1.5 transition-all duration-200 inline-flex items-center gap-1.5 group text-sm"
+                                    >
+                                        <FaAngleRight className="text-xs text-[#218DAE] opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
+                                        <span>{sec.value}</span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Contact Us Column */}
+                    <div className="sm:col-span-2 md:col-span-2 lg:col-span-3">
+                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#218DAE]">
+                            Contact Us
+                        </h3>
+                        <div className="space-y-3 text-sm text-slate-300">
+                            <a 
+                                href={`mailto:${contactEmail}`} 
+                                className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-[#218DAE]/50 text-slate-300 hover:text-white transition-all group shadow-xs"
+                            >
+                                <span className="p-2.5 rounded-lg bg-[#218DAE]/15 text-[#218DAE] group-hover:bg-[#218DAE] group-hover:text-white transition-colors flex-shrink-0">
+                                    <FaEnvelope className="w-4 h-4" />
+                                </span>
+                                <div className="overflow-hidden">
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Email Us</p>
+                                    <p className="font-semibold text-xs sm:text-sm text-white truncate">{contactEmail}</p>
+                                </div>
+                            </a>
+
+                            <a 
+                                href={`tel:${contactPhone}`} 
+                                className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-[#218DAE]/50 text-slate-300 hover:text-white transition-all group shadow-xs"
+                            >
+                                <span className="p-2.5 rounded-lg bg-[#218DAE]/15 text-[#218DAE] group-hover:bg-[#218DAE] group-hover:text-white transition-colors flex-shrink-0">
+                                    <FaPhone className="w-4 h-4" />
+                                </span>
+                                <div>
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Phone</p>
+                                    <p className="font-semibold text-xs sm:text-sm text-white">{contactPhone}</p>
+                                </div>
+                            </a>
+
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 shadow-xs">
+                                <span className="p-2.5 rounded-lg bg-[#218DAE]/15 text-[#218DAE] flex-shrink-0">
+                                    <FaLocationDot className="w-4 h-4" />
+                                </span>
+                                <div>
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Address</p>
+                                    <p className="text-xs font-medium text-slate-300 leading-snug">{contactAddress}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-4 gap-8">
-                        <div>
-                            <p className="font-bold text-lg mb-6 text-white">{headerFooterData?.footerSectionTwoTitle}</p>
-                            <ul className="flex flex-col gap-3">
-                                {
-                                    footerSectionTwo.map((sec: any, idx: number) => (
-                                        <li key={sec.link || idx}>
-                                            <Link href={`${sec.link}`} className="hover:underline text-slate-200 hover:text-white text-sm transition-colors">
-                                                {sec.value}
-                                            </Link>
-                                        </li>
-                                    ))
-                                }
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h6 className="font-bold text-lg mb-6 text-white">{headerFooterData?.footerSectionThreeTitle}</h6>
-                            <ul className="flex flex-col gap-3">
-                                {
-                                    footerSectionThree?.map((sec :any, idx: number) => (
-                                        <li key={sec.link || idx}>
-                                            <Link href={`${sec.link}`} className="hover:underline text-slate-200 hover:text-white text-sm transition-colors">
-                                                {sec.value}
-                                            </Link>
-                                        </li>
-                                    ))
-                                }
-                            </ul>
-                        </div>
-
-                        <div>
-                            <p className="font-bold text-lg mb-6 text-white">Contact Us</p>
-                            <div className="flex flex-col gap-3 text-slate-200 text-sm">
-                                <a href={`mailto:${headerFooterData?.contactEmail}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                                    Email: {headerFooterData?.contactEmail}
-                                </a>
-                                <p>Phone: {headerFooterData?.contactPhone}</p>
-                                <p>Address: {headerFooterData?.contactAddress}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col flex-wrap lg:ml-10">
-                            <p className="font-bold text-lg mb-6 text-white">Download it from</p>
-                            <div className="flex flex-col gap-4">
-                                <Image src={playStore} alt="Play Store" className="w-36" width={144} height={44} />
-                                <Image src={appleStore} alt="App Store" className="w-36" width={144} height={44} />
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <div className="border-t border-slate-700/80 mt-12 pt-8 flex sm:flex-row flex-col-reverse items-center justify-between">
-                    <p className="text-sm text-center text-slate-300">
-                        {headerFooterData?.copyrightText}
+                {/* Bottom Bar: Copyright & Payment Icons */}
+                <div className="border-t border-slate-800/80 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p className="text-xs text-slate-400 text-center md:text-left">
+                        {headerFooterData?.copyrightText || "© 2025 Bazaar Bound / Fashion Time. All rights reserved."}
                     </p>
 
-                    <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap lg:gap-6 mb-4 sm:mb-0">
-                        <Image src={visaCard} alt="Visa" className="h-12" width={72} height={48} />
-                        <Image src={mastardCard} alt="Mastercard" className="h-12" width={72} height={48} />
-                        <Image src={americanCard} alt="American Express" className="" width={72} height={48} />
-                        <Image src={discoveLog} alt="Discover" className="w-20" width={80} height={48} />
-                        <Image src={paypal} alt="Paypal" className="h-12" width={72} height={48} />
+                    <div className="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800/80 flex-wrap justify-center">
+                        <span className="text-[11px] font-medium text-slate-400 mr-1 hidden sm:inline">We Accept:</span>
+                        <Image src={visaCard} alt="Visa" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
+                        <Image src={mastardCard} alt="Mastercard" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
+                        <Image src={americanCard} alt="American Express" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
+                        <Image src={discoveLog} alt="Discover" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={45} height={24} />
+                        <Image src={paypal} alt="Paypal" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
                     </div>
                 </div>
             </footer>
@@ -126,3 +252,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
+

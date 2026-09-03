@@ -6,6 +6,7 @@ export interface SecondCategory {
     status: boolean;
     mainCategoryId: string;
     firstCategoryId: string;
+    position?: number;
 }
 
 export interface FirstCategory {
@@ -16,6 +17,7 @@ export interface FirstCategory {
     status: boolean;
     mainCategoryId: string;
     secondCategories: SecondCategory[];
+    position?: number;
 }
 
 export interface MainCategory {
@@ -26,6 +28,7 @@ export interface MainCategory {
     bannerImage: string;
     status: boolean;
     firstCategories: FirstCategory[];
+    position?: number;
 }
 
 export interface NestedCategory {

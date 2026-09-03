@@ -206,10 +206,15 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
             </div>
 
             <div className="divide-y divide-gray-100 dark:divide-slate-800/80">
-              {mainCategories.map((main, idx) => {
+              {[...mainCategories]
+                .sort((a, b) => (a.position ?? 9999) - (b.position ?? 9999))
+                .map((main, idx) => {
+                const firstCategories = [...(main.firstCategories || [])].sort(
+                  (a, b) => (a.position ?? 9999) - (b.position ?? 9999)
+                );
                 const catKey = main.id || `main-${idx}`;
                 const isExpanded = !!expandedCategories[catKey];
-                const hasChildren = main.firstCategories && main.firstCategories.length > 0;
+                const hasChildren = firstCategories.length > 0;
 
                 return (
                   <div key={catKey} className="py-1">
@@ -232,7 +237,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                       <div className="flex items-center gap-2">
                         {hasChildren && (
                           <span className="text-[10px] font-semibold bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">
-                            {main.firstCategories.length}
+                            {firstCategories.length}
                           </span>
                         )}
                         {hasChildren ? (
@@ -261,7 +266,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                         </Link>
 
                         {/* First-Level Subcategories */}
-                        {main.firstCategories.map((first, fIdx) => (
+                        {firstCategories.map((first, fIdx) => (
                           <Link
                             key={first.id || fIdx}
                             href={`/shop?firstCategoryId=${first.id}&pageNumber=1`}

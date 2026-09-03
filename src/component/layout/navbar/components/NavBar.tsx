@@ -9,7 +9,7 @@ import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/
 import { FaRegUser } from "react-icons/fa6";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { FiMenu, FiHome, FiPackage, FiZap, FiShoppingBag, FiChevronRight } from "react-icons/fi";
+import { FiMenu, FiHome, FiPackage, FiShoppingBag, FiChevronRight } from "react-icons/fi";
 import NotificationDropdown from "./NotificationDropdown";
 import MobileNavDrawer from "./MobileNavDrawer";
 
@@ -94,8 +94,13 @@ const NavBar = () => {
                             </Link>
 
                             {/* Dynamic Categories */}
-                            {mainCategories.map((main, idx) => {
-                                const hasDropdown = main.firstCategories && main.firstCategories.length > 0;
+                            {[...mainCategories]
+                                .sort((a, b) => (a.position ?? 9999) - (b.position ?? 9999))
+                                .map((main, idx) => {
+                                const firstCategories = [...(main.firstCategories || [])].sort(
+                                    (a, b) => (a.position ?? 9999) - (b.position ?? 9999)
+                                );
+                                const hasDropdown = firstCategories.length > 0;
                                 
                                 return (
                                     <div key={main.id || idx} className="relative group">
@@ -130,7 +135,7 @@ const NavBar = () => {
 
                                                     {/* Subcategories list */}
                                                     <div className="space-y-0.5 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
-                                                        {main.firstCategories.map((first, fIdx) => (
+                                                        {firstCategories.map((first, fIdx) => (
                                                             <Link
                                                                 key={first.id || fIdx}
                                                                 href={`/shop?firstCategoryId=${first.id}&pageNumber=1`}
@@ -154,7 +159,6 @@ const NavBar = () => {
                                     href="/shop?discountOnly=true&pageNumber=1" 
                                     className="px-3.5 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-gray-900 font-extrabold text-[13px] uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all duration-200"
                                 >
-                                    <FiZap className="text-sm text-gray-900" />
                                     <span>{megaDiscount.menuText || "Mega Sale"}</span>
                                 </Link>
                             )}

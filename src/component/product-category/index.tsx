@@ -30,10 +30,10 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
     return (
         <div className="max-w-screen-2xl mx-auto px-4 py-8 my-4">
             <div className="text-center mb-8 relative">
-                <h2 className="text-3xl md:text-4xl font-bold mb-3 text-[var(--color-green-primary)] dark:text-green-400">
+                <h2 className="text-3xl md:text-4xl font-bold mb-3 text-[var(--color-green-primary)] dark:text-[var(--color-green-primary)]">
                     {contentData?.categorySectionTitle || "Product Categories"}
                 </h2>
-                <div className="w-16 h-1 bg-[var(--color-green-primary)] dark:bg-green-400 mx-auto rounded-full"></div>
+                <div className="w-16 h-1 bg-[var(--color-green-primary)] dark:bg-[var(--color-green-primary)] mx-auto rounded-full"></div>
             </div>
             {showSkeleton ? (
                 <MainCategorySkeleton />
