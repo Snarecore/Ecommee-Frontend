@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Link from "next/link";
+import { formatImageUrl } from "@/utils/product-utils";
 
 interface HeroSliderItem {
     id: string;
@@ -69,7 +70,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                 <div className="relative w-full md:w-8/12 lg:w-9/12">
                     <div className="h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg shadow-lg relative">
                         {heroSliderList.length === 1 ? (
-                            <Image src={heroSliderList[0].image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Slider image" className="" width={1200} height={600} />
+                            <Image src={formatImageUrl(heroSliderList[0].image)} alt="Slider image" className="" width={1200} height={600} />
                         ) : (
                             <>
                                 <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${activeSlideIndex * 100}%)` }}>
@@ -80,26 +81,24 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                                     {index === 0 ? (
                                                         // First slide: priority preload for LCP
                                                         <Image
-                                                            src={slide.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                                                            src={formatImageUrl(slide.image)}
                                                             alt={`Slider image ${index + 1}`}
                                                             className=""
                                                             width={1200}
                                                             height={600}
                                                             priority
                                                             sizes="(max-width: 768px) 100vw, 75vw"
-                                                            quality={85}
                                                         />
                                                     ) : (
                                                         // Other slides: lazy load
                                                         <Image
-                                                            src={slide.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                                                            src={formatImageUrl(slide.image)}
                                                             alt={`Slider image ${index + 1}`}
                                                             className=""
                                                             width={1200}
                                                             height={600}
                                                             loading="lazy"
                                                             sizes="(max-width: 768px) 100vw, 75vw"
-                                                            quality={80}
                                                         />
                                                     )}
                                                 </Link>
@@ -140,7 +139,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                 className="flex-1 relative overflow-hidden rounded-lg shadow-lg group"
                             >
                                 <Link href={promotion.link}>
-                                    <Image src={promotion.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
+                                    <Image src={formatImageUrl(promotion.image)} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
                                 </Link>
                             </div>
                         ))
@@ -155,7 +154,7 @@ const Banner: React.FC<Props> = ({ heroSliderList = [], promotionList = [] }) =>
                                         className="flex-1 relative overflow-hidden rounded-lg shadow-lg group "
                                     >
                                         <Link href={promotion.link}>
-                                            <Image src={promotion.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
+                                            <Image src={formatImageUrl(promotion.image)} alt="Promotion image" className="w-full h-full object-cover transition-all duration-500" width={500} height={500} />
                                         </Link>
                                     </div>
                                 );

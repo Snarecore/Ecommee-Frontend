@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/store/user-store";
 import useCart from "@/hooks/useCart";
-import { finalPrice } from "@/utils/product-utils";
+import { finalPrice, formatImageUrl } from "@/utils/product-utils";
 import { isProductOutOfStock, isSizeOutOfStock } from "@/utils/stock-utils";
 import {
   calculateDeliveryZoneAndFee,
@@ -658,10 +658,7 @@ const CheckoutView = () => {
                   return (
                     <div key={item.id} className="flex items-center gap-3 text-sm">
                       <Image
-                        src={
-                          item.featuredImage ||
-                          "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&auto=format&fit=crop&q=60"
-                        }
+                        src={formatImageUrl(item.featuredImage)}
                         alt={item.name}
                         width={48}
                         height={48}

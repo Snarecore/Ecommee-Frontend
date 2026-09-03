@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { formatImageUrl } from "@/utils/product-utils";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaShoppingBag } from "react-icons/fa";
 
@@ -67,7 +68,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
                             >
                                 <div className="flex items-center gap-4 p-3">
                                     <div className="relative overflow-hidden rounded-lg group">
-                                        <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-16 h-16 object-cover rounded-lg transform transition-transform duration-300 group-hover:scale-110" width={64} height={64} />
+                                        <Image src={formatImageUrl(item.featuredImage)} alt={item.name} className="w-16 h-16 object-cover rounded-lg transform transition-transform duration-300 group-hover:scale-110" width={64} height={64} />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium text-gray-800 truncate">{item.name}</p>

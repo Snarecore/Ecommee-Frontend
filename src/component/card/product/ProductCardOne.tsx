@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Product } from "../../../interface/product.interface";
 import useCart from "../../../hooks/useCart";
 import { useRouter } from "next/navigation";
-import { finalPrice } from "../../../utils/product-utils";
+import { finalPrice, formatImageUrl } from "../../../utils/product-utils";
 import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
 import { isProductOutOfStock, getProductSizes } from "../../../utils/stock-utils";
 
@@ -53,12 +53,15 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
     const original = Number(price) || 0;
     const hasDiscount = calculatedPrice < original;
 
-    const secondImage =
+    const rawSecondImage =
         product.productImages && product.productImages.length > 0
             ? product.productImages[0].imageUrl !== featuredImage
                 ? product.productImages[0].imageUrl
                 : product.productImages[1]?.imageUrl
             : null;
+
+    const formattedFeaturedImage = formatImageUrl(featuredImage);
+    const formattedSecondImage = rawSecondImage ? formatImageUrl(rawSecondImage) : null;
 
     const openModal = (
         e: React.MouseEvent,
@@ -107,32 +110,27 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                         className="block w-full h-full rounded-t-xl sm:rounded-t-2xl"
                     >
                         <Image
-                            src={
-                                featuredImage ||
-                                "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-                            }
+                            src={formattedFeaturedImage}
                             alt={name}
                             className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl ${
-                                secondImage
+                                formattedSecondImage
                                     ? "opacity-100 group-hover:opacity-0"
                                     : ""
                             }`}
                             width={400}
                             height={400}
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            quality={75}
                             priority={false}
                         />
 
-                        {secondImage && (
+                        {formattedSecondImage && (
                             <Image
-                                src={secondImage}
+                                src={formattedSecondImage}
                                 alt={`${name} hover`}
                                 className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl"
                                 width={400}
                                 height={400}
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                quality={75}
                                 loading="lazy"
                             />
                         )}

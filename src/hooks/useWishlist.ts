@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { wishlistAtom, wishlistCounterAtom } from "../store/wishlist-store";
 import { useAtom } from "jotai";
 import { showSuccessToast, showErrorToast } from "../utils/toast-utils";
@@ -6,6 +7,11 @@ import { Product } from "../interface/product.interface";
 const useWishlist = () => {
 	const [wishlist, setWishlist] = useAtom(wishlistAtom);
 	const [wishlistCounter] = useAtom(wishlistCounterAtom || 0);
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	const addToWishlist = (product: Product): void => {
 		const wishlistItem = [...wishlist, product];
@@ -20,6 +26,7 @@ const useWishlist = () => {
 	};
 
 	const isInWishlist = (product: Product): boolean => {
+		if (!isMounted) return false;
 		return wishlist.some((item) => item.id === product.id);
 	};
 

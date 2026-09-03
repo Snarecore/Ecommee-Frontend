@@ -8,6 +8,8 @@ import { useAtom } from 'jotai';
 import EmptyComponent from "../empty-component";
 import MainCategorySkeleton from "../skeleton/MainCategorySkeleton";
 
+import { formatImageUrl } from '../../utils/product-utils';
+
 interface ProductCategoryProps {
     contentData: any;
     featuredCategories?: any[];
@@ -42,7 +44,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
                         const linkHref = isSubCategory 
                             ? `/shop?firstCategoryId=${category.id}&pageNumber=1`
                             : `/shop?mainCategoryId=${category.id}&pageNumber=1`;
-                        const imgSource = category?.image || category?.bannerImage;
+                        const imgSource = formatImageUrl(category?.image || category?.bannerImage);
 
                         return (
                             <Link
@@ -50,9 +52,9 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({ contentData, featured
                                 key={category?.id}
                                 className="group relative w-full sm:w-[200px] md:w-[220px] lg:w-[240px] h-[220px] sm:h-[270px] md:h-[320px] rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700 transform transition-all duration-500 ease-out cursor-pointer flex flex-col justify-end hover:-translate-y-1.5"
                             >
-                                <div className="absolute inset-0 w-full h-full">
+                                <div className="absolute inset-0 w-full h-full bg-gray-100">
                                     <Image 
-                                        src={imgSource || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} 
+                                        src={imgSource} 
                                         alt={category?.name || "Category"} 
                                         className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105" 
                                         width={300} 

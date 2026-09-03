@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { FiShoppingCart, FiArrowRight } from "react-icons/fi";
 import { Product } from "../../interface/product.interface";
-import { finalPrice } from "../../utils/product-utils";
+import { finalPrice, formatImageUrl } from "../../utils/product-utils";
 import { getProductSizes, isSizeOutOfStock, isProductOutOfStock } from "../../utils/stock-utils";
 
 interface ProductSizePickerModalProps {
@@ -95,7 +95,7 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
                 <div className="flex items-center gap-4 px-5 py-4">
                     <div className="relative w-[76px] h-[86px] rounded-xl overflow-hidden bg-neutral-50 shrink-0 border border-neutral-100">
                         <Image
-                            src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                            src={formatImageUrl(featuredImage)}
                             alt={name}
                             className="w-full h-full object-cover object-top"
                             width={160}

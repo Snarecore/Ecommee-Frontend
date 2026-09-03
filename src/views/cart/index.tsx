@@ -19,7 +19,7 @@ import { userAtom } from "../../store/user-store";
 import { metaDataAtom } from "../../store/global-store";
 
 // 👇 Adjust this import path to wherever your helper lives
-import { finalPrice } from "../../utils/product-utils"; 
+import { finalPrice, formatImageUrl } from "../../utils/product-utils"; 
 import { isProductOutOfStock, isSizeOutOfStock } from "../../utils/stock-utils";
 
 const MyCart = () => {
@@ -132,7 +132,7 @@ const MyCart = () => {
                           {/* Product & unit price */}
                           <div className="w-full md:col-span-8 flex flex-row gap-4 sm:gap-8 p-4">
                             <div className="relative">
-                              <Image src={item.featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
+                              <Image src={formatImageUrl(item.featuredImage)} alt={item.name} className="w-20 h-20 object-cover rounded" width={80} height={80} />
                               {isItemOutOfStock && (
                                 <span className="absolute top-0 left-0 bg-red-600 text-white text-[9px] font-bold px-1 rounded">Out of Stock</span>
                               )}

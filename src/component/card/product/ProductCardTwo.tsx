@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Product } from "../../../interface/product.interface";
 import useCart from "../../../hooks/useCart";
 import { useRouter } from "next/navigation";
-import { finalPrice } from "../../../utils/product-utils";
+import { finalPrice, formatImageUrl } from "../../../utils/product-utils";
 import ProductSizePickerModal from "../../modals/ProductSizePickerModal";
 import { isProductOutOfStock, getProductSizes } from "../../../utils/stock-utils";
 
@@ -58,12 +58,15 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
     const original = Number(price) || 0;
     const hasDiscount = calculatedPrice < original;
 
-    const secondImage =
+    const rawSecondImage =
         product.productImages && product.productImages.length > 0
             ? product.productImages[0].imageUrl !== featuredImage
                 ? product.productImages[0].imageUrl
                 : product.productImages[1]?.imageUrl
             : null;
+
+    const formattedFeaturedImage = formatImageUrl(featuredImage);
+    const formattedSecondImage = rawSecondImage ? formatImageUrl(rawSecondImage) : null;
 
     const openModal = (e: React.MouseEvent, type: "addToCart" | "buyNow") => {
         e.preventDefault();
@@ -103,15 +106,15 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                 <figure className="relative h-[230px] min-h-[230px] max-h-[230px] sm:h-[250px] sm:min-h-[250px] sm:max-h-[250px] md:h-[300px] md:min-h-[300px] md:max-h-[300px] lg:h-[330px] lg:min-h-[330px] lg:max-h-[330px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
                     <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-xl sm:rounded-t-2xl">
                         <Image
-                            src={featuredImage || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+                            src={formattedFeaturedImage}
                             alt={name}
-                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl ${secondImage ? "opacity-100 group-hover:opacity-0" : ""}`}
+                            className={`w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl ${formattedSecondImage ? "opacity-100 group-hover:opacity-0" : ""}`}
                             width={500}
                             height={500}
                         />
-                        {secondImage && (
+                        {formattedSecondImage && (
                             <Image
-                                src={secondImage}
+                                src={formattedSecondImage}
                                 alt={`${name} hover`}
                                 className="absolute inset-0 w-full h-full object-cover object-top opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 rounded-t-xl sm:rounded-t-2xl"
                                 width={500}

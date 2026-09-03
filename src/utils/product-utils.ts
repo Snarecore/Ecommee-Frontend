@@ -33,6 +33,10 @@ export function formatImageUrl(url?: string | null | any): string {
     let trimmed = url.trim();
     if (!trimmed) return DEFAULT_PLACEHOLDER;
 
+    if (trimmed.startsWith("data:")) {
+        return trimmed;
+    }
+
     if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
         try {
             const parsed = JSON.parse(trimmed);
@@ -48,9 +52,31 @@ export function formatImageUrl(url?: string | null | any): string {
         }
     }
 
-    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/") || trimmed.startsWith("data:")) {
-        return trimmed;
+    // Determine backend origin from environment variable
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/";
+    let apiOrigin = "";
+    try {
+        const u = new URL(apiBaseUrl);
+        apiOrigin = u.origin;
+    } catch {
+        apiOrigin = "";
     }
 
-    return `/${trimmed}`;
+    // Replace localhost server host in production if backend is hosted remotely
+    if (trimmed.startsWith("http://localhost:5000") || trimmed.startsWith("http://127.0.0.1:5000")) {
+        if (apiOrigin && !apiOrigin.includes("localhost")) {
+            trimmed = trimmed.replace(/^http:\/\/(localhost|127\.0\.0\.1):5000/, apiOrigin);
+        }
+    }
+
+    // Handle relative image paths (e.g., uploads/abc.jpg or /uploads/abc.jpg)
+    if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+        const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+        if (apiOrigin) {
+            return `${apiOrigin}${cleanPath}`;
+        }
+        return cleanPath;
+    }
+
+    return trimmed;
 }
