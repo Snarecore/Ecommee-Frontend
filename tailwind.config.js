@@ -7,11 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#064490",
+        primary: "#218DAE",
         secondary: {
-          DEFAULT: "#10B981",
-          light: "#34D399",
-          dark: "#059669",
+          DEFAULT: "#1D7693",
+          light: "#3FA5C7",
+          dark: "#145970",
         },
       },
       keyframes: {

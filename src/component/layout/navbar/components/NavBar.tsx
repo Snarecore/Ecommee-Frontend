@@ -66,8 +66,8 @@ const NavBar = () => {
     return (
         <div className="relative">
             <div
-                className={`w-full z-30 bg-gradient-to-r from-[#3e7842] via-[#519755] to-[#3a753e] border-t border-white/15 shadow-md transition-all duration-300 ${
-                    isScrolled ? "fixed top-0 left-0 right-0 z-50 shadow-xl backdrop-blur-md bg-[#519755]/95" : "relative"
+                className={`w-full z-30 bg-[#218DAE] border-t border-white/15 shadow-md transition-all duration-300 ${
+                    isScrolled ? "fixed top-0 left-0 right-0 z-50 shadow-xl backdrop-blur-md bg-[#218DAE]/95" : "relative"
                 }`}
             >
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6">
@@ -119,10 +119,10 @@ const NavBar = () => {
                                                     {/* Header: Explore All in this Category */}
                                                     <Link
                                                         href={`/shop?mainCategoryId=${main.id}&pageNumber=1`}
-                                                        className="flex items-center justify-between px-3.5 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/60 rounded-xl text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-colors mb-1.5 group/header"
+                                                        className="flex items-center justify-between px-3.5 py-2.5 bg-[#218DAE]/10 dark:bg-[#218DAE]/20 hover:bg-[#218DAE]/20 dark:hover:bg-[#218DAE]/30 rounded-xl text-xs font-bold text-[#218DAE] dark:text-[#218DAE] transition-colors mb-1.5 group/header"
                                                     >
                                                         <span className="flex items-center gap-2">
-                                                            <FiShoppingBag className="text-emerald-600 dark:text-emerald-400 text-sm" />
+                                                            <FiShoppingBag className="text-[#218DAE] text-sm" />
                                                             <span>Explore All {main.name}</span>
                                                         </span>
                                                         <FiChevronRight className="text-xs group-hover/header:translate-x-1 transition-transform" />
@@ -134,10 +134,10 @@ const NavBar = () => {
                                                             <Link
                                                                 key={first.id || fIdx}
                                                                 href={`/shop?firstCategoryId=${first.id}&pageNumber=1`}
-                                                                className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 dark:hover:bg-emerald-950/30 rounded-xl transition-all group/item"
+                                                                className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-[#218DAE] dark:hover:text-[#218DAE] hover:bg-[#218DAE]/10 dark:hover:bg-[#218DAE]/20 rounded-xl transition-all group/item"
                                                             >
                                                                 <span className="truncate">{first.name}</span>
-                                                                <FiChevronRight className="text-xs text-slate-300 dark:text-slate-600 group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 group-hover/item:translate-x-0.5 transition-all flex-shrink-0" />
+                                                                <FiChevronRight className="text-xs text-slate-300 dark:text-slate-600 group-hover/item:text-[#218DAE] dark:group-hover/item:text-[#218DAE] group-hover/item:translate-x-0.5 transition-all flex-shrink-0" />
                                                             </Link>
                                                         ))}
                                                     </div>
