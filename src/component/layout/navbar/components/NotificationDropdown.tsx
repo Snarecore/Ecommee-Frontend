@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle, FiX } from "react-icons/fi";
 
 // Native replacement for moment().fromNow()
 const timeAgo = (dateStr: string): string => {
@@ -130,84 +130,102 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden text-gray-800 dark:text-gray-100 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-sm text-[#218DAE] dark:text-[#218DAE]">
-                Notifications
-              </h3>
-              {unreadCount > 0 && (
-                <span className="bg-[#218DAE]/10 dark:bg-[#218DAE]/20 text-[#218DAE] dark:text-[#218DAE] text-xs font-semibold px-2 py-0.5 rounded-full">
-                  {unreadCount} new
-                </span>
+        <>
+          {/* Mobile backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 sm:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+
+          <div className="fixed inset-x-3 top-14 z-50 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 max-h-[85vh] sm:max-h-none bg-white dark:bg-gray-800 shadow-2xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden text-gray-800 dark:text-gray-100 animate-in fade-in duration-200 flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-sm text-[#218DAE] dark:text-[#218DAE]">
+                  Notifications
+                </h3>
+                {unreadCount > 0 && (
+                  <span className="bg-[#218DAE]/10 dark:bg-[#218DAE]/20 text-[#218DAE] dark:text-[#218DAE] text-xs font-semibold px-2 py-0.5 rounded-full">
+                    {unreadCount} new
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-xs text-[#218DAE] dark:text-[#218DAE] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                  >
+                    <FiCheck /> Mark all read
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="sm:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-lg"
+                  aria-label="Close notifications"
+                >
+                  <FiX className="text-lg" />
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-[60vh] sm:max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700/50">
+              {notifications.length === 0 ? (
+                <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                  <FiBell className="mx-auto text-3xl mb-2 text-gray-300 dark:text-gray-600" />
+                  No notifications yet
+                </div>
+              ) : (
+                notifications.map((notif) => (
+                  <div
+                    key={notif._id}
+                    onClick={() => handleNotificationClick(notif)}
+                    className={`p-3.5 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer transition-colors ${
+                      !notif.isRead ? "bg-[#218DAE]/10 dark:bg-gray-700/30" : ""
+                    }`}
+                  >
+                    <div className="mt-0.5">{getTypeIcon(notif.type)}</div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className={`text-xs sm:text-sm font-semibold truncate ${!notif.isRead ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}>
+                          {notif.title}
+                        </p>
+                        <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                          {timeAgo(notif.createdAt)}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5 line-clamp-2">
+                        {notif.message}
+                      </p>
+                    </div>
+
+                    {!notif.isRead && (
+                      <span className="w-2 h-2 rounded-full bg-[var(--color-green-primary)] flex-shrink-0 mt-1" />
+                    )}
+                  </div>
+                ))
               )}
             </div>
 
-            {unreadCount > 0 && (
+            <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 text-center flex-shrink-0">
               <button
-                onClick={handleMarkAllRead}
-                className="text-xs text-[#218DAE] dark:text-[#218DAE] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/customer-dashboard?tab=order");
+                }}
+                className="text-xs font-medium text-[var(--color-green-primary)] dark:text-[#218DAE] hover:underline cursor-pointer"
               >
-                <FiCheck /> Mark all read
+                View Order Dashboard →
               </button>
-            )}
+            </div>
           </div>
-
-          <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700/50">
-            {notifications.length === 0 ? (
-              <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                <FiBell className="mx-auto text-3xl mb-2 text-gray-300 dark:text-gray-600" />
-                No notifications yet
-              </div>
-            ) : (
-              notifications.map((notif) => (
-                <div
-                  key={notif._id}
-                  onClick={() => handleNotificationClick(notif)}
-                  className={`p-3.5 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer transition-colors ${
-                    !notif.isRead ? "bg-[#218DAE]/10 dark:bg-gray-700/30" : ""
-                  }`}
-                >
-                  <div className="mt-0.5">{getTypeIcon(notif.type)}</div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <p className={`text-xs font-semibold truncate ${!notif.isRead ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}>
-                        {notif.title}
-                      </p>
-                      <span className="text-[10px] text-gray-400 whitespace-nowrap">
-                        {timeAgo(notif.createdAt)}
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5 line-clamp-2">
-                      {notif.message}
-                    </p>
-                  </div>
-
-                  {!notif.isRead && (
-                    <span className="w-2 h-2 rounded-full bg-[var(--color-green-primary)] flex-shrink-0 mt-1" />
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 text-center">
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                router.push("/customer-dashboard?tab=order");
-              }}
-              className="text-xs font-medium text-[var(--color-green-primary)] dark:text-[#218DAE] hover:underline cursor-pointer"
-            >
-              View Order Dashboard →
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
 };
 
 export default NotificationDropdown;
+

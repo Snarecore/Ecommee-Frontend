@@ -171,18 +171,8 @@ const Login = () => {
         <div className="w-full max-w-[480px] mx-auto">
             {/* Clean Centered Auth Card */}
             <div className="bg-white dark:bg-slate-800/95 border border-gray-200/80 dark:border-slate-700/80 shadow-xl shadow-gray-200/40 dark:shadow-none rounded-2xl p-6 sm:p-9 transition-all">
-                {/* Brand Logo & Title */}
+                {/* Brand Title */}
                 <div className="text-center mb-6">
-                    <Link href="/" className="inline-block transition-transform hover:scale-105 duration-200">
-                        <Image
-                            src={companyLogo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
-                            alt="Fashion Time"
-                            width={190}
-                            height={45}
-                            priority
-                            className="h-9 sm:h-11 w-auto mx-auto mb-4 object-contain"
-                        />
-                    </Link>
                     <h1 className="text-2xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
                         Sign In to Your Account
                     </h1>
