@@ -125,7 +125,7 @@ const Shop = () => {
     return (
         <div>
                 <div className="bg-blue-300 p-4 h-48 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${categoryBannerImage || response?.bannerImage})` }}>
-                    <p className="text-2xl font-semibold text-white">
+                    <p className="text-2xl font-semibold text-black">
                         {breadcrumbPath.length > 0 ? breadcrumbPath.join(" → ") : "Shop"}
                     </p>
                 </div>

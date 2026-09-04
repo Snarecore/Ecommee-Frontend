@@ -21,14 +21,47 @@ async function refreshAccessToken(): Promise<string | null> {
     refreshPromise = (async () => {
         try {
             const baseUrl = getApiBaseUrl();
+            let storedToken = "";
+            let storageType: "session" | "local" | null = null;
+            if (typeof window !== "undefined") {
+                const sessionStr = sessionStorage.getItem("user");
+                const localStr = localStorage.getItem("user");
+                if (sessionStr) {
+                    storageType = "session";
+                    try { storedToken = JSON.parse(sessionStr)?.token || ""; } catch {}
+                } else if (localStr) {
+                    storageType = "local";
+                    try { storedToken = JSON.parse(localStr)?.token || ""; } catch {}
+                }
+            }
+
+            const headers: Record<string, string> = { "Content-Type": "application/json" };
+            if (storedToken) {
+                headers["Authorization"] = `Bearer ${storedToken}`;
+            }
+
             const response = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/refresh-token`, {
                 method: "POST",
                 credentials: "include",
-                headers: { "Content-Type": "application/json" }
+                headers
             });
             if (response.ok) {
                 const resData = await response.json();
                 const newToken = resData?.accessToken || resData?.data?.accessToken || "refreshed";
+                if (newToken && typeof window !== "undefined") {
+                    try {
+                        if (storageType === "session" || sessionStorage.getItem("user")) {
+                            const userObj = JSON.parse(sessionStorage.getItem("user") || "{}");
+                            userObj.token = newToken;
+                            sessionStorage.setItem("user", JSON.stringify(userObj));
+                        }
+                        if (storageType === "local" || localStorage.getItem("user")) {
+                            const userObj = JSON.parse(localStorage.getItem("user") || "{}");
+                            userObj.token = newToken;
+                            localStorage.setItem("user", JSON.stringify(userObj));
+                        }
+                    } catch {}
+                }
                 return newToken;
             }
             return null;
