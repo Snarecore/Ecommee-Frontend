@@ -190,14 +190,14 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                                 <button
                                     title="Add to Cart"
                                     aria-label="Add to Cart"
-                                    className="w-10 sm:w-1/2 py-2 px-1 sm:px-2 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
+                                    className="w-10 sm:w-1/2 py-2 md:py-2.5 px-1 sm:px-2 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
-                                    <span className="hidden sm:inline">Add to Cart</span>
+                                    <span className="hidden sm:inline whitespace-nowrap">Add to Cart</span>
                                     <FiShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[var(--color-green-primary)] flex-shrink-0" />
                                 </button>
                                 <button
-                                    className="flex-1 sm:w-1/2 py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="flex-1 sm:w-1/2 py-2 md:py-2.5 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
                                     <span>Buy Now</span>

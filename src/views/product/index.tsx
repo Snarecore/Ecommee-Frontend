@@ -576,21 +576,21 @@ const Product = ({ initialData }: ProductProps) => {
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="flex flex-wrap items-center gap-3 mb-6">
+                                        <div className="flex items-center gap-2 sm:gap-3 mb-6">
                                             <button
-                                                className="flex-1 sm:flex-none px-6 py-3 border-2 border-[var(--color-green-primary)] text-[var(--color-green-primary)] font-bold text-sm sm:text-base rounded-xl hover:bg-[var(--color-green-primary)] hover:text-white transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.98] flex items-center justify-center gap-2 group"
+                                                className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-3 border-2 border-[var(--color-green-primary)] text-[var(--color-green-primary)] font-bold text-xs sm:text-base rounded-xl hover:bg-[var(--color-green-primary)] hover:text-white transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 group whitespace-nowrap"
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
                                                     handleAddToCart();
                                                 }}
                                             >
-                                                <FiShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                                <span>Add to Cart</span>
+                                                <FiShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform flex-shrink-0" />
+                                                <span className="whitespace-nowrap">Add to Cart</span>
                                             </button>
 
                                             <button
-                                                className="flex-1 sm:flex-none px-6 py-3 bg-[var(--color-green-primary)] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#1D7693] transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 group"
+                                                className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-green-primary)] text-white font-bold text-xs sm:text-base rounded-xl hover:bg-[#1D7693] transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 group whitespace-nowrap"
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
@@ -602,12 +602,12 @@ const Product = ({ initialData }: ProductProps) => {
                                                     }
                                                 }}
                                             >
-                                                <span>Buy Now</span>
-                                                <FiShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                                <span className="whitespace-nowrap">Buy Now</span>
+                                                <FiShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform flex-shrink-0" />
                                             </button>
 
                                             <button
-                                                className="w-12 h-12 rounded-xl border border-neutral-200 hover:border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md active:scale-95 flex-shrink-0 group"
+                                                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border border-neutral-200 hover:border-[var(--color-green-primary)] bg-white text-[var(--color-green-primary)] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md active:scale-95 flex-shrink-0 group"
                                                 title="Wishlist"
                                                 aria-label="Wishlist"
                                                 onClick={(e) => {
@@ -616,13 +616,13 @@ const Product = ({ initialData }: ProductProps) => {
                                                     handleWishlistToggle();
                                                 }}
                                             >
-                                                {product && (isInWishlist(product) ? <FaHeart className="text-red-500 fill-current text-xl" /> : <FaRegHeart className="text-xl group-hover:scale-110 transition-transform" />)}
+                                                {product && (isInWishlist(product) ? <FaHeart className="text-red-500 fill-current text-lg sm:text-xl" /> : <FaRegHeart className="text-lg sm:text-xl group-hover:scale-110 transition-transform" />)}
                                             </button>
                                         </div>
                                     </>
                                 );
                             })()}
-                            <div className="mb-4">
+                            <div className="mb-1 sm:mb-4">
                                 <p className="text-lg sm:text-xl font-semibold mb-4 text-[var(--color-black-primary)]">Specification:</p>
                                 <ul className="list-decimal list-inside space-y-1 text-[var(--color-black-primary)]">
                                     {product?.summary
@@ -709,7 +709,7 @@ const Product = ({ initialData }: ProductProps) => {
                         </Modal>
                     </div>
 
-                    <div className="flex items-center justify-center border-b border-gray-300 mt-12 mb-6 gap-12">
+                    <div className="flex items-center justify-center border-b border-gray-300 mt-1 sm:mt-12 mb-6 gap-12">
                         {["description", "ratings", "reviews"].map((tab) => (
                             <button
                                 key={tab}
@@ -803,7 +803,7 @@ const Product = ({ initialData }: ProductProps) => {
                         />
                     )}
 
-                    <div className="border border-gray-300 mt-8"></div>
+                    <div className="border border-gray-300 mt-1 sm:mt-8"></div>
 
                     {relatedProducts.length > 0 && (
                         <SimilarProducts relatedProducts={relatedProducts} />
