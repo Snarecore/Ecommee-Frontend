@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle, FiX } from "react-icons/fi";
 
 // Native replacement for moment().fromNow()
@@ -35,23 +35,54 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const user = useAtomValue(userAtom);
+
+  // Critical Route Shield: Disable background notification requests during Checkout
+  const isCheckoutPage = pathname?.includes("/checkout");
 
   const { data, refetch } = useQuery({
     queryKey: ["notifications", user?.id || user?._id],
     queryFn: fetchNotificationsApi,
-    enabled: Boolean(user),
-    refetchInterval: user ? 15000 : false,
-    staleTime: 5000
+    enabled: Boolean(user && !isCheckoutPage),
+    refetchInterval: false, // ❌ No aggressive polling
+    refetchOnWindowFocus: !isCheckoutPage, // ✅ Window Focus Sync (only 1 request if stale)
+    staleTime: 1000 * 60 * 2, // ✅ 2 minutes smart cache
+    gcTime: 1000 * 60 * 10, // ✅ 10 minutes cache retention
+    retry: false
   });
 
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;
 
+  // Cross-Tab Realtime Sync via BroadcastChannel (Same-Browser Admin Tab <-> Customer Tab)
+  useEffect(() => {
+    if (typeof window === "undefined" || !("BroadcastChannel" in window)) return;
+
+    const channel = new BroadcastChannel("fashion_time_notifications");
+    channel.onmessage = (event) => {
+      if (
+        event.data?.type === "SYNC_NOTIFICATIONS" ||
+        event.data?.type === "ORDER_STATUS_CHANGED"
+      ) {
+        if (!isCheckoutPage) {
+          refetch();
+        }
+      }
+    };
+
+    return () => {
+      channel.close();
+    };
+  }, [refetch, isCheckoutPage]);
+
+  // Event-Driven Local Sync (orders_updated, notifications_updated)
   useEffect(() => {
     const handleUpdate = () => {
-      refetch();
+      if (!isCheckoutPage) {
+        refetch();
+      }
     };
 
     window.addEventListener("notifications_updated", handleUpdate);
@@ -61,7 +92,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
       window.removeEventListener("notifications_updated", handleUpdate);
       window.removeEventListener("orders_updated", handleUpdate);
     };
-  }, [refetch]);
+  }, [refetch, isCheckoutPage]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -23,6 +23,13 @@ export const saveStoredNotifications = (notifications: NotificationItem[], emitE
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
     if (emitEvents) {
       window.dispatchEvent(new Event("notifications_updated"));
+      if ("BroadcastChannel" in window) {
+        try {
+          const channel = new BroadcastChannel("fashion_time_notifications");
+          channel.postMessage({ type: "SYNC_NOTIFICATIONS" });
+          channel.close();
+        } catch {}
+      }
     }
   } catch (err) {
     // console.error("Error saving notifications:", err);
