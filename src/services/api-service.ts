@@ -64,6 +64,25 @@ async function refreshAccessToken(): Promise<string | null> {
                 }
                 return newToken;
             }
+
+            // Organization Standard: If refresh-token fails (401/expired), remove dead token to prevent refresh loops
+            if (typeof window !== "undefined") {
+                try {
+                    const sessionStr = sessionStorage.getItem("user");
+                    const localStr = localStorage.getItem("user");
+                    if (sessionStr) {
+                        const u = JSON.parse(sessionStr);
+                        delete u.token;
+                        sessionStorage.setItem("user", JSON.stringify(u));
+                    }
+                    if (localStr) {
+                        const u = JSON.parse(localStr);
+                        delete u.token;
+                        localStorage.setItem("user", JSON.stringify(u));
+                    }
+                } catch {}
+                window.dispatchEvent(new Event("auth_token_expired"));
+            }
             return null;
         } catch {
             return null;
