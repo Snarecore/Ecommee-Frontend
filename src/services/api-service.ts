@@ -22,22 +22,32 @@ async function refreshAccessToken(): Promise<string | null> {
         try {
             const baseUrl = getApiBaseUrl();
             let storedToken = "";
+            let storedRefreshToken = "";
             let storageType: "session" | "local" | null = null;
             if (typeof window !== "undefined") {
                 const sessionStr = sessionStorage.getItem("user");
                 const localStr = localStorage.getItem("user");
                 if (sessionStr) {
                     storageType = "session";
-                    try { storedToken = JSON.parse(sessionStr)?.token || ""; } catch {}
+                    try {
+                        const parsed = JSON.parse(sessionStr);
+                        storedToken = parsed?.token || "";
+                        storedRefreshToken = parsed?.refreshToken || "";
+                    } catch {}
                 } else if (localStr) {
                     storageType = "local";
-                    try { storedToken = JSON.parse(localStr)?.token || ""; } catch {}
+                    try {
+                        const parsed = JSON.parse(localStr);
+                        storedToken = parsed?.token || "";
+                        storedRefreshToken = parsed?.refreshToken || "";
+                    } catch {}
                 }
             }
 
+            const tokenToUse = storedRefreshToken || storedToken;
             const headers: Record<string, string> = { "Content-Type": "application/json" };
-            if (storedToken) {
-                headers["Authorization"] = `Bearer ${storedToken}`;
+            if (tokenToUse) {
+                headers["Authorization"] = `Bearer ${tokenToUse}`;
             }
 
             const response = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/refresh-token`, {
@@ -149,18 +159,27 @@ async function apiRequest<T>(
 
         if (!response.ok) {
             // console.warn(`API HTTP ${response.status}: ${response.statusText} for ${url}`);
+            if (response.status === 413) {
+                return {
+                    error: true,
+                    status: 413,
+                    message: "The uploaded file(s) or payload size is too large. Please upload smaller files."
+                };
+            }
             const errData = await response.json().catch(() => null);
+            const rawMsg = errData?.message || errData?.data?.message || `Failed (${response.status}): ${response.statusText}`;
+            const formattedMsg = Array.isArray(rawMsg) ? rawMsg.join(", ") : String(rawMsg);
             return {
                 error: true,
                 status: response.status,
-                message: errData?.message || `Failed (${response.status}): ${response.statusText}`
+                message: formattedMsg
             };
         }
 
         return await response.json().catch(() => ({ error: true, message: "Invalid JSON response" }));
-    } catch (error) {
+    } catch (error: any) {
         // console.warn("Fetch exception handled: ", error);
-        return { error: true, message: "An error occurred while making the request." };
+        return { error: true, message: error?.message || "An error occurred while making the request." };
     }
 }
 

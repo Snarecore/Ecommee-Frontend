@@ -5,10 +5,24 @@ import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle, FiX } fr
 
 // Native replacement for moment().fromNow()
 const timeAgo = (dateStr: string): string => {
-  const date = new Date(dateStr);
+  if (!dateStr) return "just now";
+
+  let parsedStr = String(dateStr).trim();
+  // Normalize date string if missing explicit UTC offset
+  if (
+    !parsedStr.endsWith("Z") &&
+    !parsedStr.includes("+") &&
+    !/-\d{2}:\d{2}$/.test(parsedStr)
+  ) {
+    parsedStr = parsedStr.includes("T") ? `${parsedStr}Z` : `${parsedStr.replace(" ", "T")}Z`;
+  }
+
+  const date = new Date(parsedStr);
   if (isNaN(date.getTime())) return "just now";
+
   const diffMs = Date.now() - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);
+
   if (diffSec < 60) return "just now";
   const diffMin = Math.floor(diffSec / 60);
   if (diffMin < 60) return `${diffMin}m ago`;
