@@ -102,8 +102,8 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
     return (
         <>
-            <div className="group rounded-xl sm:rounded-2xl transition-all duration-300 overflow-hidden w-full h-auto min-h-[345px] sm:h-[370px] md:h-[425px] lg:h-[445px] bg-white flex flex-col border border-neutral-200 hover:border-neutral-300">
-                <figure className="relative h-[210px] min-h-[210px] max-h-[210px] sm:h-[235px] sm:min-h-[235px] sm:max-h-[235px] md:h-[275px] md:min-h-[275px] md:max-h-[275px] lg:h-[300px] lg:min-h-[300px] lg:max-h-[300px] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
+            <div className="group rounded-xl sm:rounded-2xl transition-all duration-300 overflow-hidden w-full h-full bg-white flex flex-col justify-between border border-neutral-200 hover:border-neutral-300">
+                <figure className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-50 rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
                     <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="block w-full h-full rounded-t-xl sm:rounded-t-2xl">
                         <Image
                             src={formattedFeaturedImage}
@@ -124,13 +124,13 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     </Link>
 
                     {hasDiscount && (
-                        <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
+                        <div className="absolute top-2.5 left-2.5 z-10 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm">
                             {discountType === "PERCENT" ? `${discountAmount}% OFF` : `-$${discountAmount}`}
                         </div>
                     )}
 
                     <button
-                        className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 backdrop-blur-sm text-neutral-600 shadow-sm transition-all duration-300 hover:bg-white hover:text-red-500 hover:scale-110 cursor-pointer"
+                        className="absolute top-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur-sm text-neutral-600 shadow-sm transition-all duration-300 hover:bg-white hover:text-red-500 hover:scale-110 cursor-pointer"
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -142,46 +142,44 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                         }}
                     >
                         {isInWishlist(product) ? (
-                            <FaHeart className="text-red-500 fill-current" />
+                            <FaHeart className="text-red-500 fill-current text-xs" />
                         ) : (
-                            <FiHeart className="text-[var(--color-green-primary)]" size={16} />
+                            <FiHeart className="text-[var(--color-green-primary)]" size={15} />
                         )}
                     </button>
                 </figure>
 
-                <div className="flex-1 p-2.5 sm:p-4 bg-white flex flex-col justify-between">
-                    <div className="hidden md:block text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-0.5">
-                        {mainCategoryName || "Clothing"}
-                    </div>
+                <div className="flex-1 p-2.5 sm:p-3 bg-white flex flex-col justify-between">
+                    <div>
+                        <h2 className="text-xs sm:text-[13px] font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 h-8 sm:h-9 flex items-start mb-1 leading-snug">
+                            <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="line-clamp-2">{name}</Link>
+                        </h2>
 
-                    <h2 className="text-xs sm:text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 mb-1 leading-snug">
-                        <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`}>{name}</Link>
-                    </h2>
+                        <div className="flex items-baseline gap-1.5 mb-1.5">
+                            {hasDiscount ? (
+                                <>
+                                    <span className="text-sm sm:text-[15px] font-bold text-neutral-900">${calculatedPrice.toFixed(2)}</span>
+                                    <span className="text-[10px] sm:text-[11px] text-neutral-400 line-through">${original.toFixed(2)}</span>
+                                </>
+                            ) : (
+                                <span className="text-sm sm:text-[15px] font-bold text-neutral-900">${original.toFixed(2)}</span>
+                            )}
+                        </div>
 
-                    <div className="flex items-baseline gap-2 mb-1">
-                        {hasDiscount ? (
-                            <>
-                                <span className="text-base font-bold text-neutral-900">${calculatedPrice.toFixed(2)}</span>
-                                <span className="text-xs text-neutral-400 line-through">${original.toFixed(2)}</span>
-                            </>
-                        ) : (
-                            <span className="text-base font-bold text-neutral-900">${original.toFixed(2)}</span>
+                        {rating && rating > 0 && (
+                            <div className="flex items-center gap-1 mb-1">
+                                <div className="flex items-center text-[10px] gap-0.5">{renderStars(rating)}</div>
+                                <span className="text-[10px] text-neutral-500 font-medium ml-0.5">({rating.toFixed(1)})</span>
+                            </div>
                         )}
                     </div>
 
-                    {rating && rating > 0 && (
-                        <div className="flex items-center gap-1 mb-1">
-                            <div className="flex items-center text-[10px] gap-0.5">{renderStars(rating)}</div>
-                            <span className="text-[11px] text-neutral-500 font-medium ml-0.5">({rating.toFixed(1)})</span>
-                        </div>
-                    )}
-
                     {/* Action Buttons */}
-                    <div className="mt-0.5 pt-1.5 border-t border-[var(--color-green-primary)]/30 flex items-center gap-1.5 sm:gap-2">
+                    <div className="mt-auto pt-2 border-t border-[var(--color-green-primary)]/20 flex items-center gap-1.5 sm:gap-2">
                         {isOutOfStock ? (
                             <button
                                 disabled
-                                className="w-full py-2 bg-red-100 border border-red-300 text-red-600 text-[11px] sm:text-xs font-bold rounded-md sm:rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5"
+                                className="w-full py-1.5 sm:py-2 bg-red-50 border border-red-200 text-red-600 text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5"
                             >
                                 Out of Stock
                             </button>
@@ -190,14 +188,14 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                                 <button
                                     title="Add to Cart"
                                     aria-label="Add to Cart"
-                                    className="w-10 sm:w-1/2 py-2 md:py-2.5 px-1 sm:px-2 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
+                                    className="w-9 sm:w-1/2 py-1.5 sm:py-2 px-1 sm:px-2 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
                                     <span className="hidden sm:inline whitespace-nowrap">Add to Cart</span>
-                                    <FiShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[var(--color-green-primary)] flex-shrink-0" />
+                                    <FiShoppingCart className="w-3.5 h-3.5 text-[var(--color-green-primary)] flex-shrink-0" />
                                 </button>
                                 <button
-                                    className="flex-1 sm:w-1/2 py-2 md:py-2.5 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="flex-1 sm:w-1/2 py-1.5 sm:py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
                                     <span>Buy Now</span>

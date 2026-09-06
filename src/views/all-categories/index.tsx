@@ -72,7 +72,7 @@ const AllCategories = () => {
 					) : dataList?.length > 0 ? (
 						<>
 							{dataList.map((product) => (
-								<div key={product.id}>
+								<div key={product.id} className="w-full h-full flex flex-col">
 									<ProductCardTwo product={product} />
 								</div>
 							))}
