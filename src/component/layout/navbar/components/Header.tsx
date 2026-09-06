@@ -1,11 +1,16 @@
 import Link from "next/link";
 import Marquee from 'react-fast-marquee';
 import { headerFooterAtom } from "../../../../store/global-store";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
+import { userAtom, authStatusAtom, getUserDisplayName } from "../../../../store/user-store";
 import { FiPhoneCall, FiUser, FiZap } from "react-icons/fi";
 
 const Header = () => {
     const [headerFooterData] = useAtom(headerFooterAtom);
+    const user = useAtomValue(userAtom);
+    const authStatus = useAtomValue(authStatusAtom);
+
+    const displayName = getUserDisplayName(user);
 
     return (
         <header className="hidden sm:block bg-[#FBF9F5] dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-b border-gray-200/80 dark:border-gray-800 text-xs py-2 w-full transition-colors duration-300">
@@ -30,13 +35,25 @@ const Header = () => {
 
                     {/* Quick Access Links */}
                     <div className="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto text-xs font-medium">
-                        <Link
-                            href="/login"
-                            className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
-                        >
-                            <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
-                            <span>Sign In / Register</span>
-                        </Link>
+                        {authStatus === "loading" ? (
+                            <div className="w-24 h-4 bg-gray-200 dark:bg-slate-700 animate-pulse rounded-md" />
+                        ) : user ? (
+                            <Link
+                                href="/customer-dashboard?tab=order"
+                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
+                            >
+                                <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
+                                <span>Hello, <strong className="font-semibold text-slate-900 dark:text-white">{displayName}</strong></span>
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
+                            >
+                                <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
+                                <span>Sign In / Register</span>
+                            </Link>
+                        )}
 
                         <div className="h-3 w-px bg-slate-300 dark:bg-slate-700 hidden sm:block" />
 

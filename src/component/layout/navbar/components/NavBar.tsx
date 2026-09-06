@@ -5,7 +5,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { nestedCategoriesAtom, megaDiscountAtom } from "../../../../store/global-store";
 import { MainCategory } from "../../../../interface/nested-category.interface";
-import { userAtom, logoutUserAtom, getUserDisplayName } from "../../../../store/user-store";
+import { userAtom, logoutUserAtom, getUserDisplayName, authStatusAtom } from "../../../../store/user-store";
 import { FaRegUser } from "react-icons/fa6";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
@@ -20,6 +20,7 @@ const NavBar = () => {
     const mainCategories = (nestedCategories ?? []) as unknown as MainCategory[];
 
     const user = useAtomValue(userAtom);
+    const authStatus = useAtomValue(authStatusAtom);
     const setLogout = useSetAtom(logoutUserAtom);
     const router = useRouter();
 
@@ -175,7 +176,9 @@ const NavBar = () => {
                                     className="flex items-center gap-2 text-white cursor-pointer py-1.5 px-2.5 rounded-md sm:rounded-lg hover:bg-white/20 bg-white/10 border border-white/20 transition-all duration-200 shadow-xs active:scale-95"
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 >
-                                    {isMounted && user ? (
+                                    {!isMounted || authStatus === "loading" ? (
+                                        <div className="w-16 h-5 bg-white/20 animate-pulse rounded-md" />
+                                    ) : user ? (
                                         <>
                                             <div className="w-7 h-7 rounded-full bg-white/25 border border-white/50 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">
                                                 {getUserInitial()}

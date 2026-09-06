@@ -67,41 +67,35 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
     role: "CUSTOMER"
   };
 
-  // Attempt to exchange with backend if endpoint is available
-  const potentialEndpoints = [
-    `${baseUrl}/auth/google-login`,
-    `${baseUrl}/auth/social-login`,
-    `${baseUrl}/auth/firebase-login`,
-    `${baseUrl}/auth/google`
-  ];
+  // 1. Attempt authoritative backend token exchange
+  const exchangePath = (apiConfig as any)?.auth?.firebaseLoginUrl || (apiConfig as any)?.auth?.googleLoginUrl || "auth/firebase-login";
+  try {
+    const fullUrl = exchangePath.startsWith("http") ? exchangePath : `${baseUrl}/${exchangePath.replace(/^\//, "")}`;
+    const response = await fetch(fullUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      credentials: "include"
+    });
 
-  for (const endpoint of potentialEndpoints) {
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "include"
-      });
+    if (response.ok) {
+      const data = await response.json();
+      const serverUser = data?.data?.user || data?.data || data?.user;
+      const serverToken = data?.data?.accessToken || data?.accessToken || data?.data?.token || data?.token;
 
-      if (response.ok) {
-        const data = await response.json();
-        const serverUser = data?.data?.user || data?.data || data?.user;
-        const serverToken = data?.data?.accessToken || data?.accessToken || data?.data?.token || data?.token;
-
-        if (serverUser && typeof serverUser === "object") {
-          return {
-            ...serverUser,
-            token: serverToken || idToken
-          };
-        }
+      if (serverUser && typeof serverUser === "object") {
+        return {
+          ...serverUser,
+          token: serverToken || idToken,
+          provider: "google"
+        };
       }
-    } catch {
-      // Continue to next endpoint or fallback
     }
+  } catch {
+    // ignore exchange network error and fallback to client model
   }
 
-  // Graceful fallback to client session model
+  // 2. Authoritative Client Session Model for Google Auth
   return {
     id: firebaseUser.uid,
     _id: firebaseUser.uid,

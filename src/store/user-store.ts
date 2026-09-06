@@ -26,17 +26,36 @@ export const getUserDisplayName = (user: User | null): string => {
     return "User";
 };
 
+export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+
 export const userAtom = atom<User | null>(null);
 export const userLoadedAtom = atom(false);
+export const authStatusAtom = atom<AuthStatus>("loading");
 
-export const logoutUserAtom = atom(null, (_get, set, action?: any) => {
+export const logoutUserAtom = atom(null, (get, set, action?: any) => {
+    const currentUser = get(userAtom);
+    const userId = currentUser?.id || currentUser?._id || currentUser?.email;
+
     logoutFirebaseUser().catch(() => null);
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/"}auth/logout`, {
         method: "POST",
         credentials: "include"
     }).catch(() => null);
+
     deleteCookie("user");
+    if (typeof window !== "undefined") {
+        try {
+            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
+            if (userId) {
+                localStorage.removeItem(`shipping_notifications_${userId}`);
+                localStorage.removeItem(`shipping_notifications_v1_${userId}`);
+            }
+        } catch {}
+    }
+
     set(userAtom, null);
+    set(authStatusAtom, "unauthenticated");
     set(userLoadedAtom, true);
 
     if (typeof action === "function") {

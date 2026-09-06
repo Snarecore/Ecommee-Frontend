@@ -121,10 +121,23 @@ async function apiRequest<T>(
         }
 
         if (response.status === 401 && !isRetry && !url.includes("auth/login") && !url.includes("auth/refresh-token")) {
+            let isGoogleSession = false;
+            if (typeof window !== "undefined") {
+                try {
+                    const raw = sessionStorage.getItem("user") || localStorage.getItem("user");
+                    if (raw) {
+                        const u = JSON.parse(raw);
+                        if (u.provider === "google" || u.firebaseUid) isGoogleSession = true;
+                    }
+                } catch {}
+            }
+
             const hasTokenOrSession = typeof window !== "undefined" && (
                 sessionStorage.getItem("user") || localStorage.getItem("user") || document.cookie.includes("user")
             );
-            if (hasTokenOrSession) {
+
+            // Organization Standard: Only invoke backend JWT refresh endpoint for local_jwt sessions
+            if (hasTokenOrSession && !isGoogleSession) {
                 const newToken = await refreshAccessToken();
                 if (newToken) {
                     const newHeaders = new Headers(options.headers || {});

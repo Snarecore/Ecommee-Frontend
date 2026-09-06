@@ -5,11 +5,15 @@ import { getUserToken } from "../hooks/useApi";
 
 const STORAGE_KEY = "shipping_notifications_v1";
 
-export const getStoredNotifications = (): NotificationItem[] => {
+export const getStoredNotifications = (userId?: string): NotificationItem[] => {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    const key = userId ? `${STORAGE_KEY}_${userId}` : STORAGE_KEY;
+    const raw = localStorage.getItem(key);
+    if (!raw) {
+      // For specific logged-in users, fallback to empty array so demo notifications don't leak to new users
+      return userId ? [] : [];
+    }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -17,10 +21,15 @@ export const getStoredNotifications = (): NotificationItem[] => {
   }
 };
 
-export const saveStoredNotifications = (notifications: NotificationItem[], emitEvents: boolean = true) => {
+export const saveStoredNotifications = (
+  notifications: NotificationItem[],
+  userId?: string,
+  emitEvents: boolean = true
+) => {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+    const key = userId ? `${STORAGE_KEY}_${userId}` : STORAGE_KEY;
+    localStorage.setItem(key, JSON.stringify(notifications));
     if (emitEvents) {
       window.dispatchEvent(new Event("notifications_updated"));
       if ("BroadcastChannel" in window) {
@@ -36,14 +45,26 @@ export const saveStoredNotifications = (notifications: NotificationItem[], emitE
   }
 };
 
-export const fetchNotificationsApi = async (): Promise<{
+export const fetchNotificationsApi = async (userId?: string): Promise<{
   notifications: NotificationItem[];
   unreadCount: number;
 }> => {
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
-  if (notifUrl && token) {
+  let isGoogleSession = false;
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("user") || localStorage.getItem("user");
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u.provider === "google" || u.firebaseUid) isGoogleSession = true;
+      }
+    } catch {}
+  }
+
+  // Only invoke backend notifications endpoint for local_jwt sessions (or if backend is configured to handle Google tokens)
+  if (notifUrl && token && !isGoogleSession) {
     try {
       const res: any = await getData({ url: notifUrl, token });
       if (res && !res.error) {
@@ -56,7 +77,7 @@ export const fetchNotificationsApi = async (): Promise<{
         const unreadCount =
           payload.unreadCount ?? list.filter((n: any) => !n.isRead).length;
 
-        saveStoredNotifications(list, false);
+        saveStoredNotifications(list, userId, false);
         return { notifications: list, unreadCount };
       }
     } catch (err) {
@@ -64,12 +85,12 @@ export const fetchNotificationsApi = async (): Promise<{
     }
   }
 
-  const list = getStoredNotifications();
+  const list = getStoredNotifications(userId);
   const unreadCount = list.filter((n) => !n.isRead).length;
   return { notifications: list, unreadCount };
 };
 
-export const markNotificationReadApi = async (id: string): Promise<void> => {
+export const markNotificationReadApi = async (id: string, userId?: string): Promise<void> => {
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
@@ -81,12 +102,12 @@ export const markNotificationReadApi = async (id: string): Promise<void> => {
     }
   }
 
-  const list = getStoredNotifications();
+  const list = getStoredNotifications(userId);
   const updated = list.map((n) => (n._id === id || (n as any).id === id ? { ...n, isRead: true } : n));
-  saveStoredNotifications(updated);
+  saveStoredNotifications(updated, userId);
 };
 
-export const markAllNotificationsReadApi = async (): Promise<void> => {
+export const markAllNotificationsReadApi = async (userId?: string): Promise<void> => {
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
@@ -98,15 +119,16 @@ export const markAllNotificationsReadApi = async (): Promise<void> => {
     }
   }
 
-  const list = getStoredNotifications();
+  const list = getStoredNotifications(userId);
   const updated = list.map((n) => ({ ...n, isRead: true }));
-  saveStoredNotifications(updated);
+  saveStoredNotifications(updated, userId);
 };
 
 export const addShippingNotification = (
   orderId: string,
   status: string,
-  customNote?: string
+  customNote?: string,
+  userId?: string
 ): NotificationItem => {
   const typeMap: Record<string, NotificationType> = {
     Processing: "ORDER_PROCESSING",
@@ -129,14 +151,14 @@ export const addShippingNotification = (
     createdAt: new Date().toISOString()
   };
 
-  const list = getStoredNotifications();
+  const list = getStoredNotifications(userId);
   const isDuplicate = list.some(
     (n) => n.orderId === orderId && n.title === newNotif.title && (Date.now() - new Date(n.createdAt).getTime() < 5000)
   );
 
   if (!isDuplicate) {
     const updated = [newNotif, ...list];
-    saveStoredNotifications(updated);
+    saveStoredNotifications(updated, userId);
   }
 
   return newNotif;

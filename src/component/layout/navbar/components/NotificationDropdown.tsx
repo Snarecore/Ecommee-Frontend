@@ -39,12 +39,12 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const queryClient = useQueryClient();
   const user = useAtomValue(userAtom);
 
-  // Critical Route Shield: Disable background notification requests during Checkout
   const isCheckoutPage = pathname?.includes("/checkout");
+  const userId = user?.id || user?._id || user?.email || "";
 
   const { data, refetch } = useQuery({
-    queryKey: ["notifications", user?.id || user?._id],
-    queryFn: fetchNotificationsApi,
+    queryKey: ["notifications", userId],
+    queryFn: () => fetchNotificationsApi(userId),
     enabled: Boolean(user && !isCheckoutPage),
     refetchInterval: false, // ❌ No aggressive polling
     refetchOnWindowFocus: !isCheckoutPage, // ✅ Window Focus Sync (only 1 request if stale)
@@ -106,7 +106,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
 
   const handleNotificationClick = async (notif: NotificationItem) => {
     if (!notif.isRead) {
-      await markNotificationReadApi(notif._id);
+      await markNotificationReadApi(notif._id, userId);
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     }
     setIsOpen(false);
@@ -120,7 +120,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   };
 
   const handleMarkAllRead = async () => {
-    await markAllNotificationsReadApi();
+    await markAllNotificationsReadApi(userId);
     refetch();
   };
 

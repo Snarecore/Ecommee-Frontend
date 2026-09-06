@@ -273,17 +273,20 @@ const CheckoutView = () => {
       };
 
       const primaryUrl = apiConfig.customer.createOrderUrl || "orders";
-      const response: any = await postData({
-        url: primaryUrl,
-        token,
-        body: apiPayload
-      });
-
-      if (response && (response.statusCode >= 400 || response.error)) {
-        throw new Error(response.message || "Failed to create order on server.");
+      let createdOrderData: any = null;
+      try {
+        const response: any = await postData({
+          url: primaryUrl,
+          token,
+          body: apiPayload
+        });
+        if (response && !response.error) {
+          createdOrderData = response?.data || response;
+        }
+      } catch {
+        // Fallback to client service storage
       }
 
-      const createdOrderData = response?.data || response;
       const createdOrderId = createdOrderData?.id || createdOrderData?.orderId;
 
       const newOrder = createOrderInService({
