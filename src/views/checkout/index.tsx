@@ -311,6 +311,16 @@ const CheckoutView = () => {
 
       setOrderSubmitted(true);
       clearCart();
+
+      // Instantly notify admin dashboard tabs if open
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        try {
+          const bc = new BroadcastChannel("fashion_time_admin_notifications");
+          bc.postMessage({ type: "NEW_ADMIN_NOTIF_AVAILABLE" });
+          bc.close();
+        } catch {}
+      }
+
       showSuccessToast(
         "Order submitted successfully! Your order is now waiting for admin approval."
       );
