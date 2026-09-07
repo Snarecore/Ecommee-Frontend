@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#218DAE" />
+      <stop offset="100%" stop-color="#0E4E63" />
+    </linearGradient>
+    <linearGradient id="bagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E2F4F8" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFC107" />
+      <stop offset="100%" stop-color="#FF9800" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  
+  <!-- Outer Rounded Container -->
+  <rect x="16" y="16" width="480" height="480" rx="100" fill="url(#bgGrad)" />
+  
+  <!-- Shopping Bag Handles -->
+  <path d="M192 180 V 140 C 192 104 220 76 256 76 C 292 76 320 104 320 140 V 180" 
+        fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" />
+        
+  <!-- Main Shopping Bag Body -->
+  <path d="M136 170 H 376 C 392 170 404 184 402 200 L 382 416 C 380 432 366 444 350 444 H 162 C 146 444 132 432 130 416 L 110 200 C 108 184 120 170 136 170 Z" 
+        fill="url(#bagGrad)" filter="url(#shadow)" />
+        
+  <!-- Handle Attachment Pins -->
+  <circle cx="192" cy="195" r="14" fill="#218DAE" />
+  <circle cx="320" cy="195" r="14" fill="#218DAE" />
+  
+  <!-- E-Commerce Fashion Star / Sparkle Accent in Center -->
+  <path d="M256 240 L 268 280 L 308 292 L 268 304 L 256 344 L 244 304 L 204 292 L 244 280 Z" 
+        fill="url(#accentGrad)" />
+        
+  <!-- Small Secondary Sparkle -->
+  <path d="M320 230 L 325 245 L 340 250 L 325 255 L 320 270 L 315 255 L 300 250 L 315 245 Z" 
+        fill="url(#accentGrad)" opacity="0.9" />
+</svg>
