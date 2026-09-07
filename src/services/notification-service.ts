@@ -124,6 +124,30 @@ export const markAllNotificationsReadApi = async (userId?: string): Promise<void
   saveStoredNotifications(updated, userId);
 };
 
+export function playChimeSound() {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+  } catch {}
+}
+
 export const addShippingNotification = (
   orderId: string,
   status: string,
@@ -159,6 +183,7 @@ export const addShippingNotification = (
   if (!isDuplicate) {
     const updated = [newNotif, ...list];
     saveStoredNotifications(updated, userId);
+    playChimeSound();
   }
 
   return newNotif;

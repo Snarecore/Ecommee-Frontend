@@ -89,7 +89,7 @@ const handleErrorMessage = (error: unknown) => {
 export const getUserToken = (): string => {
     if (typeof window === 'undefined') return '';
     try {
-        const stored = sessionStorage.getItem("user") || getCookie("user") || localStorage.getItem("user");
+        const stored = getCookie("user") || sessionStorage.getItem("user") || localStorage.getItem("user");
         if (stored) {
             const user = typeof stored === 'string' ? JSON.parse(stored) : stored;
             return user?.token || '';

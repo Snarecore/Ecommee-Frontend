@@ -44,6 +44,7 @@ const AppInitializer = () => {
                             name: fbUser.displayName || fbUser.email?.split("@")[0] || "User",
                             email: fbUser.email || "",
                             photoURL: fbUser.photoURL || "",
+                            role: "customer",
                             provider: "google"
                         };
                         setUser(clientUser);
@@ -76,8 +77,15 @@ const AppInitializer = () => {
                     const data = await res.json();
                     const userData = data?.data || data?.user;
                     if (userData) {
-                        const fullUserData = { ...userData, token: userData.token || currentToken };
+                        const fullUserData = { role: "customer", ...userData, token: userData.token || currentToken };
                         setCookie("user", JSON.stringify(fullUserData), 7);
+                        if (typeof window !== "undefined") {
+                            try {
+                                const str = JSON.stringify(fullUserData);
+                                if (localStorage.getItem("user")) localStorage.setItem("user", str);
+                                if (sessionStorage.getItem("user")) sessionStorage.setItem("user", str);
+                            } catch {}
+                        }
                         setUser(fullUserData as User);
                         setAuthStatus("authenticated");
                     } else if (parsedUser) {
@@ -156,6 +164,7 @@ const AppInitializer = () => {
                                 name: fbUser.displayName || fbUser.email?.split("@")[0] || "User",
                                 email: fbUser.email || "",
                                 photoURL: fbUser.photoURL || "",
+                                role: "customer",
                                 provider: "google"
                             };
                             setUser(clientUser);

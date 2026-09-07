@@ -84,7 +84,8 @@ const OrderTab = () => {
     refetch: fetchData
   } = usePaginatedQuery({
     queryKey: [orderQueryKey, currentPageNumber.toString()],
-    url: getOrderListApiUrl()
+    url: getOrderListApiUrl(),
+    refetchOnWindowFocus: true
   });
 
   const loadStoredOrders = () => {
@@ -93,10 +94,34 @@ const OrderTab = () => {
 
   useEffect(() => {
     loadStoredOrders();
-    const handleUpdate = () => loadStoredOrders();
+
+    const handleUpdate = () => {
+      loadStoredOrders();
+      fetchData();
+    };
+
     window.addEventListener("orders_updated", handleUpdate);
-    return () => window.removeEventListener("orders_updated", handleUpdate);
-  }, []);
+    window.addEventListener("notifications_updated", handleUpdate);
+
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      channel = new BroadcastChannel("fashion_time_notifications");
+      channel.onmessage = (event) => {
+        if (
+          event.data?.type === "SYNC_NOTIFICATIONS" ||
+          event.data?.type === "ORDER_STATUS_CHANGED"
+        ) {
+          handleUpdate();
+        }
+      };
+    }
+
+    return () => {
+      window.removeEventListener("orders_updated", handleUpdate);
+      window.removeEventListener("notifications_updated", handleUpdate);
+      if (channel) channel.close();
+    };
+  }, [fetchData]);
 
   // Process API orders list from Backend first with top priority
   const apiOrdersMapped = (dataList || []).map((apiOrd: any) => {

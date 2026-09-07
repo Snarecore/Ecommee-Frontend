@@ -16,13 +16,19 @@ const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps)
     const userLoaded = useAtomValue(userLoadedAtom);
     const router = useRouter();
 
+    const userRole = (user?.role || 'customer').toLowerCase();
+    const isAllowed = allowedRoles.some(
+        r => r.toLowerCase() === userRole || 
+             (r.toLowerCase() === 'customer' && (userRole === 'customer' || userRole === 'user'))
+    );
+
     useEffect(() => {
-        if (userLoaded && (!user || !allowedRoles.includes(user.role as Role))) {
+        if (userLoaded && (!user || !isAllowed)) {
             router.replace("/login");
         }
-    }, [user, userLoaded, allowedRoles, router]);
+    }, [user, userLoaded, isAllowed, router]);
 
-    if (!userLoaded || !user || !allowedRoles.includes(user.role as Role)) {
+    if (!userLoaded || !user || !isAllowed) {
         return null;
     }
 

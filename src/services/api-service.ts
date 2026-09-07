@@ -1,5 +1,6 @@
 import { GetDataProps, PostDataProps, PatchDataProps, DeleteDataProps, FormDataProps } from "../models/api-models";
 import apiConfig from "../config/api.json";
+import { getCookie, setCookie } from "../utils/cookie-utils";
 
 const getApiBaseUrl = (): string => {
     const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -25,19 +26,13 @@ async function refreshAccessToken(): Promise<string | null> {
             let storedRefreshToken = "";
             let storageType: "session" | "local" | null = null;
             if (typeof window !== "undefined") {
+                const cookieStr = getCookie("user");
                 const sessionStr = sessionStorage.getItem("user");
                 const localStr = localStorage.getItem("user");
-                if (sessionStr) {
-                    storageType = "session";
+                const activeStr = cookieStr || sessionStr || localStr;
+                if (activeStr) {
                     try {
-                        const parsed = JSON.parse(sessionStr);
-                        storedToken = parsed?.token || "";
-                        storedRefreshToken = parsed?.refreshToken || "";
-                    } catch {}
-                } else if (localStr) {
-                    storageType = "local";
-                    try {
-                        const parsed = JSON.parse(localStr);
+                        const parsed = JSON.parse(activeStr);
                         storedToken = parsed?.token || "";
                         storedRefreshToken = parsed?.refreshToken || "";
                     } catch {}
@@ -57,22 +52,24 @@ async function refreshAccessToken(): Promise<string | null> {
             });
             if (response.ok) {
                 const resData = await response.json();
-                const newToken = resData?.accessToken || resData?.data?.accessToken || "refreshed";
-                if (newToken && typeof window !== "undefined") {
+                const newToken = resData?.accessToken || resData?.data?.accessToken || resData?.token || resData?.data?.token || resData?.data?.user?.token || resData?.user?.token;
+                if (newToken && typeof newToken === "string" && newToken !== "refreshed" && typeof window !== "undefined") {
                     try {
-                        if (storageType === "session" || sessionStorage.getItem("user")) {
-                            const userObj = JSON.parse(sessionStorage.getItem("user") || "{}");
-                            userObj.token = newToken;
-                            sessionStorage.setItem("user", JSON.stringify(userObj));
+                        let userObj: any = {};
+                        const cookieUser = getCookie("user");
+                        const storageUser = sessionStorage.getItem("user") || localStorage.getItem("user");
+                        const raw = cookieUser || storageUser;
+                        if (raw) {
+                            try { userObj = JSON.parse(raw); } catch {}
                         }
-                        if (storageType === "local" || localStorage.getItem("user")) {
-                            const userObj = JSON.parse(localStorage.getItem("user") || "{}");
-                            userObj.token = newToken;
-                            localStorage.setItem("user", JSON.stringify(userObj));
-                        }
+                        userObj.token = newToken;
+                        setCookie("user", JSON.stringify(userObj), 7);
+                        if (sessionStorage.getItem("user")) sessionStorage.setItem("user", JSON.stringify(userObj));
+                        if (localStorage.getItem("user")) localStorage.setItem("user", JSON.stringify(userObj));
                     } catch {}
+                    return newToken;
                 }
-                return newToken;
+                return null;
             }
 
             // Organization Standard: If refresh-token fails (401/expired), remove dead token to prevent refresh loops

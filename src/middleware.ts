@@ -27,6 +27,7 @@ export function middleware(request: NextRequest) {
 
     try {
       const user = JSON.parse(decodeURIComponent(userCookie));
+      const userRole = (user?.role || 'customer').toLowerCase();
       
       // Protect vendor routes
       const isVendorRoute = pathname.startsWith('/vendor-dashboard') || 
@@ -34,13 +35,13 @@ export function middleware(request: NextRequest) {
                             pathname.startsWith('/edit-product') ||
                             pathname.startsWith('/messages');
                             
-      if (isVendorRoute && user.role !== 'vendor') {
+      if (isVendorRoute && userRole !== 'vendor' && userRole !== 'admin') {
         return NextResponse.redirect(new URL('/', request.url));
       }
 
       // Protect customer routes
       const isCustomerRoute = pathname.startsWith('/customer-dashboard');
-      if (isCustomerRoute && user.role !== 'customer') {
+      if (isCustomerRoute && userRole !== 'customer' && userRole !== 'user' && userRole !== 'admin') {
         return NextResponse.redirect(new URL('/', request.url));
       }
     } catch (e) {

@@ -35,7 +35,8 @@ const timeAgo = (dateStr: string): string => {
 import {
   fetchNotificationsApi,
   markNotificationReadApi,
-  markAllNotificationsReadApi
+  markAllNotificationsReadApi,
+  playChimeSound
 } from "../../../../services/notification-service";
 import { NotificationItem, NotificationType } from "../../../../interface/notification.interface";
 import { useAtomValue } from "jotai";
@@ -56,19 +57,45 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const isCheckoutPage = pathname?.includes("/checkout");
   const userId = user?.id || user?._id || user?.email || "";
 
+  const knownIdsRef = useRef<Set<string>>(new Set());
+  const isInitialLoadRef = useRef<boolean>(true);
+
   const { data, refetch } = useQuery({
     queryKey: ["notifications", userId],
     queryFn: () => fetchNotificationsApi(userId),
     enabled: Boolean(user && !isCheckoutPage),
-    refetchInterval: false, // ❌ No aggressive polling
-    refetchOnWindowFocus: !isCheckoutPage, // ✅ Window Focus Sync (only 1 request if stale)
-    staleTime: 1000 * 60 * 2, // ✅ 2 minutes smart cache
-    gcTime: 1000 * 60 * 10, // ✅ 10 minutes cache retention
+    refetchInterval: isCheckoutPage ? false : 5000, // ⚡ Realtime 5s fast polling matching admin
+    refetchOnWindowFocus: !isCheckoutPage,
+    staleTime: 2000,
+    gcTime: 1000 * 60 * 10,
     retry: false
   });
 
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;
+
+  // Sound Chime Alert on brand new unread notifications
+  useEffect(() => {
+    if (!data?.notifications || data.notifications.length === 0) return;
+    const fetchedItems = data.notifications;
+
+    if (!isInitialLoadRef.current && document.visibilityState === "visible") {
+      const hasBrandNewUnread = fetchedItems.some((item) => {
+        const id = item._id || (item as any).id || "";
+        return !item.isRead && id && !knownIdsRef.current.has(id);
+      });
+
+      if (hasBrandNewUnread) {
+        playChimeSound();
+      }
+    }
+
+    fetchedItems.forEach((item) => {
+      const key = item._id || (item as any).id;
+      if (key) knownIdsRef.current.add(key);
+    });
+    isInitialLoadRef.current = false;
+  }, [data?.notifications]);
 
   // Cross-Tab Realtime Sync via BroadcastChannel (Same-Browser Admin Tab <-> Customer Tab)
   useEffect(() => {
@@ -78,7 +105,8 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
     channel.onmessage = (event) => {
       if (
         event.data?.type === "SYNC_NOTIFICATIONS" ||
-        event.data?.type === "ORDER_STATUS_CHANGED"
+        event.data?.type === "ORDER_STATUS_CHANGED" ||
+        event.data?.type === "NEW_NOTIF_AVAILABLE"
       ) {
         if (!isCheckoutPage) {
           refetch();

@@ -64,7 +64,7 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
     photoURL: firebaseUser.photoURL || "",
     firebaseUid: firebaseUser.uid,
     idToken: idToken,
-    role: "CUSTOMER"
+    role: "customer"
   };
 
   // 1. Attempt authoritative backend token exchange
@@ -85,6 +85,7 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
 
       if (serverUser && typeof serverUser === "object") {
         return {
+          role: "customer",
           ...serverUser,
           token: serverToken || idToken,
           provider: "google"
@@ -103,7 +104,7 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
     fullName: firebaseUser.displayName || payload.name,
     email: payload.email,
     photoURL: payload.photoURL,
-    role: "CUSTOMER",
+    role: "customer",
     token: idToken,
     provider: "google"
   };

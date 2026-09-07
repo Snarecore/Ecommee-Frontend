@@ -261,7 +261,12 @@ const CheckoutView = () => {
         deliveryCharge,
         specialNote: specialNote.trim(),
         name: name.trim(),
+        customerName: name.trim(),
         phone: phone.trim(),
+        phoneNumber: phone.trim(),
+        customerPhone: phone.trim(),
+        email: user?.email || "",
+        customerEmail: user?.email || "",
         address: address.trim(),
         couponCode: appliedCoupon?.couponCode || undefined,
         shippingAddress: {
@@ -269,6 +274,11 @@ const CheckoutView = () => {
           phone: phone.trim(),
           address: address.trim(),
           city: city.trim() || "Dhaka"
+        },
+        user: {
+          name: name.trim(),
+          phone: phone.trim(),
+          email: user?.email || ""
         }
       };
 

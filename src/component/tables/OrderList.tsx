@@ -270,7 +270,10 @@ const OrderListTable = ({
                   <tr key={rowIndex} className="hover:bg-gray-50/80 transition">
                     <td className="p-3 font-semibold text-gray-500">{rowIndex + 1}</td>
                     <td className="p-3 font-extrabold text-gray-800">{row.orderId || row.id}</td>
-                    <td className="p-3">{row.user?.name || row.shippingAddress?.name || "Customer"}</td>
+                    <td className="p-3">
+                      <div className="font-semibold text-gray-800">{row.user?.name || row.shippingAddress?.name || row.name || "Customer"}</div>
+                      <div className="text-xs text-gray-400">{row.shippingAddress?.phone || row.phone || row.user?.phone || row.user?.email || "N/A"}</div>
+                    </td>
                     <td className="p-3 font-bold text-gray-900">
                       ৳{row.vendorTotalAmount || row.totalAmount || row.subtotal || 0}
                     </td>
