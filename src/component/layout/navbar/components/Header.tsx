@@ -4,11 +4,17 @@ import { headerFooterAtom } from "../../../../store/global-store";
 import { useAtom, useAtomValue } from "jotai";
 import { userAtom, authStatusAtom, getUserDisplayName } from "../../../../store/user-store";
 import { FiPhoneCall, FiUser, FiZap } from "react-icons/fi";
+import { useEffect, useState } from "react";
 
 const Header = () => {
     const [headerFooterData] = useAtom(headerFooterAtom);
     const user = useAtomValue(userAtom);
     const authStatus = useAtomValue(authStatusAtom);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const displayName = getUserDisplayName(user);
 
@@ -35,7 +41,7 @@ const Header = () => {
 
                     {/* Quick Access Links */}
                     <div className="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto text-xs font-medium">
-                        {authStatus === "loading" ? (
+                        {!isMounted || authStatus === "loading" ? (
                             <div className="w-24 h-4 bg-gray-200 dark:bg-slate-700 animate-pulse rounded-md" />
                         ) : user ? (
                             <Link
