@@ -251,7 +251,8 @@ const CheckoutView = () => {
         paymentMethod,
         items: cartItems.map((item) => ({
           productId: item.id,
-          quantity: item.quantity ?? 1
+          quantity: item.quantity ?? 1,
+          size: item.selectedSize || (item as any).size || undefined
         })),
         products: backendProducts,
         currency: "usd",
@@ -283,41 +284,21 @@ const CheckoutView = () => {
       };
 
       const primaryUrl = apiConfig.customer.createOrderUrl || "orders";
-      let createdOrderData: any = null;
-      try {
-        const response: any = await postData({
-          url: primaryUrl,
-          token,
-          body: apiPayload
-        });
-        if (response && !response.error) {
-          createdOrderData = response?.data || response;
-        }
-      } catch {
-        // Fallback to client service storage
+      const response: any = await postData({
+        url: primaryUrl,
+        token,
+        body: apiPayload
+      });
+
+      if (!response || response.error || (response.statusCode && response.statusCode >= 400)) {
+        throw new Error(response?.message || response?.error || "Order creation failed on server. Please try again.");
       }
 
+      const createdOrderData = response?.data || response;
       const createdOrderId = createdOrderData?.id || createdOrderData?.orderId;
-
-      const newOrder = createOrderInService({
-        userId: user?.id || "user-guest",
-        shippingAddress: {
-          name: name.trim(),
-          phone: phone.trim(),
-          address: address.trim(),
-          city: city.trim() || "Dhaka"
-        },
-        paymentMethod,
-        paymentStatus: paymentMethod === "Online" ? "Paid" : "Pending",
-        specialNote: specialNote.trim(),
-        items: orderItems,
-        subtotal: cartSubtotal,
-        couponCode: appliedCoupon?.couponCode || createdOrderData?.couponCode || undefined,
-        discountAmount: appliedCoupon ? appliedCoupon.discountAmount : Number(createdOrderData?.discountAmount || 0),
-        totalAmount: grandTotal,
-        id: createdOrderData?.id,
-        orderId: createdOrderData?.orderId
-      });
+      if (!createdOrderId) {
+        throw new Error("Order was not accepted by server. Please try again.");
+      }
 
       setOrderSubmitted(true);
       clearCart();
@@ -334,8 +315,7 @@ const CheckoutView = () => {
       showSuccessToast(
         "Order submitted successfully! Your order is now waiting for admin approval."
       );
-      const targetOrderId = newOrder.id || newOrder.orderId || createdOrderId;
-      router.push(`/order-confirmation/${targetOrderId}`);
+      router.push(`/order-confirmation/${createdOrderId}`);
     } catch (err: any) {
       // console.error("Order payment error:", err);
       setPaymentError(err?.message || "Payment process failed. Please check your card details or try again.");
