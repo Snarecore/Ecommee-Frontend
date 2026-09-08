@@ -22,6 +22,9 @@ import { getData } from "@/services/api-service";
 import { getUserToken } from "@/hooks/useApi";
 import { formatImageUrl } from "@/utils/product-utils";
 
+import { useSocket } from "@/hooks/useSocket";
+import { SocketEvent, OrderStatusUpdatedPayload } from "@/types/socket.types";
+
 interface OrderConfirmationViewProps {
   orderId: string;
 }
@@ -29,10 +32,10 @@ interface OrderConfirmationViewProps {
 const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }) => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const { socket } = useSocket();
 
   useEffect(() => {
     let isMounted = true;
-    let timerId: NodeJS.Timeout | null = null;
 
     const fetchOrderFromApi = async () => {
       if (!orderId) {
@@ -63,11 +66,6 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
 
     fetchOrderFromApi();
 
-    // ⚡ Real-time 4s polling matching Admin polling speed
-    timerId = setInterval(() => {
-      fetchOrderFromApi();
-    }, 4000);
-
     // ⚡ Cross-Tab / Cross-App BroadcastChannel Listener
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
@@ -86,10 +84,33 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
 
     return () => {
       isMounted = false;
-      if (timerId) clearInterval(timerId);
       if (channel) channel.close();
     };
   }, [orderId]);
+
+  // Real-time socket listener for order status changes
+  useEffect(() => {
+    if (!socket || !orderId) return;
+
+    const handleOrderStatusUpdated = (payload: OrderStatusUpdatedPayload) => {
+      if (payload.orderId === orderId || (order && order.orderId === payload.orderId)) {
+        setOrder((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            status: payload.status as any,
+            orderStatus: payload.status as any
+          };
+        });
+      }
+    };
+
+    socket.on(SocketEvent.ORDER_STATUS_UPDATED, handleOrderStatusUpdated);
+
+    return () => {
+      socket.off(SocketEvent.ORDER_STATUS_UPDATED, handleOrderStatusUpdated);
+    };
+  }, [socket, orderId, order?.orderId]);
 
   if (loading) {
     return (

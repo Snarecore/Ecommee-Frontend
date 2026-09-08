@@ -41,6 +41,8 @@ import {
 import { NotificationItem, NotificationType } from "../../../../interface/notification.interface";
 import { useAtomValue } from "jotai";
 import { userAtom } from "../../../../store/user-store";
+import { useSocket } from "../../../../hooks/useSocket";
+import { SocketEvent } from "../../../../types/socket.types";
 
 interface Props {
   variant?: "light" | "green";
@@ -53,6 +55,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const user = useAtomValue(userAtom);
+  const { socket } = useSocket();
 
   const isCheckoutPage = pathname?.includes("/checkout");
   const userId = user?.id || user?._id || user?.email || "";
@@ -64,15 +67,30 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
     queryKey: ["notifications", userId],
     queryFn: () => fetchNotificationsApi(userId),
     enabled: Boolean(user && !isCheckoutPage),
-    refetchInterval: isCheckoutPage ? false : 5000, // ⚡ Realtime 5s fast polling matching admin
-    refetchOnWindowFocus: !isCheckoutPage,
-    staleTime: 2000,
+    refetchInterval: false, // ⚡ Zero polling: Event-driven via Socket.IO
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
     retry: false
   });
 
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;
+
+  // Real-time socket listener for notifications
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      refetch();
+    };
+
+    socket.on(SocketEvent.ORDER_STATUS_UPDATED, handleUpdate);
+
+    return () => {
+      socket.off(SocketEvent.ORDER_STATUS_UPDATED, handleUpdate);
+    };
+  }, [socket, refetch]);
 
   // Sound Chime Alert on brand new unread notifications
   useEffect(() => {
