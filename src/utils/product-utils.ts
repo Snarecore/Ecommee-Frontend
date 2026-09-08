@@ -1,4 +1,4 @@
-type DiscountType = "NONE" | "PERCENT" | "FLAT";
+type DiscountType = "NONE" | "PERCENT" | "PERCENTAGE" | "FLAT" | string;
 
 export function finalPrice({
     price,
@@ -6,22 +6,23 @@ export function finalPrice({
     discountAmount = 0
 }: {
     price: number;
-    discountType?: DiscountType;
+    discountType?: DiscountType | null;
     discountAmount?: number;
 }): number {
     const originalPrice = Number(price) || 0;
     const discountPrice = Number(discountAmount) || 0;
 
     let result = originalPrice;
+    const normalizedType = (discountType || "").trim().toUpperCase();
 
-    if (discountType === "PERCENT") {
+    if (normalizedType === "PERCENT" || normalizedType.includes("PERCENTAGE")) {
         const clampValue = Math.min(Math.max(discountPrice, 0), 100);
         result = originalPrice * (1 - clampValue / 100);
-    } else if (discountType === "FLAT") {
+    } else if (normalizedType === "FLAT" || normalizedType.includes("FIXED") || normalizedType.includes("AMOUNT")) {
         result = originalPrice - Math.max(discountPrice, 0);
     }
 
-    return +Math.max(result, 0).toFixed(2);
+    return Math.max(0, Math.round((result + Number.EPSILON) * 100) / 100);
 }
 
 const DEFAULT_PLACEHOLDER = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
