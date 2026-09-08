@@ -8,12 +8,8 @@ export function middleware(request: NextRequest) {
   const protectedPaths = [
     '/customer-dashboard',
     '/checkout',
-    '/vendor-dashboard',
-    '/create-product',
-    '/edit-product',
     '/wallet',
     '/chat',
-    '/messages',
   ];
 
   const isProtected = protectedPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
@@ -44,16 +40,6 @@ export function middleware(request: NextRequest) {
 
     const rawRole = user?.role ? String(user.role).trim().toLowerCase() : 'customer';
     const userRole = rawRole || 'customer';
-    
-    // Protect vendor routes
-    const isVendorRoute = pathname.startsWith('/vendor-dashboard') || 
-                          pathname.startsWith('/create-product') || 
-                          pathname.startsWith('/edit-product') ||
-                          pathname.startsWith('/messages');
-                          
-    if (isVendorRoute && userRole !== 'vendor' && userRole !== 'admin') {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
 
     // Protect customer routes
     const isCustomerRoute = pathname.startsWith('/customer-dashboard');
@@ -71,18 +57,10 @@ export const config = {
     '/customer-dashboard/:path*',
     '/checkout',
     '/checkout/:path*',
-    '/vendor-dashboard',
-    '/vendor-dashboard/:path*',
-    '/create-product',
-    '/create-product/:path*',
-    '/edit-product',
-    '/edit-product/:path*',
     '/wallet',
     '/wallet/:path*',
     '/chat',
     '/chat/:path*',
-    '/messages',
-    '/messages/:path*',
   ],
 }
 

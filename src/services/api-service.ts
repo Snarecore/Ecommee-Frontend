@@ -48,11 +48,13 @@ async function refreshAccessToken(): Promise<string | null> {
             const response = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/refresh-token`, {
                 method: "POST",
                 credentials: "include",
-                headers
+                headers,
+                body: JSON.stringify({ refreshToken: tokenToUse })
             });
             if (response.ok) {
                 const resData = await response.json();
                 const newToken = resData?.accessToken || resData?.data?.accessToken || resData?.token || resData?.data?.token || resData?.data?.user?.token || resData?.user?.token;
+                const newRefreshToken = resData?.refreshToken || resData?.data?.refreshToken || resData?.data?.user?.refreshToken || resData?.user?.refreshToken;
                 if (newToken && typeof newToken === "string" && newToken !== "refreshed" && typeof window !== "undefined") {
                     try {
                         let userObj: any = {};
@@ -63,6 +65,7 @@ async function refreshAccessToken(): Promise<string | null> {
                             try { userObj = JSON.parse(raw); } catch {}
                         }
                         userObj.token = newToken;
+                        if (newRefreshToken) userObj.refreshToken = newRefreshToken;
                         setCookie("user", JSON.stringify(userObj), 7);
                         if (sessionStorage.getItem("user")) sessionStorage.setItem("user", JSON.stringify(userObj));
                         if (localStorage.getItem("user")) localStorage.setItem("user", JSON.stringify(userObj));
@@ -127,14 +130,57 @@ async function apiRequest<T>(
             return { error: true, message: "Backend API is currently offline or unreachable." };
         }
 
-        if (response.status === 401 && !isRetry && !url.includes("auth/login") && !url.includes("auth/refresh-token")) {
+        if (response.status === 401 && !isRetry && !url.includes("auth/login") && !url.includes("auth/refresh-token") && !url.includes("auth/firebase-login")) {
             let isGoogleSession = false;
             if (typeof window !== "undefined") {
                 try {
-                    const raw = sessionStorage.getItem("user") || localStorage.getItem("user");
+                    const raw = sessionStorage.getItem("user") || localStorage.getItem("user") || getCookie("user");
                     if (raw) {
-                        const u = JSON.parse(raw);
+                        const u = typeof raw === "string" ? JSON.parse(raw) : raw;
                         if (u.provider === "google" || u.firebaseUid) isGoogleSession = true;
+                    }
+                } catch {}
+            }
+
+            if (isGoogleSession && typeof window !== "undefined") {
+                try {
+                    const { getFirebaseAuth } = await import("../config/firebase");
+                    const fbInstance = getFirebaseAuth();
+                    if (fbInstance?.auth?.currentUser) {
+                        const idToken = await fbInstance.auth.currentUser.getIdToken(true);
+                        const baseUrl = getApiBaseUrl();
+                        const fbRes = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/firebase-login`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                idToken,
+                                email: fbInstance.auth.currentUser.email || "",
+                                name: fbInstance.auth.currentUser.displayName || "",
+                                firebaseUid: fbInstance.auth.currentUser.uid
+                            }),
+                            credentials: "include"
+                        });
+                        if (fbRes.ok) {
+                            const data = await fbRes.json();
+                            const newToken = data?.data?.accessToken || data?.accessToken;
+                            const newRefreshToken = data?.data?.refreshToken || data?.refreshToken;
+                            if (newToken) {
+                                const raw = sessionStorage.getItem("user") || localStorage.getItem("user") || getCookie("user");
+                                let userObj: any = {};
+                                if (raw) {
+                                    try { userObj = typeof raw === "string" ? JSON.parse(raw) : raw; } catch {}
+                                }
+                                userObj.token = newToken;
+                                if (newRefreshToken) userObj.refreshToken = newRefreshToken;
+                                setCookie("user", JSON.stringify(userObj), 7);
+                                if (sessionStorage.getItem("user")) sessionStorage.setItem("user", JSON.stringify(userObj));
+                                if (localStorage.getItem("user")) localStorage.setItem("user", JSON.stringify(userObj));
+
+                                const newHeaders = new Headers(options.headers || {});
+                                newHeaders.set("Authorization", `Bearer ${newToken}`);
+                                return apiRequest<T>(url, { ...options, headers: newHeaders }, true, cacheStrategy);
+                            }
+                        }
                     }
                 } catch {}
             }
@@ -143,8 +189,7 @@ async function apiRequest<T>(
                 sessionStorage.getItem("user") || localStorage.getItem("user") || document.cookie.includes("user")
             );
 
-            // Organization Standard: Only invoke backend JWT refresh endpoint for local_jwt sessions
-            if (hasTokenOrSession && !isGoogleSession) {
+            if (hasTokenOrSession) {
                 const newToken = await refreshAccessToken();
                 if (newToken) {
                     const newHeaders = new Headers(options.headers || {});

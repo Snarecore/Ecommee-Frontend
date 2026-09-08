@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { Role } from "../../../../enum/role.enum";
 import { useAPI } from "../../../../hooks/useApi";
-import apiConfig from "../../../../config/api.json";
-import { vendorPasswordUpdateQueryKey } from "../../../../config/query-key";
+import { customerPasswordUpdateQueryKey } from "../../../../config/query-key";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
 const passwordUpdateInitialFieldValues = {
@@ -42,7 +41,7 @@ const ChangePassword  = () => {
                 newPassword: passwordUpdateFieldValues.newPassword,
                 confirmPassword: passwordUpdateFieldValues.confirmPassword
             },
-            invalidateQueryKey: [vendorPasswordUpdateQueryKey],
+            invalidateQueryKey: [customerPasswordUpdateQueryKey],
             showSuccessMessage: true,
             showErrorMessage: true,
         });

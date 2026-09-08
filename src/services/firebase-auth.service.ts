@@ -82,12 +82,14 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
       const data = await response.json();
       const serverUser = data?.data?.user || data?.data || data?.user;
       const serverToken = data?.data?.accessToken || data?.accessToken || data?.data?.token || data?.token;
+      const serverRefreshToken = data?.data?.refreshToken || data?.refreshToken;
 
       if (serverUser && typeof serverUser === "object") {
         return {
           role: "customer",
           ...serverUser,
           token: serverToken || idToken,
+          refreshToken: serverRefreshToken,
           provider: "google"
         };
       }

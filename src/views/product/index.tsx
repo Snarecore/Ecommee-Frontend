@@ -18,7 +18,6 @@ import { FaPencilAlt, FaStarHalfAlt } from "react-icons/fa";
 import 'swiper/css';
 import useWishlist from "../../hooks/useWishlist";
 import useCart from "../../hooks/useCart";
-import { vendorMessageQueryKey } from "../../config/query-key";
 import { productRatingQueryKey } from "../../config/query-key";
 import { userAtom } from "../../store/user-store";
 import { useAtomValue } from "jotai";
@@ -80,8 +79,8 @@ const Product = ({ initialData }: ProductProps) => {
     const params = useParams();
     const slug = typeof params?.slug === "string" ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : "";
     const { fetchData, postMutation, handleApiMutation, usePaginatedQuery } = useAPI();
-    const apiUrl = apiConfig.vendor.vendorMessageUrl;
-    const ratingApiUrl = apiConfig.site.productRatingUrl;
+    const apiUrl = apiConfig?.messageLinks?.sendMessageUrl || apiConfig?.vendor?.vendorMessageUrl || "message/send";
+    const ratingApiUrl = apiConfig?.site?.productRatingUrl || "product-review";
     const { addToCart, isInCart } = useCart();
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const router = useRouter();
@@ -188,7 +187,7 @@ const Product = ({ initialData }: ProductProps) => {
     const handlePrevImage = () => {
         if (!product) return;
 
-        const images = [product.featuredImage, ...product.productImages.map(img => img.imageUrl)];
+        const images = [product.featuredImage, ...(product.productImages || []).map(img => img.imageUrl)];
         const currentIndex = images.indexOf(selectedImage);
         const prevIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
 
@@ -199,7 +198,7 @@ const Product = ({ initialData }: ProductProps) => {
     const handleNextImage = () => {
         if (!product) return;
 
-        const images = [product.featuredImage, ...product.productImages.map(img => img.imageUrl)];
+        const images = [product.featuredImage, ...(product.productImages || []).map(img => img.imageUrl)];
         const currentIndex = images.indexOf(selectedImage);
         const nextIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
 
@@ -243,7 +242,7 @@ const Product = ({ initialData }: ProductProps) => {
             mutation,
             url,
             body: fieldValues,
-            invalidateQueryKey: [vendorMessageQueryKey],
+            invalidateQueryKey: ["messages"],
             showSuccessMessage: true,
             showErrorMessage: true,
             requiredFields
@@ -389,13 +388,13 @@ const Product = ({ initialData }: ProductProps) => {
                                 >
                                     <Image src={formatImageUrl(product?.featuredImage)} alt={product?.name || ""} className="w-full h-full object-cover" width={500} height={500} />
                                 </button>
-                                {product?.productImages.map((image, index) => (
+                                {(product?.productImages || []).map((image, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleImageClick(image.imageUrl)}
                                         className={`w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border-2 transition cursor-pointer ${selectedImage === image.imageUrl ? "border-[var(--color-green-primary)]" : "border-gray-300"}`}
                                     >
-                                        <Image src={formatImageUrl(image.imageUrl)} alt={`${product.name} - ${index + 1}`} className="w-full h-full object-cover" width={500} height={500} />
+                                        <Image src={formatImageUrl(image.imageUrl)} alt={`${product?.name || 'Product'} - ${index + 1}`} className="w-full h-full object-cover" width={500} height={500} />
                                     </button>
                                 ))}
                             </div>

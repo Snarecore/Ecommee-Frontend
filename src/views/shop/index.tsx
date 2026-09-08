@@ -124,10 +124,19 @@ const Shop = () => {
 
     return (
         <div>
-                <div className="bg-blue-300 p-4 h-48 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${categoryBannerImage || response?.bannerImage})` }}>
-                    <p className="text-2xl font-semibold text-black">
-                        {breadcrumbPath.length > 0 ? breadcrumbPath.join(" → ") : "Shop"}
-                    </p>
+                <div 
+                    className="relative w-full h-44 sm:h-52 md:h-60 flex items-center justify-center bg-cover bg-center bg-no-repeat overflow-hidden shadow-xs" 
+                    style={{ backgroundImage: `url(${categoryBannerImage || response?.bannerImage || ''})` }}
+                >
+                    {/* Subtle contrast gradient */}
+                    <div className="absolute inset-0 bg-black/20 backdrop-brightness-95" />
+
+                    {/* Breadcrumb / Title badge */}
+                    <div className="relative z-10 px-6 py-2 rounded-full bg-white/85 dark:bg-gray-900/85 backdrop-blur-md shadow-md border border-white/50 dark:border-gray-700/50 max-w-[90%] text-center">
+                        <p className="text-base sm:text-lg md:text-xl font-bold text-[var(--color-green-primary)] dark:text-emerald-400 tracking-wide truncate">
+                            {breadcrumbPath.length > 0 ? breadcrumbPath.join(" → ") : "Shop"}
+                        </p>
+                    </div>
                 </div>
                 <div>
                     <div className="flex max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
@@ -165,7 +174,7 @@ const Shop = () => {
                                 </div>
                             ) : dataList?.length > 0 ? (
                                 <>
-                                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-2 sm:px-4">
+                                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-2 sm:px-4">
                                         {dataList.map((product) => (
                                             <div key={product.id} className="w-full h-full flex flex-col">
                                                 <ProductCardOne product={product} />

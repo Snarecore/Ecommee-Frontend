@@ -4,7 +4,7 @@ import { Role } from "@/enum/role.enum";
 
 export default function SuccessPage() {
   return (
-    <RoleProtectedRoute allowedRoles={[Role.CUSTOMER]}>
+    <RoleProtectedRoute allowedRoles={[Role.CUSTOMER, Role.ADMIN]}>
       <Success />
     </RoleProtectedRoute>
   );

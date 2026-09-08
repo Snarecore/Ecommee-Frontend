@@ -4,19 +4,19 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSetAtom } from "jotai";
+import { useSetAtom, useAtomValue } from "jotai";
 import { FcGoogle } from "react-icons/fc";
 import { LuMail, LuLock, LuShieldCheck, LuArrowRight } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 
 import companyLogo from "../../../assets/logo.svg";
-import { userAtom, User } from "../../../store/user-store";
+import { userAtom, authStatusAtom, User } from "../../../store/user-store";
 import { setCookie } from "../../../utils/cookie-utils";
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json";
 import { loginQueryKey } from "../../../config/query-key";
 import { showErrorToast, showSuccessToast } from "../../../utils/toast-utils";
-import { loginWithGoogle } from "../../../services/firebase-auth.service";
+import { loginWithGoogle, logoutFirebaseUser } from "../../../services/firebase-auth.service";
 
 const initialFieldValues = {
     email: "",
@@ -43,6 +43,35 @@ const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const user = useAtomValue(userAtom);
+    const authStatus = useAtomValue(authStatusAtom);
+
+    // Auto-clean cache and cookies when ?reset=true is in URL
+    useEffect(() => {
+        if (searchParams?.get("reset") === "true") {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                if (typeof document !== 'undefined') {
+                    document.cookie.split(';').forEach((c) => {
+                        document.cookie = c
+                            .replace(/^ +/, '')
+                            .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+                    });
+                }
+                logoutFirebaseUser().catch(() => null);
+                setUser(null);
+            } catch {}
+            router.replace("/login");
+        }
+    }, [searchParams, router, setUser]);
+
+    useEffect(() => {
+        if (searchParams?.get("reset") !== "true" && authStatus === "authenticated" && user && (user.token || user.id)) {
+            router.push(targetFrom === "/login" ? "/" : targetFrom);
+        }
+    }, [authStatus, user, router, targetFrom, searchParams]);
 
     // Load remembered email from localStorage
     useEffect(() => {
@@ -116,11 +145,13 @@ const Login = () => {
                 const resData: any = result.data;
                 const unpackedUser = resData?.data?.user || resData?.data?.data?.user || resData?.user || resData?.data;
                 const token = resData?.data?.accessToken || resData?.accessToken || resData?.data?.token || resData?.token;
+                const refreshToken = resData?.data?.refreshToken || resData?.refreshToken;
 
                 if (unpackedUser && typeof unpackedUser === 'object') {
                     const fullUserData: User = {
                         ...unpackedUser,
-                        token: token || unpackedUser.token
+                        token: token || unpackedUser.token,
+                        refreshToken: refreshToken || unpackedUser.refreshToken
                     };
                     setCookie("user", JSON.stringify(fullUserData), 7);
                     if (typeof window !== "undefined") {
@@ -346,7 +377,7 @@ const Login = () => {
                 </form>
 
                 {/* Account Switcher */}
-                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700/80 text-center">
+                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700/80 text-center space-y-2">
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         Don't have an account?{" "}
                         <Link
@@ -354,6 +385,15 @@ const Login = () => {
                             className="font-bold text-[var(--color-green-primary)] dark:text-emerald-400 hover:underline transition-colors"
                         >
                             Sign Up
+                        </Link>
+                    </p>
+                    <p className="text-[11px] text-gray-400">
+                        Need a clean session?{" "}
+                        <Link
+                            href="/login?reset=true"
+                            className="text-gray-500 hover:text-emerald-600 underline"
+                        >
+                            Clear Cache & Reset
                         </Link>
                     </p>
                 </div>

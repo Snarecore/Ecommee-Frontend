@@ -103,12 +103,12 @@ const OrderTab = () => {
     window.addEventListener("orders_updated", handleUpdate);
     window.addEventListener("notifications_updated", handleUpdate);
 
-    // ⚡ Fast 5s polling for Customer Order History tab matching Admin polling
+    // ⚡ 10s polling for Customer Order History tab matching Admin polling
     const pollInterval = setInterval(() => {
       if (document.visibilityState === "visible") {
         fetchData();
       }
-    }, 5000);
+    }, 10000);
 
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
@@ -144,6 +144,21 @@ const OrderTab = () => {
           }
         ];
 
+    let parsedShippingAddress = apiOrd.shippingAddress;
+    if (typeof parsedShippingAddress === "string") {
+      try {
+        parsedShippingAddress = JSON.parse(parsedShippingAddress);
+      } catch {}
+    }
+    if (!parsedShippingAddress || typeof parsedShippingAddress !== "object") {
+      parsedShippingAddress = {
+        name: apiOrd.user?.name || "Customer",
+        phone: apiOrd.user?.phone || "N/A",
+        address: "Delivery address",
+        city: "Dhaka"
+      };
+    }
+
     return {
       id: apiOrd.id,
       orderId: apiOrd.orderId ? `#${apiOrd.orderId}` : `ORD-${apiOrd.id?.slice(0, 6)}`,
@@ -153,16 +168,11 @@ const OrderTab = () => {
       status: currentStatus,
       paymentStatus: apiOrd.paymentStatus || "Pending",
       paymentMethod: apiOrd.paymentMethod || "COD",
-      subtotal: Number(apiOrd.totalAmount) || 0,
+      subtotal: Number(apiOrd.subtotal || apiOrd.totalAmount) || 0,
       deliveryCharge: apiOrd.deliveryCharge || 60,
-      totalAmount: Number(apiOrd.totalAmount) || 0,
+      totalAmount: Number(apiOrd.totalAmount || apiOrd.subtotal) || 0,
       deliveryZone: apiOrd.deliveryZone || "inside_dhaka",
-      shippingAddress: apiOrd.shippingAddress || {
-        name: apiOrd.user?.name || "Customer",
-        phone: apiOrd.user?.phone || "N/A",
-        address: "Delivery address",
-        city: "Dhaka"
-      },
+      shippingAddress: parsedShippingAddress,
       items: (apiOrd.orderSummaries || apiOrd.items || []).map((s: any) => ({
         id: s.id || Math.random().toString(),
         productName: s.productName || "Product",

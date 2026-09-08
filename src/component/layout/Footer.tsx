@@ -30,7 +30,6 @@ const defaultPolicyLinks = [
     { value: "Refund & Return Policy", link: "/refund-return-policy" },
     { value: "Shipping & Delivery Policy", link: "/shipping-delivery-policy" },
     { value: "Terms & Conditions", link: "/terms-conditions" },
-    { value: "Vendor Agreement", link: "/vendor-agreement" },
     { value: "About Us", link: "/about-us" },
     { value: "FAQs", link: "/faqs" },
 ];

@@ -29,7 +29,7 @@ const ChatTable = ({ dataList, fetchData, pageCount,
     currentPageNumber,
     handlePagination, isLoading, isFetching }: InboxTableProps) => {
     const { handleDeleteAPI } = useAPI();
-    const apiUrl = apiConfig.vendor.vendorMessageUrl;
+    const apiUrl = apiConfig?.people?.adminMessageUrl || apiConfig?.vendor?.vendorMessageUrl || "message";
 
     const tableHeaders = [
         { key: "sl", label: "Sl" },

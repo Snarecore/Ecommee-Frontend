@@ -12,7 +12,6 @@ export type MinimalProduct = {
       metaDescription?: string;
       metaKeywords?: string;
     };
-    vendor?: { profile?: { shopName?: string } };
   
     mainCategoryName?: string;
     firstCategoryName?: string;
@@ -62,7 +61,7 @@ export type MinimalProduct = {
       sku: p.sku || `PROD-${p.id}`,
       brand: {
         "@type": "Brand",
-        name: p?.vendor?.profile?.shopName || "Fashion Time",
+        name: "Fashion Time",
       },
       category: buildCategoryString(p),
       image: images,

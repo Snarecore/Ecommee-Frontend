@@ -6,7 +6,7 @@ import { Role } from "@/enum/role.enum";
 
 export default function CustomerDashboardPage() {
   return (
-    <RoleProtectedRoute allowedRoles={[Role.CUSTOMER]}>
+    <RoleProtectedRoute allowedRoles={[Role.CUSTOMER, Role.ADMIN]}>
       <UserProfile />
     </RoleProtectedRoute>
   );

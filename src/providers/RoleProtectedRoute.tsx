@@ -40,7 +40,7 @@ const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps)
 
     const isAllowed = allowedRoles.some(
         r => r.toLowerCase() === userRole || 
-             (r.toLowerCase() === 'customer' && (userRole === 'customer' || userRole === 'user'))
+             (r.toLowerCase() === 'customer' && (userRole === 'customer' || userRole === 'user' || userRole === 'admin'))
     );
 
     useEffect(() => {

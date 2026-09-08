@@ -92,7 +92,7 @@ export const getUserToken = (): string => {
         const stored = getCookie("user") || sessionStorage.getItem("user") || localStorage.getItem("user");
         if (stored) {
             const user = typeof stored === 'string' ? JSON.parse(stored) : stored;
-            return user?.token || '';
+            return user?.token || user?.accessToken || user?.data?.accessToken || user?.data?.token || '';
         }
     } catch {}
     return '';

@@ -20,42 +20,20 @@
         "blogUrl": "site/blog",
         "notificationsUrl": "site/notifications"
     },
-    "vendor": {
-        "productUrl": "product",
-        "productListUrl": "product/vendor-products",
-        "mainCategoryUrl": "site/main-category",
-        "firstCategoryUrl": "site/first-categories",
-        "secondCategoryUrl": "site/second-categories",
-        "thirdCategoryUrl": "site/third-categories",
-        "productUniqueCodeUrl": "unique-code/product",
-        "orderListUrl": "orders/vendor-order",
-        "updateOrderStatusUrl": "orders/status",
-        "updateCourierInfoUrl": "orders/courier",
-        "contactMessageUrl": "contact-us-message",
-        "vendorMessageUrl": "vendor-message",
-        "vendorProductReviewUrl": "product-review/update-approval-status"
-    },
     "auth": {
         "registrationUrl": "auth/register",
-        "vendorRegistrationUrl": "auth/vendor-register",
         "loginUrl": "auth/login",
         "forgetPasswordUrl": "auth/forgot-password",
         "resetPasswordUrl": "auth/reset-password"
     },
     "dashboard": {
-        "adminDashboardUrl": "site/admin-dashboard",
-        "vendorDashboardUrl": "site/vendor-dashboard",
-        "vendorSalesDashboardUrl": "vendor/sales-dashboard"
+        "adminDashboardUrl": "site/admin-dashboard"
     },
     "people": {
         "user": "user/customer",
-        "vendor": "user/vendor",
         "customerProfile": "user/customer-profile",
-        "vendorProfile": "user/vendor-profile",
         "customerPasswordUpdate": "user/customer-password",
-        "vendorPasswordUpdate": "user/vendor-password",
-        "adminMessageUrl": "message",
-        "adminListUrl": "site/admin"
+        "adminMessageUrl": "message"
     },
     "customer": {
         "orderListUrl": "orders/customer-order",
@@ -70,5 +48,8 @@
         "threadUrl": "message/thread",
         "conversationUrl": "message/conversations",
         "converstionThreadUrl": "message/thread"
+    },
+    "vendor": {
+        "vendorMessageUrl": "message/send"
     }
 }

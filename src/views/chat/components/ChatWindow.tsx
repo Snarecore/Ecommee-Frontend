@@ -8,7 +8,6 @@ import { useAtomValue } from "jotai";
 import { userAtom } from "@/store/user-store";
 import avatar from "@/assets/avatar.png";
 import { formatDate } from "@/utils/date-utils";
-import { vendorMessageQueryKey } from "@/config/query-key";
 
 const initialFieldValues = {
     content: "",
@@ -106,7 +105,7 @@ const ChatWindow = ({ selectedUser }: { selectedUser: SelectedUser }) => {
                 mutation,
                 url,
                 body: payload,
-                invalidateQueryKey: [vendorMessageQueryKey],
+                invalidateQueryKey: ["conversations", "messages"],
                 showSuccessMessage: true,
                 showErrorMessage: true,
                 requiredFields

@@ -25,12 +25,6 @@ export interface Product {
     totalStock?: number;
     sizesString?: string;
     sizeStock?: Record<string, number>;
-    vendor?: {
-        profile?: {
-            shopName?: string;
-            shopImage?: string;
-        };
-    };
     productReview?: {
         reviewCount: number;
         ratingAverage: number;
