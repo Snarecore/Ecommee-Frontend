@@ -52,19 +52,8 @@ export const fetchNotificationsApi = async (userId?: string): Promise<{
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
-  let isGoogleSession = false;
-  if (typeof window !== "undefined") {
-    try {
-      const raw = sessionStorage.getItem("user") || localStorage.getItem("user");
-      if (raw) {
-        const u = JSON.parse(raw);
-        if (u.provider === "google" || u.firebaseUid) isGoogleSession = true;
-      }
-    } catch {}
-  }
-
-  // Only invoke backend notifications endpoint for local_jwt sessions (or if backend is configured to handle Google tokens)
-  if (notifUrl && token && !isGoogleSession) {
+  // Invoke backend notifications endpoint for authenticated sessions
+  if (notifUrl && token) {
     try {
       const res: any = await getData({ url: notifUrl, token });
       if (res && !res.error) {
