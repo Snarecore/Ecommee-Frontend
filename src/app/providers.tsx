@@ -6,6 +6,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AppInitializer from "../providers/AppInitializer";
 import { Provider as JotaiProvider } from "jotai";
 
+import { SocketProvider } from "../providers/SocketProvider";
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -25,9 +27,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <JotaiProvider>
       <QueryClientProvider client={queryClient}>
         <AppInitializer />
-        <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[#F6F6F6] text-primary font-semibold">Loading...</div>}>
-          {children}
-        </React.Suspense>
+        <SocketProvider>
+          <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[#F6F6F6] text-primary font-semibold">Loading...</div>}>
+            {children}
+          </React.Suspense>
+        </SocketProvider>
         {process.env.NODE_ENV === 'development' && (
           <ReactQueryDevtools
             initialIsOpen={false}

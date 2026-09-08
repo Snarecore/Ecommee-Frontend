@@ -8,9 +8,12 @@ import { useAtomValue } from "jotai";
 import PageHeader from "@/component/card/PageHeader";
 import { LuSend } from "react-icons/lu";
 import { formatDate } from "@/utils/date-utils";
+import { useSocket } from "@/hooks/useSocket";
+import { SocketEvent, MessageCreatedPayload } from "@/types/socket.types";
 
 interface ChatMessage {
     id: string;
+    conversationId?: string;
     senderId: string;
     senderRole: string;
     content: string;
@@ -24,7 +27,9 @@ const Chat = () => {
     const [inputContent, setInputContent] = useState("");
     const [isSending, setIsSending] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [conversationId, setConversationId] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const { socket, joinConversation, leaveConversation } = useSocket();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,6 +38,11 @@ const Chat = () => {
     const loadConversation = async () => {
         try {
             const res = await fetchData({ apiUrl: apiConfig.messageLinks.myConversationUrl });
+            const convo = res?.data?.conversation || res?.conversation;
+            if (convo?.id) {
+                setConversationId(convo.id);
+                joinConversation(convo.id);
+            }
             if (res && res.messages) {
                 setMessages(res.messages);
             }
@@ -46,13 +56,32 @@ const Chat = () => {
     useEffect(() => {
         loadConversation();
 
-        // Auto poll for new replies every 4 seconds
-        const interval = setInterval(() => {
-            loadConversation();
-        }, 4000);
-
-        return () => clearInterval(interval);
+        return () => {
+            if (conversationId) {
+                leaveConversation(conversationId);
+            }
+        };
     }, []);
+
+    // Listen to real-time incoming messages
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessageCreated = (newMsg: MessageCreatedPayload) => {
+            if (!newMsg?.id) return;
+            setMessages((prev) => {
+                if (prev.some((m) => m.id === newMsg.id)) return prev;
+                return [...prev, newMsg as ChatMessage];
+            });
+            setTimeout(scrollToBottom, 50);
+        };
+
+        socket.on(SocketEvent.MESSAGE_CREATED, handleMessageCreated);
+
+        return () => {
+            socket.off(SocketEvent.MESSAGE_CREATED, handleMessageCreated);
+        };
+    }, [socket]);
 
     useEffect(() => {
         scrollToBottom();
@@ -72,8 +101,15 @@ const Chat = () => {
                 body: { content: textToSend }
             });
 
-            if (res) {
-                await loadConversation();
+            const response: any = res;
+            if (response && (response.data || response.id)) {
+                const newMsg = response.data || response;
+                if (newMsg?.id) {
+                    setMessages((prev) => {
+                        if (prev.some((m) => m.id === newMsg.id)) return prev;
+                        return [...prev, newMsg];
+                    });
+                }
             }
         } catch (error) {
             // console.error("Error sending message:", error);

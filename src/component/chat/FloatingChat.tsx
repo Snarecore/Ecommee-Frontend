@@ -21,6 +21,8 @@ import {
 } from 'react-icons/io5';
 import { RiCustomerService2Fill } from 'react-icons/ri';
 import { IoMdClose } from 'react-icons/io';
+import { useSocket } from '@/hooks/useSocket';
+import { SocketEvent, MessageCreatedPayload } from '@/types/socket.types';
 
 interface Message {
     id: string;
@@ -105,8 +107,14 @@ const FloatingChat = () => {
     const [content, setContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    const [isAdminTyping, setIsAdminTyping] = useState(false);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const { socket, joinConversation, leaveConversation, sendTypingStart, sendTypingStop } = useSocket();
 
     const [guestUser, setGuestUser] = useState<{ id: string; name: string; sessionId?: string } | null>(null);
     const [isGuestLoading, setIsGuestLoading] = useState(false);
@@ -169,6 +177,11 @@ const FloatingChat = () => {
             });
             if (!response.ok) return;
             const data = await response.json();
+            const convo = data?.data?.conversation || data?.conversation;
+            if (convo?.id) {
+                setConversationId(convo.id);
+                joinConversation(convo.id);
+            }
             const fetchedMessages = data?.data?.messages || data?.messages || [];
             if (Array.isArray(fetchedMessages)) {
                 setMessages(fetchedMessages);
@@ -181,12 +194,76 @@ const FloatingChat = () => {
         }
     };
 
+    // Initial load on open (Zero polling - replaced by Socket.io)
     useEffect(() => {
         if (!isOpen || !isLoggedIn) return;
         fetchMyConversation(true);
-        const interval = setInterval(() => fetchMyConversation(false), 3000);
-        return () => clearInterval(interval);
     }, [isOpen, isLoggedIn]);
+
+    // WebSocket real-time event listeners with deduplication
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessageCreated = (newMsg: MessageCreatedPayload) => {
+            if (!newMsg?.id) return;
+            setMessages(prev => {
+                // Idempotent deduplication check
+                if (prev.some(m => m.id === newMsg.id)) return prev;
+                const filtered = prev.filter(m => !m.id.startsWith('temp-') || m.content !== newMsg.content);
+                return [...filtered, newMsg as Message];
+            });
+            setTimeout(scrollToBottom, 50);
+        };
+
+        const handleTypingStarted = (payload: any) => {
+            if (payload?.userRole === 'admin') {
+                setIsAdminTyping(true);
+            }
+        };
+
+        const handleTypingStopped = (payload: any) => {
+            if (payload?.userRole === 'admin') {
+                setIsAdminTyping(false);
+            }
+        };
+
+        socket.on(SocketEvent.MESSAGE_CREATED, handleMessageCreated);
+        socket.on(SocketEvent.TYPING_STARTED, handleTypingStarted);
+        socket.on(SocketEvent.TYPING_STOPPED, handleTypingStopped);
+
+        return () => {
+            socket.off(SocketEvent.MESSAGE_CREATED, handleMessageCreated);
+            socket.off(SocketEvent.TYPING_STARTED, handleTypingStarted);
+            socket.off(SocketEvent.TYPING_STOPPED, handleTypingStopped);
+        };
+    }, [socket]);
+
+    // Typing lifecycle management
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setContent(e.target.value);
+        if (conversationId) {
+            sendTypingStart(conversationId);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => {
+                sendTypingStop(conversationId);
+            }, 2000);
+        }
+    };
+
+    const handleInputBlur = () => {
+        if (conversationId) {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            sendTypingStop(conversationId);
+        }
+    };
+
+    // Cleanup typing on unmount
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            if (conversationId) sendTypingStop(conversationId);
+        };
+    }, [conversationId]);
 
     // Upload image to backend, returns CDN URL
     const uploadImage = async (file: File): Promise<string | null> => {

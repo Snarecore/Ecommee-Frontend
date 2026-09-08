@@ -29,6 +29,8 @@ import CommentsSection from "./component/CommentsSection";
 import SimilarProducts from "./component/SimilarProducts";
 import { finalPrice, formatImageUrl } from "../../utils/product-utils";
 import { getProductSizes, isSizeOutOfStock, isProductOutOfStock, getSizeStockQuantity } from "../../utils/stock-utils";
+import { useSocket } from "../../hooks/useSocket";
+import { SocketEvent, StockUpdatedPayload } from "../../types/socket.types";
 
 const initialFieldValues = {
     name: "",
@@ -105,6 +107,40 @@ const Product = ({ initialData }: ProductProps) => {
 
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const { socket, joinProduct, leaveProduct } = useSocket();
+
+    // Join product real-time room for live stock updates
+    useEffect(() => {
+        if (!product?.id) return;
+        joinProduct(product.id);
+
+        return () => {
+            leaveProduct(product.id);
+        };
+    }, [product?.id]);
+
+    // Listen to real-time stock changes
+    useEffect(() => {
+        if (!socket || !product?.id) return;
+
+        const handleStockUpdated = (payload: StockUpdatedPayload) => {
+            if (payload.productId !== product.id) return;
+            setProduct((prev) => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    quantity: payload.totalQuantity,
+                    sizeStock: payload.sizeStock || prev.sizeStock
+                };
+            });
+        };
+
+        socket.on(SocketEvent.STOCK_UPDATED, handleStockUpdated);
+
+        return () => {
+            socket.off(SocketEvent.STOCK_UPDATED, handleStockUpdated);
+        };
+    }, [socket, product?.id]);
 
     useEffect(() => {
         const isValidProduct = (data: any): data is ProductItem => {

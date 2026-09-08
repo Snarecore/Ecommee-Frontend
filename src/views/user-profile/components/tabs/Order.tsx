@@ -61,12 +61,16 @@ const TIMELINE_STEPS: CustomerTimelineStep[] = [
   }
 ];
 
+import { useSocket } from "../../../../hooks/useSocket";
+import { SocketEvent, OrderStatusUpdatedPayload } from "../../../../types/socket.types";
+
 const OrderTab = () => {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [localOrders, setLocalOrders] = useState<StoredOrderType[]>([]);
   const dataLimit = 5;
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const { usePaginatedQuery } = useAPI();
+  const { socket } = useSocket();
 
   const getOrderListApiUrl = () => {
     return `${apiConfig.customer.orderListUrl}?page=${currentPageNumber}&limit=${dataLimit}`;
@@ -103,13 +107,6 @@ const OrderTab = () => {
     window.addEventListener("orders_updated", handleUpdate);
     window.addEventListener("notifications_updated", handleUpdate);
 
-    // ⚡ 10s polling for Customer Order History tab matching Admin polling
-    const pollInterval = setInterval(() => {
-      if (document.visibilityState === "visible") {
-        fetchData();
-      }
-    }, 10000);
-
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
       channel = new BroadcastChannel("fashion_time_notifications");
@@ -124,12 +121,47 @@ const OrderTab = () => {
     }
 
     return () => {
-      clearInterval(pollInterval);
       window.removeEventListener("orders_updated", handleUpdate);
       window.removeEventListener("notifications_updated", handleUpdate);
       if (channel) channel.close();
     };
   }, [fetchData]);
+
+  // Real-time order status tracking via Socket.IO
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleOrderStatusUpdated = (payload: OrderStatusUpdatedPayload) => {
+      if (!payload?.orderId) return;
+      fetchData();
+      loadStoredOrders();
+
+      setSelectedOrder((current: any) => {
+        if (current && (current.id === payload.orderId || current.rawOrderId === payload.orderId)) {
+          const updatedHistory = Array.isArray(current.statusHistory) ? [...current.statusHistory] : [];
+          updatedHistory.push({
+            status: payload.status,
+            timestamp: payload.changedAt || new Date().toISOString(),
+            updatedBy: "admin",
+            note: payload.note || ""
+          });
+          return {
+            ...current,
+            status: payload.status,
+            orderStatus: payload.status,
+            statusHistory: updatedHistory
+          };
+        }
+        return current;
+      });
+    };
+
+    socket.on(SocketEvent.ORDER_STATUS_UPDATED, handleOrderStatusUpdated);
+
+    return () => {
+      socket.off(SocketEvent.ORDER_STATUS_UPDATED, handleOrderStatusUpdated);
+    };
+  }, [socket, fetchData]);
 
   // Process API orders list from Backend first with top priority
   const apiOrdersMapped = (dataList || []).map((apiOrd: any) => {

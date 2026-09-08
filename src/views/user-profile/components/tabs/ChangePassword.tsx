@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Role } from "../../../../enum/role.enum";
 import { useAPI } from "../../../../hooks/useApi";
+import apiConfig from "../../../../config/api.json";
 import { customerPasswordUpdateQueryKey } from "../../../../config/query-key";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
