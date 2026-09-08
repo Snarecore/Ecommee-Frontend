@@ -2,25 +2,92 @@ import { Product } from "../interface/product.interface";
 
 export const DEFAULT_SIZES = ["S", "M", "L", "XL", "XXL"];
 
+const SIZE_ORDER_MAP: Record<string, number> = {
+    "3XS": 1,
+    "XXS": 2,
+    "2XS": 2,
+    "XS": 3,
+    "S": 4,
+    "SMALL": 4,
+    "M": 5,
+    "MEDIUM": 5,
+    "L": 6,
+    "LARGE": 6,
+    "XL": 7,
+    "EXTRA LARGE": 7,
+    "XXL": 8,
+    "2XL": 8,
+    "XXXL": 9,
+    "3XL": 9,
+    "4XL": 10,
+    "5XL": 11,
+    "6XL": 12,
+    "7XL": 13,
+    "FREE SIZE": 99,
+    "ONE SIZE": 99
+};
+
 /**
- * Returns the configured sizes for a product.
+ * Sorts array of size strings serially and caps sizes up to 3XL / XXXL maximum.
+ */
+export function sortSizesSerially(sizes: string[]): string[] {
+    if (!Array.isArray(sizes) || sizes.length === 0) return [];
+
+    const filtered = sizes.filter((s) => {
+        const clean = String(s).trim().toUpperCase();
+        const order = SIZE_ORDER_MAP[clean];
+        // Filter out sizes strictly greater than 3XL / XXXL (order > 9), excluding 99 (Free/One size)
+        if (order !== undefined && order > 9 && order !== 99) {
+            return false;
+        }
+        return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+        const cleanA = String(a).trim().toUpperCase();
+        const cleanB = String(b).trim().toUpperCase();
+
+        const orderA = SIZE_ORDER_MAP[cleanA];
+        const orderB = SIZE_ORDER_MAP[cleanB];
+
+        if (orderA !== undefined && orderB !== undefined) {
+            return orderA - orderB;
+        }
+        if (orderA !== undefined) return -1;
+        if (orderB !== undefined) return 1;
+
+        const numA = parseFloat(cleanA);
+        const numB = parseFloat(cleanB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+        }
+
+        return cleanA.localeCompare(cleanB);
+    });
+}
+
+/**
+ * Returns the configured sizes for a product sorted in serial order.
  */
 export function getProductSizes(product?: Product | null): string[] {
-    if (!product) return DEFAULT_SIZES;
+    if (!product) return sortSizesSerially(DEFAULT_SIZES);
     const p = product as any;
+
+    let sizesList: string[] = [];
 
     if (Array.isArray(p.sizes) && p.sizes.length > 0) {
         if (typeof p.sizes[0] === "string") {
-            return p.sizes;
+            sizesList = p.sizes;
+        } else if (typeof p.sizes[0] === "object" && p.sizes[0] !== null) {
+            sizesList = p.sizes.map((s: any) => s.size || s.name || s.label).filter(Boolean);
         }
-        if (typeof p.sizes[0] === "object" && p.sizes[0] !== null) {
-            return p.sizes.map((s: any) => s.size || s.name || s.label).filter(Boolean);
-        }
+    } else if (typeof p.sizesString === "string" && p.sizesString.trim()) {
+        sizesList = p.sizesString.split(",").map((s: string) => s.trim()).filter(Boolean);
+    } else {
+        sizesList = DEFAULT_SIZES;
     }
-    if (typeof p.sizesString === "string" && p.sizesString.trim()) {
-        return p.sizesString.split(",").map((s: string) => s.trim()).filter(Boolean);
-    }
-    return DEFAULT_SIZES;
+
+    return sortSizesSerially(sizesList);
 }
 
 /**

@@ -31,15 +31,12 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadOrder = async () => {
+    let isMounted = true;
+    let timerId: NodeJS.Timeout | null = null;
+
+    const fetchOrderFromApi = async () => {
       if (!orderId) {
-        setLoading(false);
-        return;
-      }
-      const found = getOrderByIdFromService(orderId);
-      if (found) {
-        setOrder(found);
-        setLoading(false);
+        if (isMounted) setLoading(false);
         return;
       }
       try {
@@ -47,15 +44,51 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
         const res: any = await getData({ url: `orders/${orderId}`, token });
         const apiOrder = res?.data || res;
         if (apiOrder && !apiOrder.error && (apiOrder.id || apiOrder.orderId)) {
-          setOrder(apiOrder);
+          if (isMounted) {
+            setOrder(apiOrder);
+            setLoading(false);
+          }
+          return;
         }
       } catch (err) {
-        // console.error("Failed to load order from API:", err);
-      } finally {
-        setLoading(false);
+        // Fallback to local storage if API is offline
       }
+
+      const found = getOrderByIdFromService(orderId);
+      if (found && isMounted) {
+        setOrder(found);
+      }
+      if (isMounted) setLoading(false);
     };
-    loadOrder();
+
+    fetchOrderFromApi();
+
+    // ⚡ Real-time 4s polling matching Admin polling speed
+    timerId = setInterval(() => {
+      fetchOrderFromApi();
+    }, 4000);
+
+    // ⚡ Cross-Tab / Cross-App BroadcastChannel Listener
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      try {
+        channel = new BroadcastChannel("fashion_time_notifications");
+        channel.onmessage = (event) => {
+          if (
+            event.data?.type === "ORDER_STATUS_CHANGED" ||
+            event.data?.type === "SYNC_NOTIFICATIONS"
+          ) {
+            fetchOrderFromApi();
+          }
+        };
+      } catch {}
+    }
+
+    return () => {
+      isMounted = false;
+      if (timerId) clearInterval(timerId);
+      if (channel) channel.close();
+    };
   }, [orderId]);
 
   if (loading) {

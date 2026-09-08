@@ -103,6 +103,13 @@ const OrderTab = () => {
     window.addEventListener("orders_updated", handleUpdate);
     window.addEventListener("notifications_updated", handleUpdate);
 
+    // ⚡ Fast 5s polling for Customer Order History tab matching Admin polling
+    const pollInterval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchData();
+      }
+    }, 5000);
+
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
       channel = new BroadcastChannel("fashion_time_notifications");
@@ -117,6 +124,7 @@ const OrderTab = () => {
     }
 
     return () => {
+      clearInterval(pollInterval);
       window.removeEventListener("orders_updated", handleUpdate);
       window.removeEventListener("notifications_updated", handleUpdate);
       if (channel) channel.close();
