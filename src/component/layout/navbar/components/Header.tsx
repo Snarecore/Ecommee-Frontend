@@ -57,7 +57,7 @@ const Header = () => {
                                 className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
                             >
                                 <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
-                                <span>Sign In / Register</span>
+                                <span>Login</span>
                             </Link>
                         )}
 

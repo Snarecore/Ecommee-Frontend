@@ -133,23 +133,7 @@ export default function CommentsSection({
     });
   
     if (result?.success) {
-      const createdComment: Comment = {
-        id: result.data?.id ?? Math.random().toString(), // fallback id
-        body,
-        createdAt: new Date().toISOString(),
-        user: user,
-        replies: [],
-      };
-  
       if (parentId) {
-        // add reply locally
-        setComments(prev =>
-          prev.map(c =>
-            c.id === parentId
-              ? { ...c, replies: [...(c.replies ?? []), createdComment] }
-              : c
-          )
-        );
         setReplyTextById(prev => {
           const next = { ...prev };
           delete next[parentId];
@@ -157,8 +141,6 @@ export default function CommentsSection({
         });
         setReplyingToId(null);
       } else {
-        // add top-level comment at the top
-        setComments(prev => [createdComment, ...prev]);
         setNewComment("");
       }
     }

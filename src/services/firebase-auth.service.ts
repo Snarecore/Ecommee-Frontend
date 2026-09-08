@@ -152,8 +152,15 @@ export const loginWithGoogle = async (): Promise<FirebaseAuthResult> => {
     // 4. Sync with Backend / Construct User Model
     const fullUserData = await syncUserWithBackend(firebaseUser, idToken);
 
-    // 5. Store Cookie Session (7 days expiry)
+    // 5. Store Cookie Session (7 days expiry) & Local/Session Storage
     setCookie("user", JSON.stringify(fullUserData), 7);
+    if (typeof window !== "undefined") {
+      try {
+        const str = JSON.stringify(fullUserData);
+        localStorage.setItem("user", str);
+        sessionStorage.setItem("user", str);
+      } catch {}
+    }
 
     return {
       success: true,

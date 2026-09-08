@@ -15,12 +15,12 @@ const AppInitializer = () => {
 
         const fetchSession = async () => {
             setAuthStatus("loading");
+            let parsedUser: any = null;
 
             try {
                 const storedUser = getCookie("user");
                 const rawStored = storedUser || (typeof window !== "undefined" && (localStorage.getItem("user") || sessionStorage.getItem("user")));
                 
-                let parsedUser: any = null;
                 try {
                     if (rawStored) parsedUser = typeof rawStored === "string" ? JSON.parse(rawStored) : rawStored;
                 } catch {
@@ -77,13 +77,18 @@ const AppInitializer = () => {
                     const data = await res.json();
                     const userData = data?.data || data?.user;
                     if (userData) {
-                        const fullUserData = { role: "customer", ...userData, token: userData.token || currentToken };
+                        const fullUserData = {
+                            ...(parsedUser || {}),
+                            ...userData,
+                            role: userData.role || parsedUser?.role || "customer",
+                            token: userData.token || currentToken
+                        };
                         setCookie("user", JSON.stringify(fullUserData), 7);
                         if (typeof window !== "undefined") {
                             try {
                                 const str = JSON.stringify(fullUserData);
-                                if (localStorage.getItem("user")) localStorage.setItem("user", str);
-                                if (sessionStorage.getItem("user")) sessionStorage.setItem("user", str);
+                                localStorage.setItem("user", str);
+                                sessionStorage.setItem("user", str);
                             } catch {}
                         }
                         setUser(fullUserData as User);
@@ -96,10 +101,9 @@ const AppInitializer = () => {
                         setUser(null);
                         setAuthStatus("unauthenticated");
                     }
-                } else if (res.status === 401) {
-                    // Firebase/Google ID tokens are not recognized by standard backend JWT /me endpoint.
-                    // Preserve local Google/Social session if present instead of logging out!
-                    if (parsedUser && (parsedUser.provider === "google" || parsedUser.firebaseUid || parsedUser.photoURL)) {
+                } else {
+                    // Server status non-OK (401/404/500/offline): keep client session if valid parsedUser present!
+                    if (parsedUser && typeof parsedUser === "object" && (parsedUser.id || parsedUser._id || parsedUser.email)) {
                         setUser(parsedUser as User);
                         setAuthStatus("authenticated");
                     } else {
@@ -111,32 +115,20 @@ const AppInitializer = () => {
                         setUser(null);
                         setAuthStatus("unauthenticated");
                     }
-                } else {
-                    // Other server status (e.g. 404/500/offline): keep client session if present
-                    if (parsedUser) {
-                        setUser(parsedUser as User);
-                        setAuthStatus("authenticated");
-                    } else {
-                        deleteCookie("user");
-                        setUser(null);
-                        setAuthStatus("unauthenticated");
-                    }
                 }
             } catch {
                 if (isUnmounted) return;
-                const storedUser = getCookie("user");
-                if (storedUser) {
-                    try {
-                        const u = JSON.parse(storedUser);
-                        setUser(u);
-                        setAuthStatus("authenticated");
-                    } catch {
-                        deleteCookie("user");
-                        setUser(null);
-                        setAuthStatus("unauthenticated");
-                    }
+                if (parsedUser && typeof parsedUser === "object" && (parsedUser.id || parsedUser._id || parsedUser.email)) {
+                    setUser(parsedUser as User);
+                    setAuthStatus("authenticated");
                 } else {
                     deleteCookie("user");
+                    if (typeof window !== "undefined") {
+                        try {
+                            localStorage.removeItem("user");
+                            sessionStorage.removeItem("user");
+                        } catch {}
+                    }
                     setUser(null);
                     setAuthStatus("unauthenticated");
                 }

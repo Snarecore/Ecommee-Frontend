@@ -193,15 +193,10 @@ const NavBar = () => {
                                             />
                                         </>
                                     ) : (
-                                        <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
+                                        <Link href="/login" className="flex items-center gap-1.5 text-xs font-semibold text-white hover:underline">
                                             <FaRegUser className="text-sm" />
-                                            <div className="hidden sm:flex items-center gap-1">
-                                                <Link href="/login" className="hover:underline">Login</Link>
-                                                <span>/</span>
-                                                <Link href="/signup" className="hover:underline">Register</Link>
-                                            </div>
-                                            <span className="sm:hidden">Account</span>
-                                        </div>
+                                            <span>Login</span>
+                                        </Link>
                                     )}
                                 </div>
 

@@ -123,6 +123,13 @@ const Login = () => {
                         token: token || unpackedUser.token
                     };
                     setCookie("user", JSON.stringify(fullUserData), 7);
+                    if (typeof window !== "undefined") {
+                        try {
+                            const str = JSON.stringify(fullUserData);
+                            localStorage.setItem("user", str);
+                            sessionStorage.setItem("user", str);
+                        } catch {}
+                    }
                     setUser(fullUserData);
                     showSuccessToast("Welcome back! Signed in successfully.");
                     router.push(targetFrom);
@@ -152,6 +159,14 @@ const Login = () => {
             const result = await loginWithGoogle();
 
             if (result.success && result.user) {
+                setCookie("user", JSON.stringify(result.user), 7);
+                if (typeof window !== "undefined") {
+                    try {
+                        const str = JSON.stringify(result.user);
+                        localStorage.setItem("user", str);
+                        sessionStorage.setItem("user", str);
+                    } catch {}
+                }
                 setUser(result.user);
                 showSuccessToast(`Welcome back, ${result.user.name || "User"}! Signed in with Google.`);
                 router.push(targetFrom);
