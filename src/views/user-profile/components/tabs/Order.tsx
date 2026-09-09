@@ -26,6 +26,7 @@ import {
   Order as StoredOrderType,
   OrderStatus
 } from "../../../../utils/order-service";
+import { formatImageUrl } from "../../../../utils/product-utils";
 
 interface CustomerTimelineStep {
   key: OrderStatus;
@@ -132,12 +133,21 @@ const OrderTab = () => {
     if (!socket) return;
 
     const handleOrderStatusUpdated = (payload: OrderStatusUpdatedPayload) => {
-      if (!payload?.orderId) return;
+      const targetId = payload?.orderId || (payload as any)?.rawOrderId;
+      if (!targetId) return;
+
       fetchData();
       loadStoredOrders();
 
       setSelectedOrder((current: any) => {
-        if (current && (current.id === payload.orderId || current.rawOrderId === payload.orderId)) {
+        if (
+          current &&
+          (current.id === payload.orderId ||
+            current.rawOrderId === payload.orderId ||
+            (payload as any).rawOrderId === current.rawOrderId ||
+            (payload as any).rawOrderId === current.id ||
+            current.orderId?.toLowerCase()?.includes(String(targetId).toLowerCase()))
+        ) {
           const updatedHistory = Array.isArray(current.statusHistory) ? [...current.statusHistory] : [];
           updatedHistory.push({
             status: payload.status,
@@ -318,28 +328,56 @@ const OrderTab = () => {
                   className="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 space-y-4"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-3">
-                        <span className="font-extrabold text-lg text-[var(--color-green-primary)]">
-                          {order.orderId}
-                        </span>
-                        <span
-                          className={`px-3 py-0.5 text-xs font-bold rounded-full ${
-                            currentStatus === "Pending"
-                              ? "bg-amber-100 text-amber-800"
-                              : currentStatus === "Rejected" || isCancelled
-                              ? "bg-red-100 text-red-800"
-                              : isDelivered || currentStatus === "Order Placed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {currentStatus === "Pending" ? "Pending Approval" : currentStatus}
-                        </span>
+                    <div className="flex items-center gap-4 min-w-0">
+                      {/* Product Thumbnail on the Left */}
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gray-100 overflow-hidden border border-gray-200 shrink-0 relative flex items-center justify-center shadow-xs">
+                        {order.items && order.items[0]?.productImage ? (
+                          <img
+                            src={formatImageUrl(order.items[0].productImage)}
+                            alt={order.items[0].productName || "Order Item"}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xl">🛍️</span>
+                        )}
+                        {order.items && order.items.length > 1 && (
+                          <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full shadow">
+                            +{order.items.length - 1}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-xs text-gray-500">
-                        Placed on {formatPrettyDateWithTime(order.createdAt)}
-                      </p>
+
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                          <span className="font-extrabold text-base sm:text-lg text-[var(--color-green-primary)]">
+                            {order.orderId}
+                          </span>
+                          <span
+                            className={`px-3 py-0.5 text-xs font-bold rounded-full ${
+                              currentStatus === "Pending"
+                                ? "bg-amber-100 text-amber-800"
+                                : currentStatus === "Rejected" || isCancelled
+                                ? "bg-red-100 text-red-800"
+                                : isDelivered || currentStatus === "Order Placed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {currentStatus === "Pending" ? "Pending Approval" : currentStatus}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Placed on {formatPrettyDateWithTime(order.createdAt)}
+                        </p>
+                        {order.items && order.items[0]?.productName && (
+                          <p className="text-xs font-medium text-gray-700 truncate max-w-xs sm:max-w-md">
+                            {order.items[0].productName}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">

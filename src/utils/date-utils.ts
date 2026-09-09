@@ -96,12 +96,13 @@ export const getEndOf = (unit: string): string => {
   return formatDate(now);
 };
 
-/** Pretty date: "January 15, 2024" */
+/** Pretty date: "January 15, 2024" (BST Asia/Dhaka) */
 export const formatPrettyDate = (date: Date | string): string => {
   const d = toDate(date);
   if (!d) return "Date unavailable";
   try {
     return new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Dhaka",
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -111,14 +112,15 @@ export const formatPrettyDate = (date: Date | string): string => {
   }
 };
 
-/** Pretty date with time: "January 15, 2024 at 2:30 PM" */
+/** Pretty date with time: "January 15, 2024 at 2:30 PM" (BST Asia/Dhaka) */
 export const formatPrettyDateWithTime = (date: Date | string): string => {
   const d = toDate(date);
   if (!d) return "Date unavailable";
   try {
     return new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Dhaka",
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
