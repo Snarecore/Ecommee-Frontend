@@ -1,10 +1,12 @@
 import React from "react";
+import dynamic from "next/dynamic";
 import NavBar from "@/component/layout/navbar/index";
 import Footer from "@/component/layout/Footer";
 import { Toaster } from "react-hot-toast";
 import { InitialStateService } from "@/services/initial-state-service";
-import FloatingChat from "@/component/chat/FloatingChat";
-import PromotionPopupModal from "@/component/modals/PromotionPopupModal";
+
+const FloatingChat = dynamic(() => import("@/component/chat/FloatingChat"));
+const PromotionPopupModal = dynamic(() => import("@/component/modals/PromotionPopupModal"));
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
