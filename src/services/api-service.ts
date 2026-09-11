@@ -14,94 +14,44 @@ export type ApiErrorResponse = { error: boolean; status?: number; message: strin
 let isRefreshing = false;
 let refreshPromise: Promise<string | null> | null = null;
 
-async function refreshAccessToken(): Promise<string | null> {
+async function refreshAccessToken(): Promise<boolean> {
     if (isRefreshing && refreshPromise) {
-        return refreshPromise;
+        return refreshPromise.then(res => !!res);
     }
     isRefreshing = true;
-    refreshPromise = (async () => {
+    let resolveRefresh: (val: boolean) => void = () => {};
+    const currentPromise = new Promise<boolean>((resolve) => {
+        resolveRefresh = resolve;
+    });
+
+    (async () => {
         try {
             const baseUrl = getApiBaseUrl();
-            let storedToken = "";
-            let storedRefreshToken = "";
-            let storageType: "session" | "local" | null = null;
-            if (typeof window !== "undefined") {
-                const cookieStr = getCookie("user");
-                const sessionStr = sessionStorage.getItem("user");
-                const localStr = localStorage.getItem("user");
-                const activeStr = cookieStr || sessionStr || localStr;
-                if (activeStr) {
-                    try {
-                        const parsed = JSON.parse(activeStr);
-                        storedToken = parsed?.token || "";
-                        storedRefreshToken = parsed?.refreshToken || "";
-                    } catch {}
-                }
-            }
-
-            const tokenToUse = storedRefreshToken || storedToken;
-            const headers: Record<string, string> = { "Content-Type": "application/json" };
-            if (tokenToUse) {
-                headers["Authorization"] = `Bearer ${tokenToUse}`;
-            }
-
             const response = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/refresh-token`, {
                 method: "POST",
                 credentials: "include",
-                headers,
-                body: JSON.stringify({ refreshToken: tokenToUse })
+                headers: { "Content-Type": "application/json" }
             });
+
             if (response.ok) {
-                const resData = await response.json();
-                const newToken = resData?.accessToken || resData?.data?.accessToken || resData?.token || resData?.data?.token || resData?.data?.user?.token || resData?.user?.token;
-                const newRefreshToken = resData?.refreshToken || resData?.data?.refreshToken || resData?.data?.user?.refreshToken || resData?.user?.refreshToken;
-                if (newToken && typeof newToken === "string" && newToken !== "refreshed" && typeof window !== "undefined") {
-                    try {
-                        let userObj: any = {};
-                        const cookieUser = getCookie("user");
-                        const storageUser = sessionStorage.getItem("user") || localStorage.getItem("user");
-                        const raw = cookieUser || storageUser;
-                        if (raw) {
-                            try { userObj = JSON.parse(raw); } catch {}
-                        }
-                        userObj.token = newToken;
-                        if (newRefreshToken) userObj.refreshToken = newRefreshToken;
-                        setCookie("user", JSON.stringify(userObj), 7);
-                        if (sessionStorage.getItem("user")) sessionStorage.setItem("user", JSON.stringify(userObj));
-                        if (localStorage.getItem("user")) localStorage.setItem("user", JSON.stringify(userObj));
-                    } catch {}
-                    return newToken;
-                }
-                return null;
+                resolveRefresh(true);
+                return;
             }
 
-            // Organization Standard: If refresh-token fails (401/expired), remove dead token to prevent refresh loops
+            // If refresh fails on server, clear dead session
             if (typeof window !== "undefined") {
-                try {
-                    const sessionStr = sessionStorage.getItem("user");
-                    const localStr = localStorage.getItem("user");
-                    if (sessionStr) {
-                        const u = JSON.parse(sessionStr);
-                        delete u.token;
-                        sessionStorage.setItem("user", JSON.stringify(u));
-                    }
-                    if (localStr) {
-                        const u = JSON.parse(localStr);
-                        delete u.token;
-                        localStorage.setItem("user", JSON.stringify(u));
-                    }
-                } catch {}
                 window.dispatchEvent(new Event("auth_token_expired"));
             }
-            return null;
+            resolveRefresh(false);
         } catch {
-            return null;
+            resolveRefresh(false);
         } finally {
             isRefreshing = false;
             refreshPromise = null;
         }
     })();
-    return refreshPromise;
+
+    return currentPromise;
 }
 
 async function apiRequest<T>(
@@ -122,7 +72,6 @@ async function apiRequest<T>(
             cache: cacheStrategy,
             headers: { ...options.headers },
         } as RequestInit).catch((err) => {
-            // console.warn("API fetch error caught safely:", err?.message || err);
             return null;
         });
 
@@ -131,71 +80,10 @@ async function apiRequest<T>(
         }
 
         if (response.status === 401 && !isRetry && !url.includes("auth/login") && !url.includes("auth/refresh-token") && !url.includes("auth/firebase-login")) {
-            let isGoogleSession = false;
-            if (typeof window !== "undefined") {
-                try {
-                    const raw = sessionStorage.getItem("user") || localStorage.getItem("user") || getCookie("user");
-                    if (raw) {
-                        const u = typeof raw === "string" ? JSON.parse(raw) : raw;
-                        if (u.provider === "google" || u.firebaseUid) isGoogleSession = true;
-                    }
-                } catch {}
-            }
-
-            if (isGoogleSession && typeof window !== "undefined") {
-                try {
-                    const { getFirebaseAuth } = await import("../config/firebase");
-                    const fbInstance = getFirebaseAuth();
-                    if (fbInstance?.auth?.currentUser) {
-                        const idToken = await fbInstance.auth.currentUser.getIdToken(true);
-                        const baseUrl = getApiBaseUrl();
-                        const fbRes = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/firebase-login`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                idToken,
-                                email: fbInstance.auth.currentUser.email || "",
-                                name: fbInstance.auth.currentUser.displayName || "",
-                                firebaseUid: fbInstance.auth.currentUser.uid
-                            }),
-                            credentials: "include"
-                        });
-                        if (fbRes.ok) {
-                            const data = await fbRes.json();
-                            const newToken = data?.data?.accessToken || data?.accessToken;
-                            const newRefreshToken = data?.data?.refreshToken || data?.refreshToken;
-                            if (newToken) {
-                                const raw = sessionStorage.getItem("user") || localStorage.getItem("user") || getCookie("user");
-                                let userObj: any = {};
-                                if (raw) {
-                                    try { userObj = typeof raw === "string" ? JSON.parse(raw) : raw; } catch {}
-                                }
-                                userObj.token = newToken;
-                                if (newRefreshToken) userObj.refreshToken = newRefreshToken;
-                                setCookie("user", JSON.stringify(userObj), 7);
-                                if (sessionStorage.getItem("user")) sessionStorage.setItem("user", JSON.stringify(userObj));
-                                if (localStorage.getItem("user")) localStorage.setItem("user", JSON.stringify(userObj));
-
-                                const newHeaders = new Headers(options.headers || {});
-                                newHeaders.set("Authorization", `Bearer ${newToken}`);
-                                return apiRequest<T>(url, { ...options, headers: newHeaders }, true, cacheStrategy);
-                            }
-                        }
-                    }
-                } catch {}
-            }
-
-            const hasTokenOrSession = typeof window !== "undefined" && (
-                sessionStorage.getItem("user") || localStorage.getItem("user") || document.cookie.includes("user")
-            );
-
-            if (hasTokenOrSession) {
-                const newToken = await refreshAccessToken();
-                if (newToken) {
-                    const newHeaders = new Headers(options.headers || {});
-                    newHeaders.set("Authorization", `Bearer ${newToken}`);
-                    return apiRequest<T>(url, { ...options, headers: newHeaders }, true, cacheStrategy);
-                }
+            // Attempt automatic cookie-based token rotation
+            const refreshed = await refreshAccessToken();
+            if (refreshed) {
+                return apiRequest<T>(url, { ...options }, true, cacheStrategy);
             }
         }
 

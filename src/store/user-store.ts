@@ -47,10 +47,6 @@ export const logoutUserAtom = atom(null, (get, set, action?: any) => {
         try {
             localStorage.removeItem("user");
             sessionStorage.removeItem("user");
-            if (userId) {
-                localStorage.removeItem(`shipping_notifications_${userId}`);
-                localStorage.removeItem(`shipping_notifications_v1_${userId}`);
-            }
         } catch {}
     }
 

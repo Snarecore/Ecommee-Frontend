@@ -148,20 +148,15 @@ const Login = () => {
                 const refreshToken = resData?.data?.refreshToken || resData?.refreshToken;
 
                 if (unpackedUser && typeof unpackedUser === 'object') {
-                    const fullUserData: User = {
-                        ...unpackedUser,
-                        token: token || unpackedUser.token,
-                        refreshToken: refreshToken || unpackedUser.refreshToken
+                    const safeUserData: User = {
+                        id: unpackedUser.id || unpackedUser._id,
+                        name: unpackedUser.name,
+                        fullName: unpackedUser.fullName || unpackedUser.name,
+                        email: unpackedUser.email,
+                        role: unpackedUser.role || 'customer',
+                        photoURL: unpackedUser.photoURL || ''
                     };
-                    setCookie("user", JSON.stringify(fullUserData), 7);
-                    if (typeof window !== "undefined") {
-                        try {
-                            const str = JSON.stringify(fullUserData);
-                            localStorage.setItem("user", str);
-                            sessionStorage.setItem("user", str);
-                        } catch {}
-                    }
-                    setUser(fullUserData);
+                    setUser(safeUserData);
                     showSuccessToast("Welcome back! Signed in successfully.");
                     router.push(targetFrom);
                     return;
@@ -190,16 +185,16 @@ const Login = () => {
             const result = await loginWithGoogle();
 
             if (result.success && result.user) {
-                setCookie("user", JSON.stringify(result.user), 7);
-                if (typeof window !== "undefined") {
-                    try {
-                        const str = JSON.stringify(result.user);
-                        localStorage.setItem("user", str);
-                        sessionStorage.setItem("user", str);
-                    } catch {}
-                }
-                setUser(result.user);
-                showSuccessToast(`Welcome back, ${result.user.name || "User"}! Signed in with Google.`);
+                const safeUserData: User = {
+                    id: result.user.id || result.user._id,
+                    name: result.user.name,
+                    fullName: result.user.fullName || result.user.name,
+                    email: result.user.email,
+                    role: result.user.role || 'customer',
+                    photoURL: result.user.photoURL || ''
+                };
+                setUser(safeUserData);
+                showSuccessToast(`Welcome back, ${safeUserData.name || "User"}! Signed in with Google.`);
                 router.push(targetFrom);
             } else if (result.error) {
                 showErrorToast(result.error);

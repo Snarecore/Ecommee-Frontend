@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { userAtom, User, userLoadedAtom, authStatusAtom } from "../store/user-store";
-import { getCookie, setCookie, deleteCookie } from "../utils/cookie-utils";
+import { deleteCookie } from "../utils/cookie-utils";
 import { getFirebaseAuth } from "../config/firebase";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 
@@ -25,28 +25,22 @@ const syncFirebaseWithBackend = async (fbUser: FirebaseUser): Promise<User | nul
         if (res.ok) {
             const data = await res.json();
             const serverUser = data?.data?.user || data?.data;
-            const serverToken = data?.data?.accessToken || data?.accessToken;
-            const serverRefreshToken = data?.data?.refreshToken || data?.refreshToken;
 
             if (serverUser && typeof serverUser === "object") {
-                const fullUser: User = {
-                    role: "customer",
-                    ...serverUser,
+                const safeUser: User = {
+                    id: serverUser.id || serverUser._id || fbUser.uid,
+                    name: serverUser.name || fbUser.displayName || "User",
+                    fullName: serverUser.fullName || serverUser.name || fbUser.displayName || "User",
+                    email: serverUser.email || fbUser.email || "",
+                    role: serverUser.role || "customer",
                     photoURL: fbUser.photoURL || serverUser.photoURL || "",
-                    token: serverToken || idToken,
-                    refreshToken: serverRefreshToken,
                     provider: "google"
                 };
-                setCookie("user", JSON.stringify(fullUser), 7);
-                if (typeof window !== "undefined") {
-                    localStorage.setItem("user", JSON.stringify(fullUser));
-                    sessionStorage.setItem("user", JSON.stringify(fullUser));
-                }
-                return fullUser;
+                return safeUser;
             }
         }
-    } catch (e) {
-        // console.warn("Firebase token sync error:", e);
+    } catch {
+        // ignore error
     }
     return null;
 };
@@ -59,142 +53,90 @@ const AppInitializer = () => {
     useEffect(() => {
         let isUnmounted = false;
 
+        // Clean up legacy tokens from localStorage to prevent XSS exposure
+        if (typeof window !== "undefined") {
+            try {
+                localStorage.removeItem("user");
+                sessionStorage.removeItem("user");
+                deleteCookie("user");
+            } catch {}
+        }
+
         const fetchSession = async () => {
             setAuthStatus("loading");
-            let parsedUser: any = null;
+            const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
 
             try {
-                const storedUser = getCookie("user");
-                const rawStored = storedUser || (typeof window !== "undefined" && (localStorage.getItem("user") || sessionStorage.getItem("user")));
+                // 1. Check active session via HttpOnly cookie
+                const res = await fetch(`${baseUrl}/auth/customer/me`, {
+                    method: "GET",
+                    credentials: "include"
+                });
 
-                try {
-                    if (rawStored) parsedUser = typeof rawStored === "string" ? JSON.parse(rawStored) : rawStored;
-                } catch {
-                    // ignore JSON parse error
-                }
+                if (isUnmounted) return;
 
-                // 1. Immediately hydrate local user from cookie/storage so UI doesn't flicker
-                if (parsedUser && typeof parsedUser === "object") {
-                    setUser(parsedUser as User);
-                    setAuthStatus("authenticated");
-                }
+                if (res.ok) {
+                    const data = await res.json();
+                    const userData = data?.data || data?.user;
+                    if (userData) {
+                        const safeUser: User = {
+                            id: userData.id || userData._id,
+                            name: userData.name,
+                            fullName: userData.fullName || userData.name,
+                            email: userData.email,
+                            role: userData.role || "customer",
+                            photoURL: userData.photoURL || ""
+                        };
+                        setUser(safeUser);
+                        setAuthStatus("authenticated");
+                        return;
+                    }
+                } else if (res.status === 401) {
+                    // 2. Try cookie-based refresh token rotation
+                    try {
+                        const refreshRes = await fetch(`${baseUrl}/auth/refresh-token`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include"
+                        });
 
-                const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
-                const currentToken = parsedUser?.token || parsedUser?.accessToken || "";
-
-                if (currentToken) {
-                    const headers: Record<string, string> = {
-                        "Authorization": `Bearer ${currentToken}`
-                    };
-
-                    const res = await fetch(`${baseUrl}/auth/customer/me`, {
-                        method: "GET",
-                        headers,
-                        credentials: "include"
-                    });
-
-                    if (isUnmounted) return;
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        const userData = data?.data || data?.user;
-                        if (userData) {
-                            const fullUserData: User = {
-                                ...(parsedUser || {}),
-                                ...userData,
-                                role: userData.role || parsedUser?.role || "customer",
-                                token: currentToken,
-                                refreshToken: parsedUser?.refreshToken
-                            };
-                            setCookie("user", JSON.stringify(fullUserData), 7);
-                            if (typeof window !== "undefined") {
-                                localStorage.setItem("user", JSON.stringify(fullUserData));
-                                sessionStorage.setItem("user", JSON.stringify(fullUserData));
-                            }
-                            setUser(fullUserData);
-                            setAuthStatus("authenticated");
-                            return;
-                        }
-                    } else if (res.status === 401) {
-                        // Check if Google/Firebase session can be refreshed
-                        const fbInstance = getFirebaseAuth();
-                        if (fbInstance?.auth?.currentUser) {
-                            const syncedUser = await syncFirebaseWithBackend(fbInstance.auth.currentUser);
-                            if (syncedUser && !isUnmounted) {
-                                setUser(syncedUser);
+                        if (refreshRes.ok && !isUnmounted) {
+                            const refData = await refreshRes.json();
+                            const refUser = refData?.user || refData?.data?.user;
+                            if (refUser) {
+                                const safeUser: User = {
+                                    id: refUser.id || refUser._id,
+                                    name: refUser.name,
+                                    fullName: refUser.fullName || refUser.name,
+                                    email: refUser.email,
+                                    role: refUser.role || "customer",
+                                    photoURL: refUser.photoURL || ""
+                                };
+                                setUser(safeUser);
                                 setAuthStatus("authenticated");
                                 return;
                             }
                         }
+                    } catch {}
 
-                        // Try local refresh-token
-                        const refreshToken = parsedUser?.refreshToken || currentToken;
-                        if (refreshToken) {
-                            try {
-                                const refreshRes = await fetch(`${baseUrl}/auth/refresh-token`, {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        "Authorization": `Bearer ${refreshToken}`
-                                    },
-                                    body: JSON.stringify({ refreshToken }),
-                                    credentials: "include"
-                                });
-                                if (refreshRes.ok) {
-                                    const refData = await refreshRes.json();
-                                    const newToken = refData?.accessToken || refData?.data?.accessToken;
-                                    const newRefreshToken = refData?.refreshToken || refData?.data?.refreshToken;
-                                    const refUser = refData?.user || refData?.data?.user;
-                                    if (newToken) {
-                                        const fullUserData: User = {
-                                            ...(parsedUser || {}),
-                                            ...(refUser || {}),
-                                            token: newToken,
-                                            refreshToken: newRefreshToken || parsedUser?.refreshToken
-                                        };
-                                        setCookie("user", JSON.stringify(fullUserData), 7);
-                                        if (typeof window !== "undefined") {
-                                            localStorage.setItem("user", JSON.stringify(fullUserData));
-                                            sessionStorage.setItem("user", JSON.stringify(fullUserData));
-                                        }
-                                        setUser(fullUserData);
-                                        setAuthStatus("authenticated");
-                                        return;
-                                    }
-                                }
-                            } catch {}
+                    // 3. Check if Google/Firebase session can be refreshed
+                    const fbInstance = getFirebaseAuth();
+                    if (fbInstance?.auth?.currentUser) {
+                        const syncedUser = await syncFirebaseWithBackend(fbInstance.auth.currentUser);
+                        if (syncedUser && !isUnmounted) {
+                            setUser(syncedUser);
+                            setAuthStatus("authenticated");
+                            return;
                         }
                     }
                 }
 
-                // If no currentToken or token was invalid, check active Firebase session
-                const fbInstance = getFirebaseAuth();
-                if (fbInstance?.auth?.currentUser) {
-                    const syncedUser = await syncFirebaseWithBackend(fbInstance.auth.currentUser);
-                    if (syncedUser && !isUnmounted) {
-                        setUser(syncedUser);
-                        setAuthStatus("authenticated");
-                        return;
-                    }
-                }
-
-                if (!parsedUser) {
+                if (!isUnmounted) {
                     setUser(null);
                     setAuthStatus("unauthenticated");
                 }
             } catch {
-                if (isUnmounted) return;
-                if (parsedUser && typeof parsedUser === "object" && (parsedUser.id || parsedUser._id || parsedUser.email)) {
-                    setUser(parsedUser as User);
-                    setAuthStatus("authenticated");
-                } else {
-                    deleteCookie("user");
-                    if (typeof window !== "undefined") {
-                        try {
-                            localStorage.removeItem("user");
-                            sessionStorage.removeItem("user");
-                        } catch {}
-                    }
+                if (!isUnmounted) {
                     setUser(null);
                     setAuthStatus("unauthenticated");
                 }
@@ -207,25 +149,22 @@ const AppInitializer = () => {
 
         fetchSession();
 
-        // 2. Attach Firebase Auth state observer for Google OAuth sessions
+        // Attach Firebase Auth state observer for Google OAuth sessions
         let unsubscribeFirebase: (() => void) | null = null;
         try {
             const fbInstance = getFirebaseAuth();
             if (fbInstance?.auth) {
                 unsubscribeFirebase = onAuthStateChanged(fbInstance.auth, async (fbUser) => {
                     if (fbUser && !isUnmounted) {
-                        await syncFirebaseWithBackend(fbUser).then((synced) => {
-                            if (synced && !isUnmounted) {
-                                setUser(synced);
-                                setAuthStatus("authenticated");
-                            }
-                        });
+                        const synced = await syncFirebaseWithBackend(fbUser);
+                        if (synced && !isUnmounted) {
+                            setUser(synced);
+                            setAuthStatus("authenticated");
+                        }
                     }
                 });
             }
-        } catch {
-            // ignore Firebase observer error
-        }
+        } catch {}
 
         return () => {
             isUnmounted = true;
@@ -237,3 +176,4 @@ const AppInitializer = () => {
 };
 
 export default AppInitializer;
+

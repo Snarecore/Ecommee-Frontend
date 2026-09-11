@@ -94,8 +94,8 @@ export interface OrderLike {
   date?: string | Date;
 }
 
-const STORAGE_KEY_V2 = "fashiontime_orders_v2";
-const STORAGE_KEY_V1 = "fashiontime_orders";
+// In-memory runtime cache (no localStorage persistence)
+let memoryOrders: Order[] = [];
 
 export const calculateDeliveryZoneAndFee = (city: string) => {
   const normalizedCity = (city || "").trim().toLowerCase();
@@ -114,12 +114,13 @@ export const getOrderCreatedAt = (order?: OrderLike | null): string => {
 };
 
 export const getStoredOrders = (): Order[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_V2) || localStorage.getItem(STORAGE_KEY_V1);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+  return memoryOrders;
+};
+
+export const setMemoryOrders = (orders: Order[]): void => {
+  memoryOrders = orders;
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("orders_updated"));
   }
 };
 
@@ -175,15 +176,8 @@ export const createOrderInService = (params: {
     ]
   };
 
+  memoryOrders.unshift(newOrder);
   if (typeof window !== "undefined") {
-    try {
-      const existing = getStoredOrders();
-      existing.unshift(newOrder);
-      localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(existing));
-      localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(existing));
-    } catch (e) {
-      // console.error("Failed to store order in localStorage:", e);
-    }
     window.dispatchEvent(new Event("orders_updated"));
   }
   return newOrder;
@@ -198,7 +192,7 @@ export const acceptOrderInService = async (params: {
   const { getUserToken } = require("../hooks/useApi");
   const token = getUserToken();
 
-  // Try API first
+  // Call API
   try {
     const apiRes: any = await patchData({
       url: `orders/${params.orderId}/accept`,
@@ -213,14 +207,11 @@ export const acceptOrderInService = async (params: {
     if (err?.message?.includes("409")) {
       throw err;
     }
-    // console.warn("NestJS accept API endpoint fallback to local persistence:", err?.message || err);
   }
 
-  const orders = getStoredOrders();
-  const idx = orders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
+  const idx = memoryOrders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
 
   if (idx === -1) {
-    // Construct target if not found in localStorage
     return {
       id: params.orderId,
       orderId: params.orderId,
@@ -245,7 +236,7 @@ export const acceptOrderInService = async (params: {
     };
   }
 
-  const target = { ...orders[idx] };
+  const target = { ...memoryOrders[idx] };
   if (target.orderStatus !== "Pending") {
     throw new Error("409 Conflict: Only Pending orders can be accepted.");
   }
@@ -268,12 +259,9 @@ export const acceptOrderInService = async (params: {
     }
   ];
 
-  orders[idx] = target;
+  memoryOrders[idx] = target;
   if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(orders));
-    localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(orders));
     window.dispatchEvent(new Event("orders_updated"));
-    window.dispatchEvent(new Event("storage"));
 
     try {
       const { addShippingNotification } = require("../services/notification-service");
@@ -282,9 +270,7 @@ export const acceptOrderInService = async (params: {
         "Order Placed",
         `🎉 Your order #${target.orderId || target.id} has been accepted and is now being prepared.`
       );
-    } catch (err) {
-      // console.error("Error triggering notification:", err);
-    }
+    } catch (err) {}
   }
 
   return target;
@@ -304,7 +290,6 @@ export const rejectOrderInService = async (params: {
   const { getUserToken } = require("../hooks/useApi");
   const token = getUserToken();
 
-  // Try NestJS API endpoint first
   try {
     const apiRes: any = await patchData({
       url: `orders/${params.orderId}/reject`,
@@ -322,11 +307,9 @@ export const rejectOrderInService = async (params: {
     if (err?.message?.includes("409")) {
       throw err;
     }
-    // console.warn("NestJS reject API endpoint fallback to local persistence:", err?.message || err);
   }
 
-  const orders = getStoredOrders();
-  const idx = orders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
+  const idx = memoryOrders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
 
   if (idx === -1) {
     return {
@@ -355,7 +338,7 @@ export const rejectOrderInService = async (params: {
     };
   }
 
-  const target = { ...orders[idx] };
+  const target = { ...memoryOrders[idx] };
   if (target.orderStatus !== "Pending") {
     throw new Error("409 Conflict: Only Pending orders can be rejected.");
   }
@@ -368,7 +351,6 @@ export const rejectOrderInService = async (params: {
   target.rejectionReason = params.rejectionReason;
   target.rejectionMessage = params.rejectionMessage?.trim();
 
-  // If payment was paid, mark as refunded on rejection
   if (target.paymentStatus === "Paid") {
     target.paymentStatus = "Refunded";
   }
@@ -389,12 +371,9 @@ export const rejectOrderInService = async (params: {
     }
   ];
 
-  orders[idx] = target;
+  memoryOrders[idx] = target;
   if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(orders));
-    localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(orders));
     window.dispatchEvent(new Event("orders_updated"));
-    window.dispatchEvent(new Event("storage"));
 
     try {
       const { addShippingNotification } = require("../services/notification-service");
@@ -403,9 +382,7 @@ export const rejectOrderInService = async (params: {
         "Rejected",
         `Your order #${target.orderId || target.id} was not accepted (${params.rejectionReason}).`
       );
-    } catch (err) {
-      // console.error("Error triggering notification:", err);
-    }
+    } catch (err) {}
   }
 
   return target;
@@ -421,28 +398,25 @@ export const updateOrderStatusInService = (params: {
   note?: string;
   orderFallback?: Order;
 }): Order | null => {
-  const orders = getStoredOrders();
-  let idx = orders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
+  let idx = memoryOrders.findIndex((o) => o.id === params.orderId || o.orderId === params.orderId);
 
   if (idx === -1) {
     if (params.orderFallback) {
-      orders.unshift(params.orderFallback);
+      memoryOrders.unshift(params.orderFallback);
       idx = 0;
     } else {
       return null;
     }
   }
 
-  const target = { ...orders[idx] };
+  const target = { ...memoryOrders[idx] };
 
-  // Validation rule: Pending orders cannot skip directly to Processing, Shipped, or Delivered
   if (
     target.orderStatus === "Pending" &&
     params.newStatus !== "Order Placed" &&
     params.newStatus !== "Rejected" &&
     params.newStatus !== "Cancelled"
   ) {
-    // console.error(`Invalid status transition from Pending to ${params.newStatus}. Must be Accepted or Rejected first.`);
     return null;
   }
 
@@ -455,19 +429,16 @@ export const updateOrderStatusInService = (params: {
   if (params.trackingId !== undefined) target.trackingId = params.trackingId.trim();
   if (params.courierTrackingLink !== undefined) target.courierTrackingLink = params.courierTrackingLink.trim();
 
-  // COD Payment auto-transitions to Paid when Delivered
   if (target.paymentMethod === "COD" && params.newStatus === "Delivered") {
     target.paymentStatus = "Paid";
   }
 
-  // Cancellation matrix
   if (params.newStatus === "Cancelled" || params.newStatus === "Rejected") {
     if (target.paymentStatus === "Paid") {
       target.paymentStatus = "Refunded";
     }
   }
 
-  // Append status history entry (prevent duplicate consecutive entries)
   if (!target.statusHistory) target.statusHistory = [];
   const lastHistory = target.statusHistory[target.statusHistory.length - 1];
   if (!lastHistory || lastHistory.status !== params.newStatus) {
@@ -483,14 +454,10 @@ export const updateOrderStatusInService = (params: {
     ];
   }
 
-  orders[idx] = target;
+  memoryOrders[idx] = target;
   if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(orders));
-    localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(orders));
     window.dispatchEvent(new Event("orders_updated"));
-    window.dispatchEvent(new Event("storage"));
     
-    // Automatically trigger notification for order shipping status update
     try {
       const { addShippingNotification } = require("../services/notification-service");
       addShippingNotification(
@@ -498,9 +465,7 @@ export const updateOrderStatusInService = (params: {
         params.newStatus,
         params.note || `Order status updated to "${params.newStatus}"`
       );
-    } catch (err) {
-      // console.error("Error triggering notification:", err);
-    }
+    } catch (err) {}
   }
 
   return target;
@@ -508,10 +473,9 @@ export const updateOrderStatusInService = (params: {
 
 export const getOrderByIdFromService = (orderId: string): Order | undefined => {
   if (!orderId) return undefined;
-  const orders = getStoredOrders();
   const cleanId = orderId.replace(/^#/, "").trim().toLowerCase();
 
-  return orders.find((o) => {
+  return memoryOrders.find((o) => {
     const idMatches = o.id?.toLowerCase() === cleanId;
     const orderIdMatches = o.orderId?.replace(/^#/, "").trim().toLowerCase() === cleanId;
     return idMatches || orderIdMatches;

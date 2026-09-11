@@ -3,9 +3,14 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
-import { userAtom, userLoadedAtom, User } from "../store/user-store";
-import { getCookie, setCookie } from "../utils/cookie-utils";
+import { userAtom, userLoadedAtom } from "../store/user-store";
 import { Role } from "../enum/role.enum";
+
+export const ROLE_HIERARCHY: Record<string, number> = {
+  customer: 10,
+  user: 10,
+  admin: 20,
+};
 
 interface RoleProtectedRouteProps {
     children: React.ReactElement;
@@ -13,35 +18,22 @@ interface RoleProtectedRouteProps {
 }
 
 const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps) => {
-    const [user, setUser] = useAtom(userAtom);
+    const user = useAtom(userAtom)[0];
     const userLoaded = useAtom(userLoadedAtom)[0];
     const router = useRouter();
 
-    // Secondary fallback check: if atom is transiently empty, attempt immediate local restoration
-    let activeUser: User | null = user;
-    if (!activeUser && typeof window !== "undefined") {
-        try {
-            const raw = getCookie("user") || localStorage.getItem("user") || sessionStorage.getItem("user");
-            if (raw) {
-                const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-                if (parsed && typeof parsed === "object" && (parsed.id || parsed._id || parsed.email)) {
-                    activeUser = parsed as User;
-                    setUser(parsed as User);
-                    setCookie("user", JSON.stringify(parsed), 7);
-                }
-            }
-        } catch {
-            // ignore
-        }
-    }
+    const activeUser = user;
+    const userRole = activeUser?.role ? String(activeUser.role).trim().toLowerCase() : 'customer';
+    const userLevel = ROLE_HIERARCHY[userRole] ?? 0;
 
-    const rawRole = activeUser?.role ? String(activeUser.role).trim().toLowerCase() : 'customer';
-    const userRole = rawRole || 'customer';
+    const requiredLevels = allowedRoles.map((r) => {
+        const roleStr = typeof r === 'string' ? r.toLowerCase().trim() : '';
+        return ROLE_HIERARCHY[roleStr] ?? 999;
+    });
+    const minRequiredLevel = Math.min(...requiredLevels);
 
-    const isAllowed = allowedRoles.some(
-        r => r.toLowerCase() === userRole || 
-             (r.toLowerCase() === 'customer' && (userRole === 'customer' || userRole === 'user' || userRole === 'admin'))
-    );
+    // Hierarchical evaluation: User Level >= Required Level
+    const isAllowed = userLevel >= minRequiredLevel;
 
     useEffect(() => {
         if (userLoaded && (!activeUser || !isAllowed)) {

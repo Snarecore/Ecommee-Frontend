@@ -3,22 +3,12 @@ import apiConfig from "../config/api.json";
 import { getData, patchData } from "./api-service";
 import { getUserToken } from "../hooks/useApi";
 
-const STORAGE_KEY = "shipping_notifications_v1";
+// In-memory runtime cache (no localStorage persistence)
+let memoryNotifications: Record<string, NotificationItem[]> = {};
 
 export const getStoredNotifications = (userId?: string): NotificationItem[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    const key = userId ? `${STORAGE_KEY}_${userId}` : STORAGE_KEY;
-    const raw = localStorage.getItem(key);
-    if (!raw) {
-      // For specific logged-in users, fallback to empty array so demo notifications don't leak to new users
-      return userId ? [] : [];
-    }
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  const key = userId || "default";
+  return memoryNotifications[key] || [];
 };
 
 export const saveStoredNotifications = (
@@ -26,22 +16,17 @@ export const saveStoredNotifications = (
   userId?: string,
   emitEvents: boolean = true
 ) => {
-  if (typeof window === "undefined") return;
-  try {
-    const key = userId ? `${STORAGE_KEY}_${userId}` : STORAGE_KEY;
-    localStorage.setItem(key, JSON.stringify(notifications));
-    if (emitEvents) {
-      window.dispatchEvent(new Event("notifications_updated"));
-      if ("BroadcastChannel" in window) {
-        try {
-          const channel = new BroadcastChannel("fashion_time_notifications");
-          channel.postMessage({ type: "SYNC_NOTIFICATIONS" });
-          channel.close();
-        } catch {}
-      }
+  const key = userId || "default";
+  memoryNotifications[key] = notifications;
+  if (typeof window !== "undefined" && emitEvents) {
+    window.dispatchEvent(new Event("notifications_updated"));
+    if ("BroadcastChannel" in window) {
+      try {
+        const channel = new BroadcastChannel("fashion_time_notifications");
+        channel.postMessage({ type: "SYNC_NOTIFICATIONS" });
+        channel.close();
+      } catch {}
     }
-  } catch (err) {
-    // console.error("Error saving notifications:", err);
   }
 };
 
@@ -52,10 +37,10 @@ export const fetchNotificationsApi = async (userId?: string): Promise<{
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
-  // Invoke backend notifications endpoint for authenticated sessions
-  if (notifUrl && token) {
+  // Invoke backend notifications endpoint (works via HttpOnly cookie or bearer token)
+  if (notifUrl) {
     try {
-      const res: any = await getData({ url: notifUrl, token });
+      const res: any = await getData({ url: notifUrl, token: token || undefined });
       if (res && !res.error) {
         const payload = res.data || res;
         const list = Array.isArray(payload.notifications)
@@ -70,7 +55,7 @@ export const fetchNotificationsApi = async (userId?: string): Promise<{
         return { notifications: list, unreadCount };
       }
     } catch (err) {
-      // console.warn("API fetch error for notifications, using fallback:", err);
+      // console.warn("API fetch error for notifications:", err);
     }
   }
 
@@ -83,9 +68,9 @@ export const markNotificationReadApi = async (id: string, userId?: string): Prom
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
-  if (notifUrl && token) {
+  if (notifUrl) {
     try {
-      await patchData({ url: `${notifUrl}/${id}/read`, token, body: {} });
+      await patchData({ url: `${notifUrl}/${id}/read`, token: token || undefined, body: {} });
     } catch (err) {
       // console.warn("API markNotificationReadApi error:", err);
     }
@@ -100,9 +85,9 @@ export const markAllNotificationsReadApi = async (userId?: string): Promise<void
   const token = getUserToken();
   const notifUrl = (apiConfig as any)?.site?.notificationsUrl;
 
-  if (notifUrl && token) {
+  if (notifUrl) {
     try {
-      await patchData({ url: `${notifUrl}/read-all`, token, body: {} });
+      await patchData({ url: `${notifUrl}/read-all`, token: token || undefined, body: {} });
     } catch (err) {
       // console.warn("API markAllNotificationsReadApi error:", err);
     }

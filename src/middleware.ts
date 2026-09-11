@@ -1,8 +1,26 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+const ROLE_HIERARCHY: Record<string, number> = {
+  customer: 10,
+  user: 10,
+  admin: 20,
+};
+
+function parseJwtPayload(token?: string | null): any {
+  if (!token) return null;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
 
 export function middleware(request: NextRequest) {
-  const userCookie = request.cookies.get('user')?.value;
   const pathname = request.nextUrl.pathname;
 
   const protectedPaths = [
@@ -15,35 +33,45 @@ export function middleware(request: NextRequest) {
   const isProtected = protectedPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
 
   if (isProtected) {
-    if (!userCookie) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('from', pathname + request.nextUrl.search);
-      return NextResponse.redirect(loginUrl);
-    }
+    const authToken =
+      request.cookies.get('cloth_customer_access')?.value ||
+      request.cookies.get('cloth_admin_access')?.value ||
+      request.cookies.get('accessToken')?.value;
 
-    let user: any = null;
-    try {
-      user = JSON.parse(userCookie);
-    } catch {
-      try {
-        user = JSON.parse(decodeURIComponent(userCookie));
-      } catch {
-        user = null;
+    const userCookie = request.cookies.get('user')?.value;
+
+    let userRole = '';
+    let isAuthenticated = false;
+
+    if (authToken) {
+      const payload = parseJwtPayload(authToken);
+      if (payload && (payload.sub || payload.id || payload.email)) {
+        isAuthenticated = true;
+        userRole = String(payload.role || payload.roles || 'customer').trim().toLowerCase();
       }
     }
 
-    if (!user || typeof user !== 'object') {
+    if (!isAuthenticated && userCookie) {
+      try {
+        const parsed = JSON.parse(userCookie.startsWith('%') ? decodeURIComponent(userCookie) : userCookie);
+        if (parsed && (parsed.id || parsed._id || parsed.email)) {
+          isAuthenticated = true;
+          userRole = String(parsed.role || 'customer').trim().toLowerCase();
+        }
+      } catch {}
+    }
+
+    if (!isAuthenticated) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('from', pathname + request.nextUrl.search);
       return NextResponse.redirect(loginUrl);
     }
 
-    const rawRole = user?.role ? String(user.role).trim().toLowerCase() : 'customer';
-    const userRole = rawRole || 'customer';
+    const userLevel = ROLE_HIERARCHY[userRole] ?? 10;
 
-    // Protect customer routes
-    const isCustomerRoute = pathname.startsWith('/customer-dashboard');
-    if (isCustomerRoute && userRole !== 'customer' && userRole !== 'user' && userRole !== 'admin') {
+    // Customer protected routes require at least Level 10 (Customer=10, Admin=20)
+    const requiredLevel = 10;
+    if (userLevel < requiredLevel) {
       return NextResponse.redirect(new URL('/', request.url));
     }
   }
@@ -62,5 +90,4 @@ export const config = {
     '/chat',
     '/chat/:path*',
   ],
-}
-
+};
