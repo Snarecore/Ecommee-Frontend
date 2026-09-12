@@ -151,8 +151,8 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
 
                 <div className="flex-1 p-2.5 sm:p-3 bg-white flex flex-col justify-between">
                     <div>
-                        <h2 className="text-xs sm:text-[13px] font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 h-8 sm:h-9 flex items-start mb-1 leading-snug">
-                            <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="line-clamp-2">{name}</Link>
+                        <h2 className="text-xs sm:text-[13px] font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 truncate mb-1 leading-tight" title={name}>
+                            <Link href={`/product/${product.slug || product.id || (product as any)._id || ''}`} className="truncate block" title={name}>{name}</Link>
                         </h2>
 
                         <div className="flex items-baseline gap-1.5 mb-1.5">
@@ -175,11 +175,11 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="mt-auto pt-2 border-t border-[var(--color-green-primary)]/20 flex items-center gap-1.5 sm:gap-2">
+                    <div className="mt-auto pt-2 border-t border-[var(--color-green-primary)]/20 flex items-center gap-1 sm:gap-1.5">
                         {isOutOfStock ? (
                             <button
                                 disabled
-                                className="w-full py-1.5 sm:py-2 bg-red-50 border border-red-200 text-red-600 text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5"
+                                className="w-full py-1.5 sm:py-2 bg-red-50 border border-red-200 text-red-600 text-[10px] sm:text-xs font-semibold rounded-md sm:rounded-lg cursor-not-allowed flex items-center justify-center gap-1 sm:gap-1.5"
                             >
                                 Out of Stock
                             </button>
@@ -188,18 +188,18 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                                 <button
                                     title="Add to Cart"
                                     aria-label="Add to Cart"
-                                    className="w-9 sm:w-1/2 py-1.5 sm:py-2 px-1 sm:px-2 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs flex-shrink-0 sm:flex-shrink"
+                                    className="w-8 sm:w-1/2 py-1.5 sm:py-2 px-1 sm:px-1.5 border border-[var(--color-green-primary)]/40 text-[var(--color-green-primary)] text-[10px] sm:text-[11px] xl:text-xs font-semibold rounded-md sm:rounded-lg hover:border-[var(--color-green-primary)] hover:bg-[var(--color-green-primary)]/10 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 shadow-xs flex-shrink-0 sm:flex-shrink"
                                     onClick={(e) => openModal(e, "addToCart")}
                                 >
                                     <span className="hidden sm:inline whitespace-nowrap">Add to Cart</span>
-                                    <FiShoppingCart className="w-3.5 h-3.5 text-[var(--color-green-primary)] flex-shrink-0" />
+                                    <FiShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--color-green-primary)] flex-shrink-0" />
                                 </button>
                                 <button
-                                    className="flex-1 sm:w-1/2 py-1.5 sm:py-2 px-2 bg-[var(--color-green-primary)] text-white text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="flex-1 sm:w-1/2 py-1.5 sm:py-2 px-1.5 sm:px-2 bg-[var(--color-green-primary)] text-white text-[10px] sm:text-[11px] xl:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
                                     <span>Buy Now</span>
-                                    <FiShoppingBag className="w-3.5 h-3.5 flex-shrink-0" />
+                                    <FiShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
                                 </button>
                             </>
                         )}

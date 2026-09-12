@@ -377,7 +377,7 @@ const MyCart = () => {
           </div>
 
           <div className="mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 px-2 sm:px-4 py-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4 py-2">
               {isLoading ? (
                 <ProductCardSkeletonOne />
               ) : response?.length > 0 ? (

@@ -68,8 +68,8 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
                         {mainCategoryName || "Clothing"}
                     </div>
 
-                    <h2 className="text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 line-clamp-2 mb-1.5 leading-snug">
-                        <Link href={`/product/${product.slug}`}>
+                    <h2 className="text-sm font-semibold text-neutral-800 hover:text-[var(--color-green-primary)] transition-colors duration-200 truncate mb-1 leading-tight" title={name}>
+                        <Link href={`/product/${product.slug}`} className="truncate block" title={name}>
                             {name}
                         </Link>
                     </h2>
