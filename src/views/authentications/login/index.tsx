@@ -10,7 +10,7 @@ import { LuMail, LuLock, LuShieldCheck, LuArrowRight } from "react-icons/lu";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 
 import companyLogo from "../../../assets/logo.svg";
-import { userAtom, authStatusAtom, User } from "../../../store/user-store";
+import { userAtom, authStatusAtom, User, persistUserSession } from "../../../store/user-store";
 import { setCookie } from "../../../utils/cookie-utils";
 import { useAPI } from "../../../hooks/useApi";
 import apiConfig from "../../../config/api.json";
@@ -61,6 +61,7 @@ const Login = () => {
                     });
                 }
                 logoutFirebaseUser().catch(() => null);
+                persistUserSession(null);
                 setUser(null);
             } catch {}
             router.replace("/login");
@@ -68,7 +69,7 @@ const Login = () => {
     }, [searchParams, router, setUser]);
 
     useEffect(() => {
-        if (searchParams?.get("reset") !== "true" && authStatus === "authenticated" && user && (user.token || user.id)) {
+        if (searchParams?.get("reset") !== "true" && authStatus === "authenticated" && user && (user.token || user.id || user._id || user.email)) {
             router.push(targetFrom === "/login" ? "/" : targetFrom);
         }
     }, [authStatus, user, router, targetFrom, searchParams]);
@@ -154,8 +155,10 @@ const Login = () => {
                         fullName: unpackedUser.fullName || unpackedUser.name,
                         email: unpackedUser.email,
                         role: unpackedUser.role || 'customer',
-                        photoURL: unpackedUser.photoURL || ''
+                        photoURL: unpackedUser.photoURL || '',
+                        token: token
                     };
+                    persistUserSession(safeUserData);
                     setUser(safeUserData);
                     showSuccessToast("Welcome back! Signed in successfully.");
                     router.push(targetFrom);
@@ -191,8 +194,10 @@ const Login = () => {
                     fullName: result.user.fullName || result.user.name,
                     email: result.user.email,
                     role: result.user.role || 'customer',
-                    photoURL: result.user.photoURL || ''
+                    photoURL: result.user.photoURL || '',
+                    token: result.token || result.user.token
                 };
+                persistUserSession(safeUserData);
                 setUser(safeUserData);
                 showSuccessToast(`Welcome back, ${safeUserData.name || "User"}! Signed in with Google.`);
                 router.push(targetFrom);

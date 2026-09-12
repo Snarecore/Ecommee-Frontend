@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { deleteCookie } from "../utils/cookie-utils";
+import { deleteCookie, setCookie, getCookie } from "../utils/cookie-utils";
 import { logoutFirebaseUser } from "../services/firebase-auth.service";
 
 export interface User {
@@ -32,23 +32,47 @@ export const userAtom = atom<User | null>(null);
 export const userLoadedAtom = atom(false);
 export const authStatusAtom = atom<AuthStatus>("loading");
 
-export const logoutUserAtom = atom(null, (get, set, action?: any) => {
-    const currentUser = get(userAtom);
-    const userId = currentUser?.id || currentUser?._id || currentUser?.email;
+export const persistUserSession = (user: User | null) => {
+    if (typeof window === "undefined") return;
+    if (user) {
+        try {
+            const userJson = JSON.stringify(user);
+            setCookie("user", userJson, 30);
+            try {
+                localStorage.setItem("user", userJson);
+                sessionStorage.setItem("user", userJson);
+            } catch {}
 
+            const token = user.token || (user as any).accessToken;
+            if (token) {
+                setCookie("accessToken", token, 30);
+                setCookie("cloth_customer_access", token, 30);
+                const role = String(user.role || "").toLowerCase();
+                if (role === "admin" || role === "superadmin" || role === "super_admin") {
+                    setCookie("cloth_admin_access", token, 30);
+                }
+            }
+        } catch {}
+    } else {
+        deleteCookie("user");
+        deleteCookie("accessToken");
+        deleteCookie("cloth_customer_access");
+        deleteCookie("cloth_admin_access");
+        try {
+            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
+        } catch {}
+    }
+};
+
+export const logoutUserAtom = atom(null, (get, set, action?: any) => {
     logoutFirebaseUser().catch(() => null);
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/"}auth/logout`, {
         method: "POST",
         credentials: "include"
     }).catch(() => null);
 
-    deleteCookie("user");
-    if (typeof window !== "undefined") {
-        try {
-            localStorage.removeItem("user");
-            sessionStorage.removeItem("user");
-        } catch {}
-    }
+    persistUserSession(null);
 
     set(userAtom, null);
     set(authStatusAtom, "unauthenticated");

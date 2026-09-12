@@ -4,7 +4,11 @@ import type { NextRequest } from 'next/server';
 const ROLE_HIERARCHY: Record<string, number> = {
   customer: 10,
   user: 10,
+  seller: 15,
+  vendor: 15,
   admin: 20,
+  superadmin: 30,
+  super_admin: 30,
 };
 
 function parseJwtPayload(token?: string | null): any {
@@ -45,7 +49,7 @@ export function middleware(request: NextRequest) {
 
     if (authToken) {
       const payload = parseJwtPayload(authToken);
-      if (payload && (payload.sub || payload.id || payload.email)) {
+      if (payload && (payload.sub || payload.id || payload._id || payload.email || payload.uid || payload.user_id)) {
         isAuthenticated = true;
         userRole = String(payload.role || payload.roles || 'customer').trim().toLowerCase();
       }
@@ -53,8 +57,9 @@ export function middleware(request: NextRequest) {
 
     if (!isAuthenticated && userCookie) {
       try {
-        const parsed = JSON.parse(userCookie.startsWith('%') ? decodeURIComponent(userCookie) : userCookie);
-        if (parsed && (parsed.id || parsed._id || parsed.email)) {
+        const decoded = userCookie.startsWith('%') ? decodeURIComponent(userCookie) : userCookie;
+        const parsed = JSON.parse(decoded);
+        if (parsed && (parsed.id || parsed._id || parsed.email || parsed.token || parsed.uid)) {
           isAuthenticated = true;
           userRole = String(parsed.role || 'customer').trim().toLowerCase();
         }

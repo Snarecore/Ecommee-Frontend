@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { userAtom, User, userLoadedAtom, authStatusAtom } from "../store/user-store";
-import { deleteCookie } from "../utils/cookie-utils";
+import { userAtom, User, userLoadedAtom, authStatusAtom, persistUserSession } from "../store/user-store";
+import { getCookie } from "../utils/cookie-utils";
 import { getFirebaseAuth } from "../config/firebase";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 
@@ -34,6 +34,7 @@ const syncFirebaseWithBackend = async (fbUser: FirebaseUser): Promise<User | nul
                     email: serverUser.email || fbUser.email || "",
                     role: serverUser.role || "customer",
                     photoURL: fbUser.photoURL || serverUser.photoURL || "",
+                    token: data?.data?.accessToken || data?.accessToken || idToken,
                     provider: "google"
                 };
                 return safeUser;
@@ -42,7 +43,17 @@ const syncFirebaseWithBackend = async (fbUser: FirebaseUser): Promise<User | nul
     } catch {
         // ignore error
     }
-    return null;
+
+    return {
+        id: fbUser.uid,
+        _id: fbUser.uid,
+        name: fbUser.displayName || fbUser.email?.split("@")[0] || "User",
+        fullName: fbUser.displayName || fbUser.email?.split("@")[0] || "User",
+        email: fbUser.email || "",
+        photoURL: fbUser.photoURL || "",
+        role: "customer",
+        provider: "google"
+    };
 };
 
 const AppInitializer = () => {
@@ -53,17 +64,21 @@ const AppInitializer = () => {
     useEffect(() => {
         let isUnmounted = false;
 
-        // Clean up legacy tokens from localStorage to prevent XSS exposure
+        // Restore fast from cached session if present
         if (typeof window !== "undefined") {
             try {
-                localStorage.removeItem("user");
-                sessionStorage.removeItem("user");
-                deleteCookie("user");
+                const rawUser = getCookie("user") || localStorage.getItem("user") || sessionStorage.getItem("user");
+                if (rawUser) {
+                    const parsed = typeof rawUser === "string" ? JSON.parse(rawUser.startsWith("%") ? decodeURIComponent(rawUser) : rawUser) : rawUser;
+                    if (parsed && (parsed.id || parsed._id || parsed.email)) {
+                        setUser(parsed);
+                        setAuthStatus("authenticated");
+                    }
+                }
             } catch {}
         }
 
         const fetchSession = async () => {
-            setAuthStatus("loading");
             const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
 
             try {
@@ -85,9 +100,11 @@ const AppInitializer = () => {
                             fullName: userData.fullName || userData.name,
                             email: userData.email,
                             role: userData.role || "customer",
-                            photoURL: userData.photoURL || ""
+                            photoURL: userData.photoURL || "",
+                            token: userData.token || userData.accessToken
                         };
                         setUser(safeUser);
+                        persistUserSession(safeUser);
                         setAuthStatus("authenticated");
                         return;
                     }
@@ -110,9 +127,11 @@ const AppInitializer = () => {
                                     fullName: refUser.fullName || refUser.name,
                                     email: refUser.email,
                                     role: refUser.role || "customer",
-                                    photoURL: refUser.photoURL || ""
+                                    photoURL: refUser.photoURL || "",
+                                    token: refData?.accessToken || refData?.data?.accessToken
                                 };
                                 setUser(safeUser);
+                                persistUserSession(safeUser);
                                 setAuthStatus("authenticated");
                                 return;
                             }
@@ -125,20 +144,30 @@ const AppInitializer = () => {
                         const syncedUser = await syncFirebaseWithBackend(fbInstance.auth.currentUser);
                         if (syncedUser && !isUnmounted) {
                             setUser(syncedUser);
+                            persistUserSession(syncedUser);
                             setAuthStatus("authenticated");
                             return;
                         }
                     }
                 }
 
+                // If no server session and no valid local session
                 if (!isUnmounted) {
-                    setUser(null);
-                    setAuthStatus("unauthenticated");
+                    const rawUser = getCookie("user") || (typeof window !== "undefined" ? localStorage.getItem("user") : null);
+                    if (!rawUser) {
+                        setUser(null);
+                        persistUserSession(null);
+                        setAuthStatus("unauthenticated");
+                    }
                 }
             } catch {
                 if (!isUnmounted) {
-                    setUser(null);
-                    setAuthStatus("unauthenticated");
+                    const rawUser = getCookie("user") || (typeof window !== "undefined" ? localStorage.getItem("user") : null);
+                    if (!rawUser) {
+                        setUser(null);
+                        persistUserSession(null);
+                        setAuthStatus("unauthenticated");
+                    }
                 }
             } finally {
                 if (!isUnmounted) {
@@ -159,6 +188,7 @@ const AppInitializer = () => {
                         const synced = await syncFirebaseWithBackend(fbUser);
                         if (synced && !isUnmounted) {
                             setUser(synced);
+                            persistUserSession(synced);
                             setAuthStatus("authenticated");
                         }
                     }

@@ -9,7 +9,11 @@ import { Role } from "../enum/role.enum";
 export const ROLE_HIERARCHY: Record<string, number> = {
   customer: 10,
   user: 10,
+  seller: 15,
+  vendor: 15,
   admin: 20,
+  superadmin: 30,
+  super_admin: 30,
 };
 
 interface RoleProtectedRouteProps {
