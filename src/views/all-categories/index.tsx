@@ -12,22 +12,27 @@ import { Product } from "../../interface/product.interface";
 import { metaDataAtom } from "../../store/global-store";
 import { useAtomValue } from "jotai";
 
-const AllCategories = () => {
+interface AllCategoriesProps {
+	initialContentData?: any;
+}
+
+const AllCategories = ({ initialContentData }: AllCategoriesProps) => {
 	const dataLimit = 10;
 	const maxTotal = 50;
 	const [currentPageNumber, setCurrentPageNumber] = useState(1);
 	const { usePaginatedQuery, fetchData: fetchApiData } = useAPI();
-	const [contentData, setContentData] = useState<any>(null);
+	const [contentData, setContentData] = useState<any>(initialContentData ?? null);
 	const metaData = useAtomValue(metaDataAtom);
 	const allCategoriesMeta = metaData?.find(item => item.page?.toLowerCase().includes("all categories"));
 
 	useEffect(() => {
+		if (initialContentData !== undefined) return;
 		const fetchContentData = async () => {
 			const result = await fetchApiData({ apiUrl: `${apiConfig.site.homePageUrl}` });
 			setContentData(result?.contentData);
 		};
 		fetchContentData();
-	}, []);
+	}, [initialContentData]);
 
 	const getProductListApiUrl = () => {
 		const apiUrl = `${apiConfig.site.productListWithHardLimitUrl}?page=${currentPageNumber}&limit=${dataLimit}&maxTotal=${maxTotal}`;
