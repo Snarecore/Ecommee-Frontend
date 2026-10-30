@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { FiBell, FiCheck, FiTruck, FiPackage, FiCheckCircle, FiXCircle, FiX } from "react-icons/fi";
@@ -55,7 +55,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const user = useAtomValue(userAtom);
-  const { socket } = useSocket();
+  const { socket, isConnected } = useSocket();
 
   const isCheckoutPage = pathname?.includes("/checkout");
   const userId = user?.id || user?._id || user?.email || "";
@@ -67,15 +67,37 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
     queryKey: ["notifications", userId],
     queryFn: () => fetchNotificationsApi(userId),
     enabled: Boolean(user && !isCheckoutPage),
-    refetchInterval: false, // ⚡ Zero polling: Event-driven via Socket.IO
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
+    // Resilient Real-Time: When socket is connected, poll rarely (60s) as backup;
+    // When socket is disconnected (e.g. serverless or network glitch), poll every 15s.
+    refetchInterval: isConnected ? 60000 : 15000,
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 10,
     gcTime: 1000 * 60 * 10,
     retry: false
   });
 
-  const notifications = data?.notifications || [];
-  const unreadCount = data?.unreadCount || 0;
+  const rawNotifications = data?.notifications || [];
+
+  const notifications = useMemo(() => {
+    const seen = new Set<string>();
+    return rawNotifications.filter((notif) => {
+      const id = notif._id || (notif as any).id;
+      if (id && seen.has(id)) return false;
+      if (id) seen.add(id);
+
+      const cleanTitle = (notif.title || '').trim().toLowerCase();
+      const cleanMsg = (notif.message || '').replace(/["'\s]/g, '').toLowerCase();
+      const semanticKey = `${notif.orderId || ''}_${cleanTitle}_${cleanMsg}`;
+      if (seen.has(semanticKey)) return false;
+      seen.add(semanticKey);
+
+      return true;
+    });
+  }, [rawNotifications]);
+
+  const unreadCount = useMemo(() => {
+    return notifications.filter((n) => !n.isRead).length;
+  }, [notifications]);
 
   // Real-time socket listener for notifications
   useEffect(() => {
@@ -207,7 +229,13 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const nextState = !isOpen;
+          setIsOpen(nextState);
+          if (nextState) {
+            refetch();
+          }
+        }}
         className={`relative p-2 transition-colors focus:outline-none flex items-center justify-center cursor-pointer ${iconClass}`}
         title="Notifications"
         aria-label="Notifications"
