@@ -11,7 +11,6 @@ import { finalPrice, formatImageUrl } from "@/utils/product-utils";
 import { isProductOutOfStock, isSizeOutOfStock } from "@/utils/stock-utils";
 import {
   calculateDeliveryZoneAndFee,
-  createOrderInService,
   OrderItem,
   PaymentMethod
 } from "@/utils/order-service";

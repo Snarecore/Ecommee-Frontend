@@ -21,9 +21,7 @@ import Pagination from "../../../../component/pagination";
 import OrderListSkeleton from "../../../../component/skeleton/CustomerOrder";
 import EmptyComponent from "../../../../component/empty-component";
 import {
-  getStoredOrders,
   getOrderCreatedAt,
-  Order as StoredOrderType,
   OrderStatus
 } from "../../../../utils/order-service";
 import { formatImageUrl } from "../../../../utils/product-utils";
@@ -67,14 +65,18 @@ import { SocketEvent, OrderStatusUpdatedPayload } from "../../../../types/socket
 
 const OrderTab = () => {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
-  const [localOrders, setLocalOrders] = useState<StoredOrderType[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string>("All");
   const dataLimit = 5;
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const { usePaginatedQuery } = useAPI();
   const { socket } = useSocket();
 
   const getOrderListApiUrl = () => {
-    return `${apiConfig.customer.orderListUrl}?page=${currentPageNumber}&limit=${dataLimit}`;
+    let url = `${apiConfig.customer.orderListUrl}?page=${currentPageNumber}&limit=${dataLimit}`;
+    if (activeFilter !== "All") {
+      url += `&status=${encodeURIComponent(activeFilter)}`;
+    }
+    return url;
   };
 
   const handlePagination = (paginationData: { selected: number }) => {
@@ -86,27 +88,29 @@ const OrderTab = () => {
     isLoading,
     pageCount,
     isFetching,
-    refetch: fetchData
+    refetch: fetchData,
+    response
   } = usePaginatedQuery({
-    queryKey: [orderQueryKey, currentPageNumber.toString()],
+    queryKey: [orderQueryKey, currentPageNumber.toString(), activeFilter],
     url: getOrderListApiUrl(),
     refetchOnWindowFocus: true
   });
 
-  const loadStoredOrders = () => {
-    setLocalOrders(getStoredOrders());
+  const statusCounts = (response as any)?.statusCounts || {
+    All: 0,
+    Pending: 0,
+    "Order Placed": 0,
+    Processing: 0,
+    Shipped: 0,
+    Delivered: 0,
+    Cancelled: 0,
+    Rejected: 0
   };
 
   useEffect(() => {
-    loadStoredOrders();
-
     const handleUpdate = () => {
-      loadStoredOrders();
       fetchData();
     };
-
-    window.addEventListener("orders_updated", handleUpdate);
-    window.addEventListener("notifications_updated", handleUpdate);
 
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
@@ -122,8 +126,6 @@ const OrderTab = () => {
     }
 
     return () => {
-      window.removeEventListener("orders_updated", handleUpdate);
-      window.removeEventListener("notifications_updated", handleUpdate);
       if (channel) channel.close();
     };
   }, [fetchData]);
@@ -137,7 +139,6 @@ const OrderTab = () => {
       if (!targetId) return;
 
       fetchData();
-      loadStoredOrders();
 
       setSelectedOrder((current: any) => {
         if (
@@ -173,8 +174,8 @@ const OrderTab = () => {
     };
   }, [socket, fetchData]);
 
-  // Process API orders list from Backend first with top priority
-  const apiOrdersMapped = (dataList || []).map((apiOrd: any) => {
+  // Process API orders list directly from Backend (authoritative source of truth)
+  const ordersList: any[] = (dataList || []).map((apiOrd: any) => {
     const currentStatus = (apiOrd.status || apiOrd.orderStatus || "Order Placed") as OrderStatus;
     const historyList = Array.isArray(apiOrd.statusHistory) && apiOrd.statusHistory.length > 0
       ? apiOrd.statusHistory
@@ -215,36 +216,23 @@ const OrderTab = () => {
       totalAmount: Number(apiOrd.totalAmount || apiOrd.subtotal) || 0,
       deliveryZone: apiOrd.deliveryZone || "inside_dhaka",
       shippingAddress: parsedShippingAddress,
+      courierName: apiOrd.courierName,
+      trackingId: apiOrd.trackingId,
+      courierTrackingLink: apiOrd.courierTrackingLink,
+      rejectionReason: apiOrd.rejectionReason,
+      rejectionMessage: apiOrd.rejectionMessage,
+      couponCode: apiOrd.couponCode,
+      discountAmount: apiOrd.discountAmount,
+      specialNote: apiOrd.specialNote,
       items: (apiOrd.orderSummaries || apiOrd.items || []).map((s: any) => ({
         id: s.id || Math.random().toString(),
         productName: s.productName || "Product",
-        productImage: s.productImage || "",
+        productImage: s.productImage || s.productFileUrl || "",
         price: Number(s.price) || 0,
         quantity: Number(s.quantity) || 1
       })),
       statusHistory: historyList
     };
-  });
-
-  // Combine: API orders take highest precedence, then remaining local storage orders
-  const combinedOrdersList: any[] = [...apiOrdersMapped];
-  localOrders.forEach((locOrd) => {
-    const isDuplicate = combinedOrdersList.some(
-      (o) =>
-        o.id === locOrd.id ||
-        (o.rawOrderId && locOrd.orderId && o.rawOrderId.toLowerCase() === locOrd.orderId.toLowerCase()) ||
-        (o.orderId && locOrd.orderId && o.orderId.toLowerCase().includes(locOrd.orderId.toLowerCase()))
-    );
-    if (!isDuplicate) {
-      combinedOrdersList.push(locOrd);
-    }
-  });
-
-  // Ensure newest orders placed appear first at top (createdAt DESC)
-  combinedOrdersList.sort((a: any, b: any) => {
-    const timeA = new Date(a.createdAt || a.timestamp || 0).getTime();
-    const timeB = new Date(b.createdAt || b.timestamp || 0).getTime();
-    return timeB - timeA;
   });
 
   const handleViewOrder = (order: any) => {
@@ -268,14 +256,14 @@ const OrderTab = () => {
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
-      combinedOrdersList.length > 0 &&
+      ordersList.length > 0 &&
       !selectedOrder &&
       !hasAutoOpenedRef.current
     ) {
       const params = new URLSearchParams(window.location.search);
       const targetOrderId = params.get("orderId");
       if (targetOrderId) {
-        const found = combinedOrdersList.find(
+        const found = ordersList.find(
           (o: any) =>
             o.id === targetOrderId ||
             (o.orderId && o.orderId.toLowerCase().includes(targetOrderId.toLowerCase())) ||
@@ -294,7 +282,7 @@ const OrderTab = () => {
         }
       }
     }
-  }, [combinedOrdersList]);
+  }, [ordersList]);
 
   if (isLoading) return <OrderListSkeleton />;
 
@@ -311,12 +299,45 @@ const OrderTab = () => {
         </div>
       </div>
 
+      {/* Dynamic Status Tabs from Backend */}
+      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-2 border-b border-gray-100">
+        {(["All", "Pending", "Order Placed", "Processing", "Shipped", "Delivered", "Cancelled"] as const).map(
+          (filterKey) => {
+            const count = statusCounts[filterKey] ?? (filterKey === "All" ? statusCounts.All || 0 : 0);
+            const isActive = activeFilter === filterKey;
+            return (
+              <button
+                key={filterKey}
+                onClick={() => {
+                  setActiveFilter(filterKey);
+                  setCurrentPageNumber(1);
+                }}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                  isActive
+                    ? "bg-[var(--color-green-primary)] text-white shadow-xs"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {filterKey}
+                <span
+                  className={`px-1.5 py-0.2 text-[10px] rounded-full font-extrabold ${
+                    isActive ? "bg-white text-[var(--color-green-primary)]" : "bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          }
+        )}
+      </div>
+
       <div className="mt-6">
         <p className="font-bold text-xl text-[var(--color-green-primary)]">Order History</p>
 
         <div className="mt-4 grid gap-4">
-          {combinedOrdersList.length > 0 ? (
-            combinedOrdersList.map((order: any) => {
+          {ordersList.length > 0 ? (
+            ordersList.map((order: any) => {
               const currentStatus: OrderStatus = order.orderStatus || order.status || "Order Placed";
               const isDelivered = currentStatus === "Delivered";
               const isCancelled = currentStatus === "Cancelled";

@@ -1,9 +1,7 @@
-// Legacy order storage utility (Deprecated - use order-service.ts)
+// Legacy order storage utility (Deprecated - use authoritative backend API)
 import { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, OrderStatusHistoryItem, ShippingAddress } from "./order-service";
 
 export type { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, OrderStatusHistoryItem, ShippingAddress };
-
-let memoryOrders: Order[] = [];
 
 export const calculateDeliveryZoneAndFee = (city: string) => {
   const normalizedCity = (city || "").trim().toLowerCase();
@@ -15,5 +13,5 @@ export const calculateDeliveryZoneAndFee = (city: string) => {
 };
 
 export const getStoredOrders = (): Order[] => {
-  return memoryOrders;
+  return [];
 };

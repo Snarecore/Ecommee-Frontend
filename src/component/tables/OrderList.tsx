@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import { FiEye, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import { FiEye } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import EmptyComponent from "../empty-component";
-import {
-  acceptOrderInService,
-  rejectOrderInService,
-  RejectionReason
-} from "../../utils/order-service";
-import { showErrorToast, showSuccessToast } from "../../utils/toast-utils";
 
 interface OrdersDataProps {
   id: string;
@@ -21,18 +15,10 @@ interface OrdersDataProps {
   paymentStatus: string;
   createdAt?: string;
   user?: { name: string };
-  rejectionReason?: string;
-  rejectionMessage?: string;
+  shippingAddress?: { name?: string; phone?: string; city?: string };
+  name?: string;
+  phone?: string;
 }
-
-const REJECTION_REASONS: RejectionReason[] = [
-  "Product unavailable",
-  "Out of stock",
-  "Delivery unavailable",
-  "Customer information issue",
-  "Payment issue",
-  "Other"
-];
 
 const OrderListTable = ({
   title,
@@ -41,25 +27,12 @@ const OrderListTable = ({
 }: {
   title: string;
   headers: string[];
-  data: any[];
+  data: OrdersDataProps[];
 }) => {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<string>("All");
 
-  // Local state to reflect instant state changes
-  const [ordersList, setOrdersList] = useState<any[]>(initialData || []);
-
-  // Sync state if prop changes
-  React.useEffect(() => {
-    setOrdersList(initialData || []);
-  }, [initialData]);
-
-  // Modal States
-  const [acceptingOrder, setAcceptingOrder] = useState<any | null>(null);
-  const [rejectingOrder, setRejectingOrder] = useState<any | null>(null);
-  const [rejectionReason, setRejectionReason] = useState<string>("");
-  const [rejectionMessage, setRejectionMessage] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const ordersList = initialData || [];
 
   const handleNavigate = (row: any) => {
     router.push(`/order-confirmation/${row.id || row.orderId}`);
@@ -98,82 +71,6 @@ const OrderListTable = ({
     Rejected: ordersList.filter((o) => (o.orderStatus || o.status) === "Rejected").length
   };
 
-  // Confirm Accept Order
-  const handleConfirmAccept = async () => {
-    if (!acceptingOrder) return;
-    setIsSubmitting(true);
-    try {
-      const orderId = acceptingOrder.id || acceptingOrder.orderId;
-      const res = await acceptOrderInService({ orderId, adminUserId: "admin_1" });
-      if (res) {
-        showSuccessToast(`Order #${res.orderId || res.id} accepted successfully!`);
-        // Update local list
-        setOrdersList((prev) =>
-          prev.map((o) =>
-            (o.id === orderId || o.orderId === orderId) ? { ...o, status: "Order Placed", orderStatus: "Order Placed" } : o
-          )
-        );
-      } else {
-        showErrorToast("409 Conflict: Failed to accept order. Only Pending orders can be accepted.");
-      }
-    } catch (err: any) {
-      showErrorToast(err?.message || "409 Conflict: An error occurred while accepting order.");
-    } finally {
-      setIsSubmitting(false);
-      setAcceptingOrder(null);
-    }
-  };
-
-  // Confirm Reject Order
-  const handleConfirmReject = async () => {
-    if (!rejectingOrder) return;
-    if (!rejectionReason) {
-      showErrorToast("Please select a reason for rejecting this order.");
-      return;
-    }
-    if (rejectionReason === "Other" && !rejectionMessage.trim()) {
-      showErrorToast("Please provide an additional message when selecting 'Other'.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const orderId = rejectingOrder.id || rejectingOrder.orderId;
-      const res = await rejectOrderInService({
-        orderId,
-        adminUserId: "admin_1",
-        rejectionReason,
-        rejectionMessage: rejectionMessage.trim()
-      });
-      if (res) {
-        showSuccessToast(`Order #${res.orderId || res.id} rejected.`);
-        // Update local list
-        setOrdersList((prev) =>
-          prev.map((o) =>
-            (o.id === orderId || o.orderId === orderId)
-              ? {
-                  ...o,
-                  status: "Rejected",
-                  orderStatus: "Rejected",
-                  rejectionReason,
-                  rejectionMessage: rejectionMessage.trim()
-                }
-              : o
-          )
-        );
-      } else {
-        showErrorToast("409 Conflict: Failed to reject order. Only Pending orders can be rejected.");
-      }
-    } catch (err: any) {
-      showErrorToast(err?.message || "409 Conflict: An error occurred while rejecting order.");
-    } finally {
-      setIsSubmitting(false);
-      setRejectingOrder(null);
-      setRejectionReason("");
-      setRejectionMessage("");
-    }
-  };
-
   const getStatusBadge = (statusStr: string) => {
     const s = (statusStr || "Pending").trim();
     if (s === "Pending") {
@@ -209,7 +106,7 @@ const OrderListTable = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2">
         <h2 className="text-xl font-bold text-gray-800">{title}</h2>
         <Link
-          href={"/orders"}
+          href={"/customer-dashboard?tab=order"}
           className="underline text-[#212B36] text-xs hover:text-[var(--color-green-primary)] transition"
         >
           View All
@@ -264,21 +161,24 @@ const OrderListTable = ({
             {filteredOrders.length > 0 ? (
               filteredOrders.map((row, rowIndex) => {
                 const currentStatus = (row.orderStatus || row.status || "Pending").trim();
-                const isPending = currentStatus === "Pending";
 
                 return (
-                  <tr key={rowIndex} className="hover:bg-gray-50/80 transition">
+                  <tr key={row.id || rowIndex} className="hover:bg-gray-50/80 transition">
                     <td className="p-3 font-semibold text-gray-500">{rowIndex + 1}</td>
                     <td className="p-3 font-extrabold text-gray-800">{row.orderId || row.id}</td>
                     <td className="p-3">
-                      <div className="font-semibold text-gray-800">{row.user?.name || row.shippingAddress?.name || row.name || "Customer"}</div>
-                      <div className="text-xs text-gray-400">{row.shippingAddress?.phone || row.phone || row.user?.phone || row.user?.email || "N/A"}</div>
+                      <div className="font-semibold text-gray-800">
+                        {row.user?.name || row.shippingAddress?.name || row.name || "Customer"}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {row.shippingAddress?.phone || row.phone || "N/A"}
+                      </div>
                     </td>
                     <td className="p-3 font-bold text-gray-900">
-                      ৳{row.vendorTotalAmount || row.totalAmount || row.subtotal || 0}
+                      ৳{row.vendorTotalAmount || row.totalAmount || 0}
                     </td>
                     <td className="p-3">{getStatusBadge(currentStatus)}</td>
-                    <td className="p-3 text-gray-500 text-xs">{formatPrettyDateWithTime(row.createdAt)}</td>
+                    <td className="p-3 text-gray-500 text-xs">{row.createdAt ? formatPrettyDateWithTime(row.createdAt) : "N/A"}</td>
 
                     {/* Action buttons */}
                     <td className="p-3">
@@ -286,33 +186,11 @@ const OrderListTable = ({
                         {/* View Button */}
                         <button
                           onClick={() => handleNavigate(row)}
-                          title="View Order Confirmation"
+                          title="View Order Details"
                           className="border border-gray-200 text-gray-700 hover:text-[var(--color-green-primary)] hover:bg-emerald-50 cursor-pointer p-2 rounded-lg transition"
                         >
                           <FiEye size={16} />
                         </button>
-
-                        {/* Accept & Reject Buttons - ONLY shown for Pending orders */}
-                        {isPending && (
-                          <>
-                            <button
-                              onClick={() => setAcceptingOrder(row)}
-                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg cursor-pointer transition shadow-xs flex items-center gap-1"
-                            >
-                              <FiCheckCircle /> Accept
-                            </button>
-                            <button
-                              onClick={() => {
-                                setRejectingOrder(row);
-                                setRejectionReason("");
-                                setRejectionMessage("");
-                              }}
-                              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg cursor-pointer transition shadow-xs flex items-center gap-1"
-                            >
-                              <FiXCircle /> Reject
-                            </button>
-                          </>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -328,101 +206,6 @@ const OrderListTable = ({
           </tbody>
         </table>
       </div>
-
-      {/* Accept Confirmation Modal */}
-      {acceptingOrder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-lg font-extrabold text-gray-900 flex items-center gap-2">
-              <FiCheckCircle className="text-emerald-600 text-xl" /> Accept Order?
-            </h3>
-            <p className="text-sm text-gray-600">
-              This will move Order <strong className="text-gray-800">#{acceptingOrder.orderId || acceptingOrder.id}</strong> from <span className="text-amber-700 font-bold">Pending</span> to <span className="text-emerald-700 font-bold">Order Placed</span>.
-            </p>
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                disabled={isSubmitting}
-                onClick={() => setAcceptingOrder(null)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                disabled={isSubmitting}
-                onClick={handleConfirmAccept}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl cursor-pointer transition"
-              >
-                {isSubmitting ? "Accepting..." : "Accept Order"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Reject Modal with Mandatory Reason */}
-      {rejectingOrder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-lg font-extrabold text-red-600 flex items-center gap-2">
-              <FiXCircle className="text-xl" /> Reject Order #{rejectingOrder.orderId || rejectingOrder.id}
-            </h3>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Reason <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  className="w-full border border-gray-300 rounded-xl p-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none"
-                >
-                  <option value="">Select a reason...</option>
-                  {REJECTION_REASONS.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Additional Message {rejectionReason === "Other" && <span className="text-red-500">*</span>}
-                </label>
-                <textarea
-                  rows={3}
-                  value={rejectionMessage}
-                  onChange={(e) => setRejectionMessage(e.target.value)}
-                  placeholder="Write a message for the customer..."
-                  className="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                disabled={isSubmitting}
-                onClick={() => {
-                  setRejectingOrder(null);
-                  setRejectionReason("");
-                  setRejectionMessage("");
-                }}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                disabled={isSubmitting}
-                onClick={handleConfirmReject}
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl cursor-pointer transition"
-              >
-                {isSubmitting ? "Rejecting..." : "Reject Order"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
