@@ -22,6 +22,8 @@ import { metaDataAtom } from "../../store/global-store";
 // 👇 Adjust this import path to wherever your helper lives
 import { finalPrice, formatImageUrl } from "../../utils/product-utils"; 
 import { isProductOutOfStock, isSizeOutOfStock } from "../../utils/stock-utils";
+import { postData } from "../../services/api-service";
+import { getUserToken } from "../../hooks/useApi";
 
 const MyCart = () => {
   const { fetchData } = useAPI();
@@ -60,15 +62,58 @@ const MyCart = () => {
     fetchCartPageData();
   }, []);
 
-  // ---- Discount-aware subtotal for the whole cart ----
-  const cartSubtotal = cartItems.reduce((sum, item) => {
+  // Authoritative server-calculated subtotal (Backend SSOT)
+  const [serverSubtotal, setServerSubtotal] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      setServerSubtotal(0);
+      return;
+    }
+
+    let isCancelled = false;
+    const fetchCartPreview = async () => {
+      try {
+        const payload = {
+          items: cartItems.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity ?? 1,
+            size: item.selectedSize
+          }))
+        };
+        const token = getUserToken();
+        const res: any = await postData({
+          url: apiConfig.customer.orderPreviewUrl || "orders/preview",
+          token,
+          body: payload
+        });
+        const data = res?.data || res;
+        if (!isCancelled && data && data.subtotal !== undefined) {
+          setServerSubtotal(Number(data.subtotal) || 0);
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    };
+
+    fetchCartPreview();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [cartItems]);
+
+  // Fallback local subtotal calculation
+  const fallbackSubtotal = cartItems.reduce((sum, item) => {
     const unit = finalPrice({
       price: Number(item.price) || 0,
-      discountType: item.discountType,        // "NONE" | "PERCENT" | "FLAT"
+      discountType: item.discountType,
       discountAmount: item.discountAmount ?? 0,
     });
     return sum + unit * (item.quantity ?? 1);
   }, 0);
+
+  const cartSubtotal = serverSubtotal ?? fallbackSubtotal;
 
   return (
     <div className="py-2 sm:py-8 max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto sm:px-2">

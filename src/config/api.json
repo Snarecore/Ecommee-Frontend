@@ -37,7 +37,8 @@
     },
     "customer": {
         "orderListUrl": "orders/customer-order",
-        "createOrderUrl": "orders"
+        "createOrderUrl": "orders",
+        "orderPreviewUrl": "orders/preview"
     },
     "contentCMS": {
         "reviews": "reviews"

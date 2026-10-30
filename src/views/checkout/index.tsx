@@ -119,8 +119,64 @@ const CheckoutView = () => {
     }
   }, [user]);
 
-  // Calculate Subtotal with discounts
-  const cartSubtotal = cartItems.reduce((sum, item) => {
+  // Server-authoritative Price & Delivery Calculation (Backend SSOT)
+  const [serverCalculation, setServerCalculation] = useState<{
+    subtotal: number;
+    deliveryCharge: number;
+    deliveryZone: "inside_dhaka" | "outside_dhaka";
+    discountAmount: number;
+    totalAmount: number;
+  } | null>(null);
+  const [isCalculatingPrice, setIsCalculatingPrice] = useState(false);
+
+  useEffect(() => {
+    if (!isMounted || cartItems.length === 0) return;
+
+    let isCancelled = false;
+    const fetchServerCalculation = async () => {
+      setIsCalculatingPrice(true);
+      try {
+        const payload = {
+          items: cartItems.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity ?? 1,
+            size: item.selectedSize
+          })),
+          city: city.trim(),
+          couponCode: appliedCoupon?.couponCode || undefined
+        };
+        const token = getUserToken();
+        const res: any = await postData({
+          url: apiConfig.customer.orderPreviewUrl || "orders/preview",
+          token,
+          body: payload
+        });
+        const data = res?.data || res;
+        if (!isCancelled && data && (data.subtotal !== undefined || data.totalAmount !== undefined)) {
+          setServerCalculation({
+            subtotal: Number(data.subtotal) || 0,
+            deliveryCharge: Number(data.deliveryCharge) || 0,
+            deliveryZone: data.deliveryZone || (city.toLowerCase().includes("dhaka") ? "inside_dhaka" : "outside_dhaka"),
+            discountAmount: Number(data.discountAmount) || 0,
+            totalAmount: Number(data.totalAmount) || 0
+          });
+        }
+      } catch (err) {
+        // Fallback seamlessly to local calculation if endpoint is temporarily unavailable
+      } finally {
+        if (!isCancelled) setIsCalculatingPrice(false);
+      }
+    };
+
+    fetchServerCalculation();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [cartItems, city, appliedCoupon, isMounted]);
+
+  // Fallback local subtotal calculation
+  const fallbackSubtotal = cartItems.reduce((sum, item) => {
     const unit = finalPrice({
       price: Number(item.price) || 0,
       discountType: item.discountType,
@@ -129,10 +185,14 @@ const CheckoutView = () => {
     return sum + unit * (item.quantity ?? 1);
   }, 0);
 
-  // Authoritative delivery zone & fee calculation
-  const { deliveryZone, deliveryCharge } = calculateDeliveryZoneAndFee(city);
-  const couponDiscount = appliedCoupon ? appliedCoupon.discountAmount : 0;
-  const grandTotal = Math.max(0, cartSubtotal + deliveryCharge - couponDiscount);
+  const fallbackDelivery = calculateDeliveryZoneAndFee(city);
+
+  // Authoritative calculations from backend first, with local fallback
+  const cartSubtotal = serverCalculation?.subtotal ?? fallbackSubtotal;
+  const deliveryCharge = serverCalculation?.deliveryCharge ?? fallbackDelivery.deliveryCharge;
+  const deliveryZone = serverCalculation?.deliveryZone ?? fallbackDelivery.deliveryZone;
+  const couponDiscount = serverCalculation?.discountAmount ?? (appliedCoupon ? appliedCoupon.discountAmount : 0);
+  const grandTotal = serverCalculation?.totalAmount ?? Math.max(0, cartSubtotal + deliveryCharge - couponDiscount);
 
   // Handle Form Submission
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -209,7 +269,13 @@ const CheckoutView = () => {
           url: "payments",
           token,
           body: {
-            products: backendProducts,
+            items: cartItems.map((item) => ({
+              productId: item.id,
+              quantity: item.quantity ?? 1,
+              size: item.selectedSize
+            })),
+            city: city.trim(),
+            couponCode: appliedCoupon?.couponCode || undefined,
             currency: "usd"
           }
         });

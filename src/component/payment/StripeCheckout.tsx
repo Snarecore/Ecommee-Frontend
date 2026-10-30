@@ -87,7 +87,14 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
                 const response: any = await postData({
                     url: 'payments',
                     token: getUserToken(),
-                    body: { products, currency: 'usd' }
+                    body: {
+                        items: products.map((p) => ({
+                            productId: p.id,
+                            quantity: p.quantity ?? 1
+                        })),
+                        city,
+                        currency: 'usd'
+                    }
                 });
                 if (response?.clientSecret || response?.data?.clientSecret) {
                     setClientSecret(response.clientSecret || response.data.clientSecret);
@@ -130,7 +137,14 @@ const StripeCheckout = ({ products, onSuccess }: StripeCheckoutProps) => {
                 const response: any = await postData({
                     url: 'payments',
                     token: getUserToken(),
-                    body: { products, currency: 'usd' }
+                    body: {
+                        items: products.map((p) => ({
+                            productId: p.id,
+                            quantity: p.quantity ?? 1
+                        })),
+                        city,
+                        currency: 'usd'
+                    }
                 });
                 secret = response?.clientSecret || response?.data?.clientSecret;
                 setClientSecret(secret);
