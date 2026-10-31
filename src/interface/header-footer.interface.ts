@@ -18,4 +18,7 @@ export interface HeaderFooter {
         link: string;
         value: string;
     }>;
+    primaryColor?: string;
+    secondaryColor?: string;
+    themeConfig?: any;
 }

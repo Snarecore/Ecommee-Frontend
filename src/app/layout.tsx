@@ -36,6 +36,22 @@ export default function RootLayout({
                     document.documentElement.classList.remove('dark');
                     document.documentElement.setAttribute('data-theme', 'light');
                   }
+
+                  var savedAccent = localStorage.getItem('storefront-primary-color');
+                  if (!savedAccent) {
+                    var savedThemeConfig = localStorage.getItem('storefront-theme') || localStorage.getItem('bazaarbound-appearance');
+                    if (savedThemeConfig) {
+                      try {
+                        var parsed = JSON.parse(savedThemeConfig);
+                        savedAccent = (parsed.palette && parsed.palette.accent) || (parsed.overrides && parsed.overrides.palette && parsed.overrides.palette.accent) || parsed.accent;
+                      } catch (err) {}
+                    }
+                  }
+                  if (savedAccent) {
+                    document.documentElement.style.setProperty('--color-primary', savedAccent);
+                    document.documentElement.style.setProperty('--color-green-primary', savedAccent);
+                    document.documentElement.style.setProperty('--color-green-secondary', savedAccent);
+                  }
                 } catch (e) {}
               })();
             `,
