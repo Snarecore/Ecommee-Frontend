@@ -259,11 +259,11 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
           <div className="fixed inset-x-3 top-14 z-50 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 max-h-[85vh] sm:max-h-none bg-white dark:bg-gray-800 shadow-2xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden text-gray-800 dark:text-gray-100 animate-in fade-in duration-200 flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-sm text-[#218DAE] dark:text-[#218DAE]">
+                <h3 className="font-bold text-sm text-[var(--color-primary)] dark:text-[var(--color-primary)]">
                   Notifications
                 </h3>
                 {unreadCount > 0 && (
-                  <span className="bg-[#218DAE]/10 dark:bg-[#218DAE]/20 text-[#218DAE] dark:text-[#218DAE] text-xs font-semibold px-2 py-0.5 rounded-full">
+                  <span className="bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:text-[var(--color-primary)] text-xs font-semibold px-2 py-0.5 rounded-full">
                     {unreadCount} new
                   </span>
                 )}
@@ -273,7 +273,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="text-xs text-[#218DAE] dark:text-[#218DAE] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                    className="text-xs text-[var(--color-primary)] dark:text-[var(--color-primary)] hover:underline flex items-center gap-1 font-medium cursor-pointer"
                   >
                     <FiCheck /> Mark all read
                   </button>
@@ -300,7 +300,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
                     key={notif._id}
                     onClick={() => handleNotificationClick(notif)}
                     className={`p-3.5 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer transition-colors ${
-                      !notif.isRead ? "bg-[#218DAE]/10 dark:bg-gray-700/30" : ""
+                      !notif.isRead ? "bg-[var(--color-primary)]/10 dark:bg-gray-700/30" : ""
                     }`}
                   >
                     <div className="mt-0.5">{getTypeIcon(notif.type)}</div>
@@ -334,7 +334,7 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
                   setIsOpen(false);
                   router.push("/customer-dashboard?tab=order");
                 }}
-                className="text-xs font-medium text-[var(--color-green-primary)] dark:text-[#218DAE] hover:underline cursor-pointer"
+                className="text-xs font-medium text-[var(--color-green-primary)] dark:text-[var(--color-primary)] hover:underline cursor-pointer"
               >
                 View Order Dashboard →
               </button>

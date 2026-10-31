@@ -22,7 +22,6 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
     const router = useRouter();
     const {
         name,
-        mainCategoryName,
         price,
         featuredImage,
         discountType,
@@ -223,7 +222,7 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
 
                                 {/* Buy Now */}
                                 <button
-                                    className="flex-1 sm:w-1/2 py-1.5 sm:py-2 px-1.5 sm:px-2 bg-[var(--color-green-primary)] text-white text-[10px] sm:text-[11px] xl:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[#1D7693] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
+                                    className="flex-1 sm:w-1/2 py-1.5 sm:py-2 px-1.5 sm:px-2 bg-[var(--color-green-primary)] text-white text-[10px] sm:text-[11px] xl:text-xs font-semibold rounded-md sm:rounded-lg hover:bg-[var(--color-green-secondary)] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 shadow-xs hover:shadow-md whitespace-nowrap overflow-hidden"
                                     onClick={(e) => openModal(e, "buyNow")}
                                 >
                                     <span>Buy Now</span>

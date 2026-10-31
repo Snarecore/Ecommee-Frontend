@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/store/user-store';
-import { getUserToken } from '@/hooks/useApi';
 import apiConfig from '@/config/api.json';
 const formatChatTime = (dateStr?: string): string => {
     const d = dateStr ? new Date(dateStr) : new Date();
@@ -404,7 +403,7 @@ const FloatingChat = () => {
                     <button
                         onClick={() => setIsOpen(true)}
                         aria-label="Open Chat with Support"
-                        className="group relative flex items-center justify-center w-14 h-14 bg-[var(--color-green-primary)] hover:bg-[#1D7693] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-sky-100"
+                        className="group relative flex items-center justify-center w-14 h-14 bg-[var(--color-green-primary)] hover:bg-[var(--color-green-secondary)] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-sky-100"
                     >
                         <IoChatbubbleEllipsesSharp className="w-7 h-7 transition-transform group-hover:rotate-6 text-white" />
                         <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
@@ -426,7 +425,7 @@ const FloatingChat = () => {
                 >
 
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[#1D7693] px-4 py-3.5 text-white flex items-center justify-between shadow-md flex-shrink-0">
+                    <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[var(--color-green-secondary)] px-4 py-3.5 text-white flex items-center justify-between shadow-md flex-shrink-0">
                         <div className="flex items-center space-x-3">
                             <div className="relative">
                                 <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white text-xl border border-white/30">
@@ -471,7 +470,7 @@ const FloatingChat = () => {
                                     <p className="text-xs text-red-500 font-medium">Unable to connect to chat support.</p>
                                     <button
                                         onClick={() => initializeGuest()}
-                                        className="px-4 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[#1D7693] transition-colors cursor-pointer shadow-sm"
+                                        className="px-4 py-2 bg-[var(--color-green-primary)] text-white text-xs font-semibold rounded-xl hover:bg-[var(--color-green-secondary)] transition-colors cursor-pointer shadow-sm"
                                     >
                                         Retry Connection
                                     </button>
@@ -597,7 +596,7 @@ const FloatingChat = () => {
                                     type="submit"
                                     disabled={isSending || (!content.trim() && !pendingImage)}
                                     aria-label="Send Message"
-                                    className="w-9 h-9 bg-[var(--color-green-primary)] hover:bg-[#1D7693] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-colors cursor-pointer shadow-sm shrink-0"
+                                    className="w-9 h-9 bg-[var(--color-green-primary)] hover:bg-[var(--color-green-secondary)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-colors cursor-pointer shadow-sm shrink-0"
                                 >
                                     {isSending ? (
                                         <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

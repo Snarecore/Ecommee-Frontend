@@ -24,8 +24,8 @@ const Header = () => {
                 <div className="flex items-center justify-between gap-4">
                     {/* Marquee Banner */}
                     <div className="hidden sm:flex items-center gap-2 flex-1 overflow-hidden">
-                        <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-[#218DAE]/10 dark:bg-[#218DAE]/20 text-[#218DAE] dark:text-[#218DAE] px-2 py-0.5 rounded-full border border-[#218DAE]/30 flex-shrink-0">
-                            <FiZap className="text-[#218DAE] animate-pulse" /> Offer
+                        <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:text-[var(--color-primary)] px-2 py-0.5 rounded-full border border-[var(--color-primary)]/30 flex-shrink-0">
+                            <FiZap className="text-[var(--color-primary)] animate-pulse" /> Offer
                         </span>
                         <Marquee
                             speed={65}
@@ -33,7 +33,7 @@ const Header = () => {
                             pauseOnHover={true}
                             className="text-xs font-medium text-slate-700 dark:text-slate-300"
                         >
-                            <span className="text-[#218DAE] dark:text-[#218DAE] font-semibold px-4">
+                            <span className="text-[var(--color-primary)] dark:text-[var(--color-primary)] font-semibold px-4">
                                 {headerFooterData?.bannerText || "Welcome to Fashion Time - Special Discounts Available Today!"}
                             </span>
                         </Marquee>
@@ -46,17 +46,17 @@ const Header = () => {
                         ) : user ? (
                             <Link
                                 href="/customer-dashboard?tab=order"
-                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
+                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[var(--color-primary)] dark:hover:text-[var(--color-primary)] transition-colors duration-200 py-0.5 group"
                             >
-                                <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
+                                <FiUser className="text-[var(--color-primary)] group-hover:scale-110 transition-transform duration-200" />
                                 <span>Hello, <strong className="font-semibold text-slate-900 dark:text-white">{displayName}</strong></span>
                             </Link>
                         ) : (
                             <Link
                                 href="/login"
-                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
+                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[var(--color-primary)] dark:hover:text-[var(--color-primary)] transition-colors duration-200 py-0.5 group"
                             >
-                                <FiUser className="text-[#218DAE] group-hover:scale-110 transition-transform duration-200" />
+                                <FiUser className="text-[var(--color-primary)] group-hover:scale-110 transition-transform duration-200" />
                                 <span>Login</span>
                             </Link>
                         )}
@@ -66,9 +66,9 @@ const Header = () => {
                         {headerFooterData?.contactPhone && (
                             <a
                                 href={`tel:${headerFooterData.contactPhone}`}
-                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors duration-200 py-0.5 group"
+                                className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-[var(--color-primary)] dark:hover:text-[var(--color-primary)] transition-colors duration-200 py-0.5 group"
                             >
-                                <FiPhoneCall className="text-[#218DAE] group-hover:rotate-12 transition-transform duration-200" />
+                                <FiPhoneCall className="text-[var(--color-primary)] group-hover:rotate-12 transition-transform duration-200" />
                                 <span><strong className="font-semibold text-slate-800 dark:text-slate-400">Helpline:</strong> {headerFooterData?.contactPhone}</span>
                             </a>
                         )}

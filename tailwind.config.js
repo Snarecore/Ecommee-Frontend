@@ -7,11 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#218DAE",
+        primary: {
+          DEFAULT: "var(--color-primary, #218DAE)",
+          foreground: "var(--color-primary-foreground, #FFFFFF)",
+        },
         secondary: {
-          DEFAULT: "#1D7693",
-          light: "#3FA5C7",
-          dark: "#145970",
+          DEFAULT: "var(--color-green-secondary, #1D7693)",
+          light: "var(--color-green-secondary-light, #3FA5C7)",
+          dark: "var(--color-green-secondary-dark, #145970)",
         },
       },
       keyframes: {

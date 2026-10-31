@@ -383,11 +383,11 @@ const Product = ({ initialData }: ProductProps) => {
                         border-radius: 10px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-thumb {
-                        background: #218DAE;
+                        background: var(--color-primary, #218DAE);
                         border-radius: 10px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                        background: #1D7693;
+                        background: var(--color-green-secondary, var(--color-green-secondary));
                     }
                 `}
                 </style>
@@ -625,7 +625,7 @@ const Product = ({ initialData }: ProductProps) => {
                                             </button>
 
                                             <button
-                                                className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-green-primary)] text-white font-bold text-xs sm:text-base rounded-xl hover:bg-[#1D7693] transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 group whitespace-nowrap"
+                                                className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-green-primary)] text-white font-bold text-xs sm:text-base rounded-xl hover:bg-[var(--color-green-secondary)] transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 group whitespace-nowrap"
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();

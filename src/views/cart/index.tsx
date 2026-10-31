@@ -332,7 +332,7 @@ const MyCart = () => {
                           className={`mt-6 w-full py-3.5 px-4 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md ${
                             isDisabled
                               ? "bg-gray-200 text-gray-400 opacity-80 cursor-not-allowed shadow-none"
-                              : "bg-[var(--color-green-primary)] text-white hover:bg-[#1D7693] active:scale-[0.99] cursor-pointer"
+                              : "bg-[var(--color-green-primary)] text-white hover:bg-[var(--color-green-secondary)] active:scale-[0.99] cursor-pointer"
                           }`}
                         >
                           <span>Proceed to Checkout</span>

@@ -91,7 +91,7 @@ const Footer = () => {
     return (
         <div className="bg-slate-950 text-slate-300 pt-16 pb-8 border-t border-slate-800 relative overflow-hidden transition-colors duration-300">
             {/* Ambient Background Gradient Accent */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#218DAE]/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl pointer-events-none" />
 
             <footer className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 {/* Main Grid Layout */}
@@ -111,7 +111,7 @@ const Footer = () => {
                                     />
                                 ) : (
                                     <span className="text-2xl font-black text-white tracking-wider uppercase flex items-center gap-2">
-                                        <span className="bg-[#218DAE] text-white px-2 py-0.5 rounded-md">Fashion</span> Time
+                                        <span className="bg-[var(--color-primary)] text-white px-2 py-0.5 rounded-md">Fashion</span> Time
                                     </span>
                                 )}
                             </Link>
@@ -132,7 +132,7 @@ const Footer = () => {
                                                 href={link}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-[#218DAE] border border-slate-800 hover:border-[#218DAE] text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs hover:-translate-y-1"
+                                                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-[var(--color-primary)] border border-slate-800 hover:border-[var(--color-primary)] text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs hover:-translate-y-1"
                                                 aria-label={social.name || social.link || "Social link"}
                                             >
                                                 {getSocialIcon(link)}
@@ -146,7 +146,7 @@ const Footer = () => {
 
                     {/* Main Categories Column */}
                     <div className="sm:col-span-1 md:col-span-1 lg:col-span-3">
-                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#218DAE]">
+                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[var(--color-primary)]">
                             Categories
                         </h3>
                         <ul className="space-y-2.5">
@@ -156,7 +156,7 @@ const Footer = () => {
                                         href={item.link} 
                                         className="text-slate-400 hover:text-white hover:translate-x-1.5 transition-all duration-200 inline-flex items-center gap-1.5 group text-sm"
                                     >
-                                        <FaAngleRight className="text-xs text-[#218DAE] opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
+                                        <FaAngleRight className="text-xs text-[var(--color-primary)] opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
                                         <span>{item.value}</span>
                                     </Link>
                                 </li>
@@ -166,7 +166,7 @@ const Footer = () => {
 
                     {/* Policies Column */}
                     <div className="sm:col-span-1 md:col-span-1 lg:col-span-2">
-                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#218DAE]">
+                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[var(--color-primary)]">
                             Policy & Info
                         </h3>
                         <ul className="space-y-2.5">
@@ -176,7 +176,7 @@ const Footer = () => {
                                         href={sec.link} 
                                         className="text-slate-400 hover:text-white hover:translate-x-1.5 transition-all duration-200 inline-flex items-center gap-1.5 group text-sm"
                                     >
-                                        <FaAngleRight className="text-xs text-[#218DAE] opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
+                                        <FaAngleRight className="text-xs text-[var(--color-primary)] opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
                                         <span>{sec.value}</span>
                                     </Link>
                                 </li>
@@ -186,15 +186,15 @@ const Footer = () => {
 
                     {/* Contact Us Column */}
                     <div className="sm:col-span-2 md:col-span-2 lg:col-span-3">
-                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#218DAE]">
+                        <h3 className="text-white font-bold text-base mb-4 relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[var(--color-primary)]">
                             Contact Us
                         </h3>
                         <div className="space-y-3 text-sm text-slate-300">
                             <a 
                                 href={`mailto:${contactEmail}`} 
-                                className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-[#218DAE]/50 text-slate-300 hover:text-white transition-all group shadow-xs"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-[var(--color-primary)]/50 text-slate-300 hover:text-white transition-all group shadow-xs"
                             >
-                                <span className="p-2.5 rounded-lg bg-[#218DAE]/15 text-[#218DAE] group-hover:bg-[#218DAE] group-hover:text-white transition-colors flex-shrink-0">
+                                <span className="p-2.5 rounded-lg bg-[var(--color-primary)]/15 text-[var(--color-primary)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors flex-shrink-0">
                                     <FaEnvelope className="w-4 h-4" />
                                 </span>
                                 <div className="overflow-hidden">
@@ -205,9 +205,9 @@ const Footer = () => {
 
                             <a 
                                 href={`tel:${contactPhone}`} 
-                                className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-[#218DAE]/50 text-slate-300 hover:text-white transition-all group shadow-xs"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-[var(--color-primary)]/50 text-slate-300 hover:text-white transition-all group shadow-xs"
                             >
-                                <span className="p-2.5 rounded-lg bg-[#218DAE]/15 text-[#218DAE] group-hover:bg-[#218DAE] group-hover:text-white transition-colors flex-shrink-0">
+                                <span className="p-2.5 rounded-lg bg-[var(--color-primary)]/15 text-[var(--color-primary)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors flex-shrink-0">
                                     <FaPhone className="w-4 h-4" />
                                 </span>
                                 <div>
@@ -217,7 +217,7 @@ const Footer = () => {
                             </a>
 
                             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 shadow-xs">
-                                <span className="p-2.5 rounded-lg bg-[#218DAE]/15 text-[#218DAE] flex-shrink-0">
+                                <span className="p-2.5 rounded-lg bg-[var(--color-primary)]/15 text-[var(--color-primary)] flex-shrink-0">
                                     <FaLocationDot className="w-4 h-4" />
                                 </span>
                                 <div>

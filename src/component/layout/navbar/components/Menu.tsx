@@ -172,7 +172,7 @@ const Menu = () => {
                     {item.name}
                   </p>
                   {item.price !== undefined && (
-                    <span className="inline-block mt-0.5 font-bold text-xs text-[#218DAE] dark:text-[#218DAE] bg-[#218DAE]/10 dark:bg-[#218DAE]/20 px-2 py-0.5 rounded-full border border-[#218DAE]/20">
+                    <span className="inline-block mt-0.5 font-bold text-xs text-[var(--color-primary)] dark:text-[var(--color-primary)] bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/20 px-2 py-0.5 rounded-full border border-[var(--color-primary)]/20">
                       ${item.price}
                     </span>
                   )}
@@ -208,11 +208,11 @@ const Menu = () => {
               <input
                 type="text"
                 placeholder="Search products, categories..."
-                className="w-full pl-11 pr-10 py-2.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/80 text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#218DAE]/15 focus:border-[#218DAE] transition-all duration-300 shadow-xs"
+                className="w-full pl-11 pr-10 py-2.5 rounded-full border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-800/80 text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[var(--color-primary)]/15 focus:border-[var(--color-primary)] transition-all duration-300 shadow-xs"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-[#218DAE] dark:text-[#218DAE]">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-[var(--color-primary)] dark:text-[var(--color-primary)]">
                 <FiSearch className="text-lg" />
               </div>
 
@@ -239,13 +239,13 @@ const Menu = () => {
             {/* Wishlist Button */}
             <Link
               href="/wishlist"
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[#1D7693] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[var(--color-primary)]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[var(--color-green-secondary)] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
               title="Wishlist"
               aria-label="Wishlist"
             >
               <FaRegHeart className="text-base sm:text-xl text-[var(--color-green-primary)] group-hover:scale-110 transition-transform duration-200" />
               {isMounted && wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#218DAE] text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
+                <span className="absolute -top-1 -right-1 bg-[var(--color-primary)] text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
                   {wishlistCount}
                 </span>
               )}
@@ -254,13 +254,13 @@ const Menu = () => {
             {/* Cart Button */}
             <Link
               href="/cart"
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[#1D7693] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[var(--color-primary)]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[var(--color-green-secondary)] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 relative group"
               title="Shopping Cart"
               aria-label="Shopping Cart"
             >
               <HiOutlineShoppingBag className="text-lg sm:text-2xl text-[var(--color-green-primary)] group-hover:scale-110 transition-transform duration-200" />
               {isMounted && cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#218DAE] text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
+                <span className="absolute -top-1 -right-1 bg-[var(--color-primary)] text-white font-bold text-[10px] min-w-[18px] h-4.5 px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 animate-in zoom-in duration-200">
                   {cartItemCount}
                 </span>
               )}
@@ -269,7 +269,7 @@ const Menu = () => {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[#218DAE]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[#1D7693] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 hover:border-[var(--color-primary)]/50 flex items-center justify-center text-[var(--color-green-primary)] hover:text-[var(--color-green-secondary)] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
               title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
               aria-label="Toggle Theme"
             >
@@ -288,11 +288,11 @@ const Menu = () => {
             <input
               type="text"
               placeholder="Search products, categories..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white/95 dark:bg-gray-800/90 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#218DAE]/20 focus:border-[#218DAE] transition-all shadow-xs"
+              className="w-full pl-9 pr-8 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white/95 dark:bg-gray-800/90 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] transition-all shadow-xs"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-[#218DAE] dark:text-[#218DAE]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-[var(--color-primary)] dark:text-[var(--color-primary)]">
               <FiSearch className="text-sm" />
             </div>
 

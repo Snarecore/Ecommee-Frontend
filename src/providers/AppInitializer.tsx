@@ -202,32 +202,6 @@ const AppInitializer = () => {
         };
     }, [setUser, setUserLoaded, setAuthStatus]);
 
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-
-        const syncStorefrontTheme = () => {
-            try {
-                let savedAccent = localStorage.getItem('storefront-primary-color');
-                if (!savedAccent) {
-                    const savedThemeConfig = localStorage.getItem('storefront-theme') || localStorage.getItem('bazaarbound-appearance');
-                    if (savedThemeConfig) {
-                        const parsed = JSON.parse(savedThemeConfig);
-                        savedAccent = (parsed.palette && parsed.palette.accent) || (parsed.overrides && parsed.overrides.palette && parsed.overrides.palette.accent) || parsed.accent;
-                    }
-                }
-                if (savedAccent) {
-                    document.documentElement.style.setProperty('--color-primary', savedAccent);
-                    document.documentElement.style.setProperty('--color-green-primary', savedAccent);
-                    document.documentElement.style.setProperty('--color-green-secondary', savedAccent);
-                }
-            } catch {}
-        };
-
-        syncStorefrontTheme();
-        window.addEventListener("storage", syncStorefrontTheme);
-        return () => window.removeEventListener("storage", syncStorefrontTheme);
-    }, []);
-
     return null;
 };
 

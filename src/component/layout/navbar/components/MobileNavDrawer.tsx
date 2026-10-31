@@ -162,13 +162,13 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
           <Link
             href="/shop"
             onClick={onClose}
-            className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#218DAE]/10 dark:bg-[#218DAE]/20 border border-[#218DAE]/30 dark:border-[#218DAE]/40 hover:bg-[#218DAE]/20 dark:hover:bg-[#218DAE]/30 text-[#218DAE] dark:text-[#218DAE] transition-colors group"
+            className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/20 border border-[var(--color-primary)]/30 dark:border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/20 dark:hover:bg-[var(--color-primary)]/30 text-[var(--color-primary)] dark:text-[var(--color-primary)] transition-colors group"
           >
             <div className="flex items-center gap-2.5">
-              <FiShoppingBag className="text-[#218DAE] dark:text-[#218DAE] text-lg" />
+              <FiShoppingBag className="text-[var(--color-primary)] dark:text-[var(--color-primary)] text-lg" />
               <span className="text-sm font-semibold tracking-wide">All Products</span>
             </div>
-            <FiChevronRight className="text-[#218DAE] dark:text-[#218DAE] text-base group-hover:translate-x-0.5 transition-transform" />
+            <FiChevronRight className="text-[var(--color-primary)] dark:text-[var(--color-primary)] text-base group-hover:translate-x-0.5 transition-transform" />
           </Link>
 
           {/* Promotional Mega Discount Banner (if active) */}
@@ -230,7 +230,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                       }}
                       className="flex items-center justify-between py-2.5 px-2 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 active:bg-gray-100 dark:active:bg-slate-800 transition-colors group"
                     >
-                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-[#218DAE] dark:group-hover:text-[#218DAE] transition-colors uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-[var(--color-primary)] dark:group-hover:text-[var(--color-primary)] transition-colors uppercase tracking-wide">
                         {main.name}
                       </span>
 
@@ -243,7 +243,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                         {hasChildren ? (
                           <FiChevronDown
                             className={`text-gray-400 text-sm transition-transform duration-200 ${
-                              isExpanded ? 'rotate-180 text-[#218DAE] dark:text-[#218DAE]' : ''
+                              isExpanded ? 'rotate-180 text-[var(--color-primary)] dark:text-[var(--color-primary)]' : ''
                             }`}
                           />
                         ) : (
@@ -254,12 +254,12 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
                     {/* Subcategories Clean Accordion List */}
                     {hasChildren && isExpanded && (
-                      <div className="ml-3 pl-3 border-l-2 border-[#218DAE]/40 py-1 space-y-0.5 animate-in slide-in-from-top-1 duration-150">
+                      <div className="ml-3 pl-3 border-l-2 border-[var(--color-primary)]/40 py-1 space-y-0.5 animate-in slide-in-from-top-1 duration-150">
                         {/* Explore All Category Link */}
                         <Link
                           href={`/shop?mainCategoryId=${main.id}&pageNumber=1`}
                           onClick={onClose}
-                          className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-bold text-[#218DAE] dark:text-[#218DAE] hover:bg-[#218DAE]/10 dark:hover:bg-[#218DAE]/20 transition-colors"
+                          className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-bold text-[var(--color-primary)] dark:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 dark:hover:bg-[var(--color-primary)]/20 transition-colors"
                         >
                           <span>Explore All in {main.name}</span>
                           <FiChevronRight className="text-xs" />
@@ -290,9 +290,9 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
           <div className="p-3.5 border-t border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-slate-900/50 flex-shrink-0">
             <a
               href={`tel:${headerFooterData.contactPhone}`}
-              className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-[#218DAE] dark:hover:text-[#218DAE] transition-colors"
+              className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-[var(--color-primary)] dark:hover:text-[var(--color-primary)] transition-colors"
             >
-              <FiPhoneCall className="text-[#218DAE] dark:text-[#218DAE] text-sm" />
+              <FiPhoneCall className="text-[var(--color-primary)] dark:text-[var(--color-primary)] text-sm" />
               <span>Helpline: <strong className="font-semibold">{headerFooterData.contactPhone}</strong></span>
             </a>
           </div>

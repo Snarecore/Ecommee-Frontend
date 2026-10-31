@@ -23,6 +23,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -35,22 +41,6 @@ export default function RootLayout({
                   } else {
                     document.documentElement.classList.remove('dark');
                     document.documentElement.setAttribute('data-theme', 'light');
-                  }
-
-                  var savedAccent = localStorage.getItem('storefront-primary-color');
-                  if (!savedAccent) {
-                    var savedThemeConfig = localStorage.getItem('storefront-theme') || localStorage.getItem('bazaarbound-appearance');
-                    if (savedThemeConfig) {
-                      try {
-                        var parsed = JSON.parse(savedThemeConfig);
-                        savedAccent = (parsed.palette && parsed.palette.accent) || (parsed.overrides && parsed.overrides.palette && parsed.overrides.palette.accent) || parsed.accent;
-                      } catch (err) {}
-                    }
-                  }
-                  if (savedAccent) {
-                    document.documentElement.style.setProperty('--color-primary', savedAccent);
-                    document.documentElement.style.setProperty('--color-green-primary', savedAccent);
-                    document.documentElement.style.setProperty('--color-green-secondary', savedAccent);
                   }
                 } catch (e) {}
               })();
