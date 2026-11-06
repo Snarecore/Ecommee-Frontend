@@ -66,6 +66,26 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
 
     fetchOrderFromApi();
 
+    // Bounded status polling (every 3s for up to 18s) if payment is in-flight/pending
+    let pollCount = 0;
+    const maxPolls = 6;
+    const pollInterval = setInterval(async () => {
+      pollCount++;
+      if (pollCount > maxPolls || !isMounted) {
+        clearInterval(pollInterval);
+        return;
+      }
+      try {
+        const token = getUserToken();
+        const res: any = await getData({ url: `orders/${orderId}`, token });
+        const refreshed = res?.data || res;
+        if (refreshed && refreshed.paymentStatus === "Paid") {
+          setOrder(refreshed);
+          clearInterval(pollInterval);
+        }
+      } catch {}
+    }, 3000);
+
     // ⚡ Cross-Tab / Cross-App BroadcastChannel Listener
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
@@ -77,6 +97,26 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
             event.data?.type === "SYNC_NOTIFICATIONS"
           ) {
             fetchOrderFromApi();
+
+    // Bounded status polling (every 3s for up to 18s) if payment is in-flight/pending
+    let pollCount = 0;
+    const maxPolls = 6;
+    const pollInterval = setInterval(async () => {
+      pollCount++;
+      if (pollCount > maxPolls || !isMounted) {
+        clearInterval(pollInterval);
+        return;
+      }
+      try {
+        const token = getUserToken();
+        const res: any = await getData({ url: `orders/${orderId}`, token });
+        const refreshed = res?.data || res;
+        if (refreshed && refreshed.paymentStatus === "Paid") {
+          setOrder(refreshed);
+          clearInterval(pollInterval);
+        }
+      } catch {}
+    }, 3000);
           }
         };
       } catch {}

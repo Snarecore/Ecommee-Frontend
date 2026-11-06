@@ -262,7 +262,7 @@ const CheckoutView = () => {
       const token = getUserToken();
 
       // 1. Generate & Confirm Stripe PaymentIntent for Online payments
-      let validPaymentIntentId = "COD";
+      let validPaymentIntentId = paymentMethod === "COD" ? "COD" : paymentMethod === "SSLCOMMERZ" ? "SSLCOMMERZ" : "Online";
       if (paymentMethod === "Online") {
         const paymentRes: any = await postData({
           url: "payments",
@@ -363,6 +363,35 @@ const CheckoutView = () => {
       const createdOrderId = createdOrderData?.id || createdOrderData?.orderId;
       if (!createdOrderId) {
         throw new Error("Order was not accepted by server. Please try again.");
+      }
+
+      // Handle SSLCommerz Gateway Redirection Flow
+      if (paymentMethod === "SSLCOMMERZ") {
+        try {
+          const initRes: any = await postData({
+            url: "payments/sslcommerz/init",
+            token,
+            body: {
+              orderId: createdOrderId,
+              customerName: name.trim(),
+              customerPhone: phone.trim(),
+              customerAddress: address.trim(),
+              customerCity: city.trim()
+            }
+          });
+
+          const gatewayUrl = initRes?.gatewayPageUrl || initRes?.data?.gatewayPageUrl;
+          if (gatewayUrl) {
+            setOrderSubmitted(true);
+            clearCart();
+            window.location.href = gatewayUrl;
+            return;
+          } else {
+            throw new Error(initRes?.failedReason || initRes?.message || "Failed to initialize SSLCommerz payment session.");
+          }
+        } catch (gatewayErr: any) {
+          throw new Error(gatewayErr?.message || "Failed to connect to SSLCommerz payment gateway. Please try again.");
+        }
       }
 
       setOrderSubmitted(true);
@@ -595,12 +624,44 @@ const CheckoutView = () => {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <label
+                  onClick={() => setPaymentMethod("SSLCOMMERZ")}
+                  className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-3 transition-all ${
+                    paymentMethod === "SSLCOMMERZ"
+                      ? "border-[var(--color-green-primary)] bg-emerald-50/30 shadow-sm"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === "SSLCOMMERZ"}
+                    onChange={() => setPaymentMethod("SSLCOMMERZ")}
+                    className="mt-1 accent-[var(--color-green-primary)]"
+                  />
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-800 flex items-center justify-between gap-1 flex-wrap">
+                      <span className="flex items-center gap-1.5 text-sm">
+                        <FaCreditCard className="text-pink-600" /> bKash / Nagad / Cards
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                      <span className="text-[10px] bg-pink-100 text-pink-700 font-bold px-1.5 py-0.5 rounded">bKash</span>
+                      <span className="text-[10px] bg-orange-100 text-orange-700 font-bold px-1.5 py-0.5 rounded">Nagad</span>
+                      <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-1.5 py-0.5 rounded">Rocket</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-2">
+                      Instant & secure checkout via SSLCommerz gateway.
+                    </p>
+                  </div>
+                </label>
+
                 <label
                   onClick={() => setPaymentMethod("COD")}
                   className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-3 transition-all ${
                     paymentMethod === "COD"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/30"
+                      ? "border-[var(--color-green-primary)] bg-emerald-50/30 shadow-sm"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -612,10 +673,10 @@ const CheckoutView = () => {
                     className="mt-1 accent-[var(--color-green-primary)]"
                   />
                   <div>
-                    <div className="font-bold text-gray-800 flex items-center gap-2">
+                    <div className="font-bold text-gray-800 flex items-center gap-2 text-sm">
                       <FaMoneyBillWave className="text-emerald-600" /> Cash on Delivery (COD)
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-[11px] text-gray-500 mt-2">
                       Pay with cash when your package is delivered to your doorstep.
                     </p>
                   </div>
@@ -625,7 +686,7 @@ const CheckoutView = () => {
                   onClick={() => setPaymentMethod("Online")}
                   className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-3 transition-all ${
                     paymentMethod === "Online"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/30"
+                      ? "border-[var(--color-green-primary)] bg-emerald-50/30 shadow-sm"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -637,11 +698,11 @@ const CheckoutView = () => {
                     className="mt-1 accent-[var(--color-green-primary)]"
                   />
                   <div>
-                    <div className="font-bold text-gray-800 flex items-center gap-2">
-                      <FaCreditCard className="text-blue-600" /> Pay Online (Stripe Card)
+                    <div className="font-bold text-gray-800 flex items-center gap-2 text-sm">
+                      <FaCreditCard className="text-blue-600" /> Stripe Card
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Instant & secure payment via Credit Card, Debit Card, or Online Banking.
+                    <p className="text-[11px] text-gray-500 mt-2">
+                      International Credit or Debit Card payment via Stripe.
                     </p>
                   </div>
                 </label>

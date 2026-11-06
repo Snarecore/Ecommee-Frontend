@@ -25,7 +25,7 @@ export type RejectionReason =
   | "Other";
 
 export type PaymentStatus = "Pending" | "Paid" | "Failed" | "Refunded";
-export type PaymentMethod = "COD" | "Online";
+export type PaymentMethod = "COD" | "Online" | "SSLCOMMERZ";
 
 export interface OrderItem {
   id: string;
