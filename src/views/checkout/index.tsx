@@ -497,82 +497,89 @@ const CheckoutView = () => {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                    <FaUser className="text-gray-400" /> Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter your full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
-                  />
+              <div className="space-y-4">
+                {/* Line 1: 3 Input Fields (Full Name, Phone Number, Email Address) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                      <FaUser className="text-gray-400" /> Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter your full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                      <FaPhoneAlt className="text-gray-400" /> Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. 01810000000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                      <FaEnvelope className="text-gray-400" /> Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. yourname@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                    <FaPhoneAlt className="text-gray-400" /> Phone Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="e.g. 01810000000"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
-                  />
+                {/* Line 2: 2 Input Fields (Full Delivery Address, City / District) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Full Delivery Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="House / Flat No, Road Name, Area details"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      City / District <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Dhaka, Chittagong, Sylhet"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      * Entering &quot;Dhaka&quot; automatically sets delivery fee to Inside Dhaka (৳60). Other districts default to Outside Dhaka (৳120).
+                    </p>
+                  </div>
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                    <FaEnvelope className="text-gray-400" /> Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. yourname@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    * Order invoice &amp; all shipping status update notifications will be sent to this email address.
-                  </p>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Full Delivery Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="House / Flat No, Road Name, Area details"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    City / District <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Dhaka, Chittagong, Sylhet"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    * Entering &quot;Dhaka&quot; automatically sets delivery fee to Inside Dhaka (৳60). Other districts default to Outside Dhaka (৳120).
-                  </p>
-                </div>
+                <p className="text-xs text-gray-500 pt-0.5">
+                  * Order confirmation, invoice &amp; shipping status update notifications will be sent to this email address.
+                </p>
               </div>
             </div>
 

@@ -57,6 +57,7 @@ export interface ShippingAddress {
   phone: string;
   address: string;
   city: string;
+  email?: string;
 }
 
 export interface Order {

@@ -383,6 +383,9 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
               <div className="text-sm space-y-1 text-gray-600">
                 <p className="font-bold text-gray-800 text-base">{order.shippingAddress.name}</p>
                 <p className="flex items-center gap-2">📞 {order.shippingAddress.phone}</p>
+                {order.shippingAddress.email && (
+                  <p className="flex items-center gap-2">✉️ {order.shippingAddress.email}</p>
+                )}
                 <p className="flex items-start gap-2 mt-1">📍 {order.shippingAddress.address}</p>
                 <p className="font-semibold text-gray-700 mt-1">City: {order.shippingAddress.city}</p>
               </div>
