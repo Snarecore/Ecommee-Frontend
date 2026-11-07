@@ -24,7 +24,15 @@ export type RejectionReason =
   | "Payment issue"
   | "Other";
 
-export type PaymentStatus = "Pending" | "Paid" | "Failed" | "Refunded";
+export type PaymentStatus =
+  | "Pending"
+  | "Paid"
+  | "Unpaid"
+  | "Failed"
+  | "Review Required"
+  | "Processing"
+  | "Partially Refunded"
+  | "Refunded";
 export type PaymentMethod = "COD" | "Online" | "SSLCOMMERZ";
 
 export interface OrderItem {

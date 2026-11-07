@@ -260,55 +260,6 @@ const CheckoutView = () => {
       }));
 
       const token = getUserToken();
-
-      // 1. Generate & Confirm Stripe PaymentIntent for Online payments
-      let validPaymentIntentId = paymentMethod === "COD" ? "COD" : paymentMethod === "SSLCOMMERZ" ? "SSLCOMMERZ" : "Online";
-      if (paymentMethod === "Online") {
-        const paymentRes: any = await postData({
-          url: "payments",
-          token,
-          body: {
-            items: cartItems.map((item) => ({
-              productId: item.id,
-              quantity: item.quantity ?? 1,
-              size: item.selectedSize
-            })),
-            city: city.trim(),
-            couponCode: appliedCoupon?.couponCode || undefined,
-            currency: "usd"
-          }
-        });
-
-        const clientSecret = paymentRes?.clientSecret || paymentRes?.data?.clientSecret;
-        if (!clientSecret) {
-          throw new Error("Failed to initialize payment gateway. Please try again.");
-        }
-
-        const cardNumberElement = elements!.getElement(CardNumberElement);
-        if (!cardNumberElement) {
-          throw new Error("Card details missing. Please enter your card information.");
-        }
-
-        const stripeResult = await stripe!.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: cardNumberElement,
-            billing_details: {
-              name: name.trim() || "Customer"
-            }
-          }
-        });
-
-        if (stripeResult.error) {
-          throw new Error(stripeResult.error.message || "Card payment confirmation failed.");
-        }
-
-        if (stripeResult.paymentIntent && stripeResult.paymentIntent.status === "succeeded") {
-          validPaymentIntentId = stripeResult.paymentIntent.id;
-        } else {
-          throw new Error("Card payment could not be completed.");
-        }
-      }
-
       const idempotencyKey = `idempotency_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
 
       const apiPayload: Record<string, any> = {
@@ -321,7 +272,7 @@ const CheckoutView = () => {
         })),
         products: backendProducts,
         currency: "usd",
-        paymentIntentId: validPaymentIntentId,
+        paymentIntentId: paymentMethod === "COD" ? "COD" : paymentMethod === "SSLCOMMERZ" ? "SSLCOMMERZ" : "PENDING_STRIPE",
         totalAmount: grandTotal,
         subtotal: cartSubtotal,
         deliveryCharge,
@@ -348,6 +299,7 @@ const CheckoutView = () => {
         }
       };
 
+      // 1. Order-First: Pre-create order and reserve stock first
       const primaryUrl = apiConfig.customer.createOrderUrl || "orders";
       const response: any = await postData({
         url: primaryUrl,
@@ -365,7 +317,82 @@ const CheckoutView = () => {
         throw new Error("Order was not accepted by server. Please try again.");
       }
 
-      // Handle SSLCommerz Gateway Redirection Flow
+      // 2. Stripe Payment Lifecycle (Order-First Flow)
+      if (paymentMethod === "Online") {
+        const stripeInitRes: any = await postData({
+          url: "payments/stripe/init",
+          token,
+          body: {
+            orderId: createdOrderId
+          }
+        });
+
+        const initData = stripeInitRes?.data || stripeInitRes;
+        const clientSecret = initData?.clientSecret;
+
+        if (!clientSecret) {
+          throw new Error(
+            initData?.message ||
+            stripeInitRes?.message ||
+            "Failed to initialize Stripe payment. Your order is pending; please retry from order history."
+          );
+        }
+
+        const cardNumberElement = elements!.getElement(CardNumberElement);
+        if (!cardNumberElement) {
+          throw new Error("Card details missing. Please enter your card information.");
+        }
+
+        const stripeResult = await stripe!.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardNumberElement,
+            billing_details: {
+              name: name.trim() || "Customer",
+              email: user?.email || undefined,
+              phone: phone.trim() || undefined,
+              address: {
+                line1: address.trim() || undefined,
+                city: city.trim() || undefined
+              }
+            }
+          }
+        });
+
+        if (stripeResult.error) {
+          // Do NOT clear cart; allow customer to fix card or retry
+          const errorMsg = stripeResult.error.message || "Card payment confirmation failed.";
+          setPaymentError(errorMsg);
+          showErrorToast(errorMsg);
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (stripeResult.paymentIntent && (stripeResult.paymentIntent.status === "succeeded" || stripeResult.paymentIntent.status === "processing")) {
+          setOrderSubmitted(true);
+          clearCart();
+
+          // Instantly notify admin dashboard tabs if open
+          if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+            try {
+              const bc = new BroadcastChannel("fashion_time_admin_notifications");
+              bc.postMessage({ type: "NEW_ADMIN_NOTIF_AVAILABLE" });
+              bc.close();
+            } catch {}
+          }
+
+          showSuccessToast("Payment successful! Your order has been placed.");
+          router.push(`/order-confirmation/${createdOrderId}?payment=processing`);
+          return;
+        } else {
+          const statusMsg = "Card payment could not be completed. Please try again.";
+          setPaymentError(statusMsg);
+          showErrorToast(statusMsg);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // 3. SSLCommerz Gateway Redirection Flow
       if (paymentMethod === "SSLCOMMERZ") {
         try {
           const initRes: any = await postData({
@@ -394,6 +421,7 @@ const CheckoutView = () => {
         }
       }
 
+      // 4. Cash on Delivery (COD) Flow
       setOrderSubmitted(true);
       clearCart();
 

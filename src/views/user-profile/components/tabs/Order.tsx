@@ -11,9 +11,10 @@ import {
   FaExclamationCircle,
   FaHistory,
   FaUndoAlt,
-  FaClock
+  FaClock,
+  FaCreditCard
 } from "react-icons/fa";
-import { useAPI } from "../../../../hooks/useApi";
+import { useAPI, getUserToken } from "../../../../hooks/useApi";
 import apiConfig from "../../../../config/api.json";
 import { orderQueryKey } from "../../../../config/query-key";
 import { formatDate, formatPrettyDate, formatPrettyDateWithTime } from "../../../../utils/date-utils";
@@ -25,6 +26,9 @@ import {
   OrderStatus
 } from "../../../../utils/order-service";
 import { formatImageUrl } from "../../../../utils/product-utils";
+import { postData } from "../../../../services/api-service";
+import { showErrorToast } from "../../../../utils/toast-utils";
+import { isOrderEligibleForPaymentRetry } from "../../../../utils/payment-retry.utils";
 
 interface CustomerTimelineStep {
   key: OrderStatus;
@@ -70,6 +74,40 @@ const OrderTab = () => {
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const { usePaginatedQuery } = useAPI();
   const { socket } = useSocket();
+  const [retryingOrderId, setRetryingOrderId] = useState<string | null>(null);
+
+  const handleRetryPayment = async (orderToRetry: any) => {
+    const orderIdentifier = orderToRetry.id || orderToRetry.rawOrderId;
+    if (retryingOrderId) return;
+
+    try {
+      setRetryingOrderId(orderIdentifier);
+      const token = getUserToken();
+      const targetId = orderToRetry.rawOrderId || orderToRetry.orderId?.replace(/^#/, '') || orderToRetry.id;
+
+      const res: any = await postData({
+        url: `payments/order/${targetId}/retry`,
+        token,
+        body: {}
+      });
+
+      if (res?.error) {
+        showErrorToast(res?.message || "Failed to initiate payment retry");
+        return;
+      }
+
+      const gatewayUrl = res?.gatewayPageUrl || res?.data?.gatewayPageUrl;
+      if (gatewayUrl) {
+        window.location.href = gatewayUrl;
+      } else {
+        showErrorToast(res?.message || "Payment gateway link not received");
+      }
+    } catch (err: any) {
+      showErrorToast(err?.message || "Network error while connecting to payment gateway");
+    } finally {
+      setRetryingOrderId(null);
+    }
+  };
 
   const getOrderListApiUrl = () => {
     let url = `${apiConfig.customer.orderListUrl}?page=${currentPageNumber}&limit=${dataLimit}`;
@@ -421,6 +459,26 @@ const OrderTab = () => {
                         </a>
                       )}
 
+                      {/* Secure Payment Retry CTA */}
+                      {isOrderEligibleForPaymentRetry(order) && (
+                        <button
+                          onClick={() => handleRetryPayment(order)}
+                          disabled={retryingOrderId === (order.id || order.rawOrderId)}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                        >
+                          {retryingOrderId === (order.id || order.rawOrderId) ? (
+                            <>
+                              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              Connecting...
+                            </>
+                          ) : (
+                            <>
+                              <FaCreditCard /> Pay Now
+                            </>
+                          )}
+                        </button>
+                      )}
+
                       <button
                         onClick={() => handleViewOrder(order)}
                         className="px-5 py-2 bg-[var(--color-green-primary)] text-white font-bold text-xs rounded-xl hover:opacity-90 transition cursor-pointer flex items-center gap-1.5 shadow-sm"
@@ -682,6 +740,27 @@ const OrderTab = () => {
                       <p className="pt-2 text-gray-500 italic">
                         Note: &quot;{selectedOrder.specialNote}&quot;
                       </p>
+                    )}
+
+                    {isOrderEligibleForPaymentRetry(selectedOrder) && (
+                      <div className="pt-3">
+                        <button
+                          onClick={() => handleRetryPayment(selectedOrder)}
+                          disabled={retryingOrderId === (selectedOrder.id || selectedOrder.rawOrderId)}
+                          className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
+                        >
+                          {retryingOrderId === (selectedOrder.id || selectedOrder.rawOrderId) ? (
+                            <>
+                              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              Connecting to Gateway...
+                            </>
+                          ) : (
+                            <>
+                              <FaCreditCard /> Pay Now (SSLCommerz)
+                            </>
+                          )}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

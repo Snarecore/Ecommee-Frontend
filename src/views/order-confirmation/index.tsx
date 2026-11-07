@@ -1,26 +1,29 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { getOrderByIdFromService, Order } from "@/utils/order-service";
 import {
   FaCheckCircle,
   FaTruck,
   FaMapMarkerAlt,
   FaShoppingBag,
-  FaCalendarAlt,
   FaShieldAlt,
-  FaMoneyBillWave,
   FaCreditCard,
   FaClock,
-  FaTimesCircle
+  FaTimesCircle,
+  FaExclamationTriangle,
+  FaSyncAlt
 } from "react-icons/fa";
 import { getOrderCreatedAt } from "@/utils/order-service";
 
-import { getData } from "@/services/api-service";
+import { getData, postData } from "@/services/api-service";
 import { getUserToken } from "@/hooks/useApi";
 import { formatImageUrl } from "@/utils/product-utils";
+import { showErrorToast } from "@/utils/toast-utils";
+import { isOrderEligibleForPaymentRetry } from "@/utils/payment-retry.utils";
 
 import { useSocket } from "@/hooks/useSocket";
 import { SocketEvent, OrderStatusUpdatedPayload } from "@/types/socket.types";
@@ -32,61 +35,78 @@ interface OrderConfirmationViewProps {
 const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }) => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPolling, setIsPolling] = useState(true);
+  const [isManualChecking, setIsManualChecking] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const searchParams = useSearchParams();
+  const paymentParam = searchParams?.get("payment") || "";
   const { socket } = useSocket();
+
+  const fetchOrderFromApi = useCallback(async (isManual = false) => {
+    if (!orderId) {
+      setLoading(false);
+      return;
+    }
+    if (isManual) setIsManualChecking(true);
+
+    try {
+      const token = getUserToken();
+      const res: any = await getData({ url: `orders/${orderId}`, token, noCache: true });
+      const apiOrder = res?.data || res;
+      if (apiOrder && !apiOrder.error && (apiOrder.id || apiOrder.orderId)) {
+        setOrder(apiOrder);
+        setLoading(false);
+        if (isManual) setIsManualChecking(false);
+        return apiOrder;
+      }
+    } catch {
+      // Fallback to local service if offline
+    }
+
+    const found = getOrderByIdFromService(orderId);
+    if (found) {
+      setOrder(found);
+    }
+    setLoading(false);
+    if (isManual) setIsManualChecking(false);
+    return found;
+  }, [orderId]);
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchOrderFromApi = async () => {
-      if (!orderId) {
-        if (isMounted) setLoading(false);
-        return;
-      }
-      try {
-        const token = getUserToken();
-        const res: any = await getData({ url: `orders/${orderId}`, token });
-        const apiOrder = res?.data || res;
-        if (apiOrder && !apiOrder.error && (apiOrder.id || apiOrder.orderId)) {
-          if (isMounted) {
-            setOrder(apiOrder);
-            setLoading(false);
-          }
-          return;
-        }
-      } catch (err) {
-        // Fallback to local storage if API is offline
-      }
-
-      const found = getOrderByIdFromService(orderId);
-      if (found && isMounted) {
-        setOrder(found);
-      }
-      if (isMounted) setLoading(false);
-    };
-
+    // 1. Initial authoritative fetch from Backend
     fetchOrderFromApi();
 
-    // Bounded status polling (every 3s for up to 18s) if payment is in-flight/pending
+    // 2. Bounded status polling (every 3s for up to 18s total) if payment is in verification / not settled
     let pollCount = 0;
     const maxPolls = 6;
     const pollInterval = setInterval(async () => {
       pollCount++;
       if (pollCount > maxPolls || !isMounted) {
         clearInterval(pollInterval);
+        if (isMounted) setIsPolling(false);
         return;
       }
+
       try {
         const token = getUserToken();
-        const res: any = await getData({ url: `orders/${orderId}`, token });
+        const res: any = await getData({ url: `orders/${orderId}`, token, noCache: true });
         const refreshed = res?.data || res;
         if (refreshed && refreshed.paymentStatus === "Paid") {
-          setOrder(refreshed);
+          if (isMounted) {
+            setOrder(refreshed);
+            setIsPolling(false);
+          }
           clearInterval(pollInterval);
         }
-      } catch {}
+      } catch {
+        // Suppress background poll errors
+      }
     }, 3000);
 
-    // ⚡ Cross-Tab / Cross-App BroadcastChannel Listener
+    // 3. Cross-Tab / Cross-App BroadcastChannel Listener
     let channel: BroadcastChannel | null = null;
     if (typeof window !== "undefined" && "BroadcastChannel" in window) {
       try {
@@ -97,36 +117,19 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
             event.data?.type === "SYNC_NOTIFICATIONS"
           ) {
             fetchOrderFromApi();
-
-    // Bounded status polling (every 3s for up to 18s) if payment is in-flight/pending
-    let pollCount = 0;
-    const maxPolls = 6;
-    const pollInterval = setInterval(async () => {
-      pollCount++;
-      if (pollCount > maxPolls || !isMounted) {
-        clearInterval(pollInterval);
-        return;
-      }
-      try {
-        const token = getUserToken();
-        const res: any = await getData({ url: `orders/${orderId}`, token });
-        const refreshed = res?.data || res;
-        if (refreshed && refreshed.paymentStatus === "Paid") {
-          setOrder(refreshed);
-          clearInterval(pollInterval);
-        }
-      } catch {}
-    }, 3000);
           }
         };
-      } catch {}
+      } catch {
+        // BroadcastChannel unsupported fallback
+      }
     }
 
     return () => {
       isMounted = false;
+      clearInterval(pollInterval);
       if (channel) channel.close();
     };
-  }, [orderId]);
+  }, [orderId, fetchOrderFromApi]);
 
   // Real-time socket listener for order status changes
   useEffect(() => {
@@ -151,6 +154,39 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
       socket.off(SocketEvent.ORDER_STATUS_UPDATED, handleOrderStatusUpdated);
     };
   }, [socket, orderId, order?.orderId]);
+
+  // Secure payment retry handler
+  const handleRetryPayment = async () => {
+    if (!order || isRetrying) return;
+
+    try {
+      setIsRetrying(true);
+      const token = getUserToken();
+      const targetId = (order as any).rawOrderId || order.orderId || order.id;
+
+      const res: any = await postData({
+        url: `payments/order/${targetId}/retry`,
+        token,
+        body: {}
+      });
+
+      if (res?.error) {
+        showErrorToast(res?.message || "Failed to initiate payment retry");
+        return;
+      }
+
+      const gatewayUrl = res?.gatewayPageUrl || res?.data?.gatewayPageUrl;
+      if (gatewayUrl) {
+        window.location.href = gatewayUrl;
+      } else {
+        showErrorToast(res?.message || "Payment gateway link not received from server");
+      }
+    } catch (err: any) {
+      showErrorToast(err?.message || "Network error while connecting to payment gateway");
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -178,6 +214,10 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
     );
   }
 
+  // Authoritative State Machine Evaluation
+  const isPaid = order.paymentStatus === "Paid";
+  const isUnderReview = order.paymentStatus === "Review Required" || order.paymentStatus === "Processing";
+  const isRetryEligible = isOrderEligibleForPaymentRetry(order);
   const isPending = order.orderStatus === "Pending";
   const isRejected = order.orderStatus === "Rejected";
 
@@ -186,19 +226,81 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Dynamic Header Card */}
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-md text-center">
-          {isPending ? (
+          {/* Priority 1: Verified PAID status */}
+          {isPaid ? (
             <>
-              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600 text-4xl">
-                <FaClock />
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-4xl shadow-inner">
+                <FaCheckCircle />
               </div>
-              <h1 className="text-3xl font-extrabold text-amber-700">
-                Order Received
+              <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
+                Order Placed & Payment Verified! 🎉
               </h1>
               <p className="text-gray-600 mt-2 max-w-lg mx-auto">
-                Your order has been successfully submitted and is currently waiting for admin approval.
+                Thank you for shopping with us. Your online payment has been confirmed by SSLCommerz and your order is now being processed.
               </p>
             </>
+          ) : isUnderReview ? (
+            /* Priority 2: In-flight verification or Risk Review */
+            <>
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-4xl shadow-inner">
+                <FaClock />
+              </div>
+              <h1 className="text-3xl font-extrabold text-blue-700">
+                Payment Verification in Progress
+              </h1>
+              <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+                We are confirming your transaction with the payment gateway. Your order will update as soon as the verification settles.
+              </p>
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl max-w-md mx-auto text-blue-900 text-xs flex flex-col items-center gap-2">
+                <span>
+                  {isPolling
+                    ? "🔄 Actively checking gateway confirmation..."
+                    : "⏳ Automated check complete. You can verify again manually."}
+                </span>
+                {!isPolling && (
+                  <button
+                    onClick={() => fetchOrderFromApi(true)}
+                    disabled={isManualChecking}
+                    className="mt-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-lg flex items-center gap-2 transition cursor-pointer"
+                  >
+                    <FaSyncAlt className={isManualChecking ? "animate-spin" : ""} /> Check Payment Status
+                  </button>
+                )}
+              </div>
+            </>
+          ) : isRetryEligible ? (
+            /* Priority 3: Eligible for Payment Retry (Failed / Cancelled / Unpaid online payment) */
+            <>
+              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600 text-4xl shadow-inner">
+                <FaExclamationTriangle />
+              </div>
+              <h1 className="text-3xl font-extrabold text-amber-700">
+                Payment Incomplete / Cancelled
+              </h1>
+              <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+                Your order is reserved (Order ID: <strong className="text-gray-800">{order.orderId || order.id}</strong>), but online payment was not completed on the gateway.
+              </p>
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  onClick={handleRetryPayment}
+                  disabled={isRetrying}
+                  className="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
+                >
+                  {isRetrying ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Connecting to Gateway...
+                    </>
+                  ) : (
+                    <>
+                      <FaCreditCard /> Complete Payment with SSLCommerz
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
           ) : isRejected ? (
+            /* Priority 4: Store Admin Rejected */
             <>
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 text-4xl">
                 <FaTimesCircle />
@@ -209,7 +311,6 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
               <p className="text-gray-600 mt-2 max-w-lg mx-auto">
                 We regret to inform you that your order could not be accepted by the store admin.
               </p>
-
               {order.rejectionReason && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-left max-w-md mx-auto space-y-1">
                   <p className="text-xs font-bold text-red-700 uppercase tracking-wide">
@@ -223,16 +324,30 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
                 </div>
               )}
             </>
+          ) : isPending ? (
+            /* Priority 5: Standard COD / Offline Pending Approval */
+            <>
+              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600 text-4xl">
+                <FaClock />
+              </div>
+              <h1 className="text-3xl font-extrabold text-amber-700">
+                Order Received
+              </h1>
+              <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+                Your order has been successfully submitted and is currently waiting for admin approval.
+              </p>
+            </>
           ) : (
+            /* Standard fallback */
             <>
               <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-4xl">
                 <FaCheckCircle />
               </div>
               <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
-                Order Accepted! 🎉
+                Order Confirmed! 🎉
               </h1>
               <p className="text-gray-600 mt-2">
-                Thank you for shopping with us. Your order has been confirmed and is now being prepared.
+                Thank you for shopping with us. Your order has been placed and is now being prepared.
               </p>
             </>
           )}
@@ -306,6 +421,8 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
                   className={`font-bold px-3 py-0.5 rounded-full text-xs ${
                     order.paymentStatus === "Paid"
                       ? "bg-emerald-100 text-emerald-800"
+                      : order.paymentStatus === "Review Required" || order.paymentStatus === "Processing"
+                      ? "bg-blue-100 text-blue-800"
                       : "bg-amber-100 text-amber-800"
                   }`}
                 >
