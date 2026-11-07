@@ -557,10 +557,7 @@ const OrderTab = () => {
                     <div className="flex flex-row items-center justify-between md:justify-end gap-3 sm:gap-3.5 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 shrink-0">
                       {/* Price Section */}
                       <div className="text-left sm:text-right">
-                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block leading-none mb-1">
-                          Total Amount
-                        </span>
-                        <span className="text-base sm:text-lg font-black text-gray-900 leading-none">
+                        <span className="text-base sm:text-lg font-black text-gray-900 tracking-tight">
                           ৳{Number(order.totalAmount || order.subtotal || 0).toLocaleString()}
                         </span>
                       </div>
