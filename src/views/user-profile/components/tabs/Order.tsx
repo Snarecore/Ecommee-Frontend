@@ -373,7 +373,7 @@ const OrderTab = () => {
       <div className="mt-6">
         <p className="font-bold text-xl text-[var(--color-green-primary)]">Order History</p>
 
-        <div className="mt-4 grid gap-4">
+        <div className="mt-3 grid gap-2.5">
           {ordersList.length > 0 ? (
             ordersList.map((order: any) => {
               const currentStatus: OrderStatus = order.orderStatus || order.status || "Order Placed";
@@ -450,34 +450,34 @@ const OrderTab = () => {
                 <div
                   key={order.id}
                   id={`order-card-${order.id || order.rawOrderId || order.orderId}`}
-                  className="bg-white rounded-2xl border border-gray-200/90 hover:border-[var(--color-green-primary)]/40 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col group"
+                  className="bg-white rounded-xl border border-gray-200/80 hover:border-[var(--color-green-primary)]/40 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group"
                 >
-                  {/* Card Header Strip */}
-                  <div className="bg-gradient-to-r from-gray-50/90 via-slate-50/50 to-white px-5 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  {/* Slim Card Header Strip */}
+                  <div className="bg-gradient-to-r from-gray-50/90 via-slate-50/50 to-white px-3.5 py-1.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2 text-xs">
                     {/* Left: Order ID & Date */}
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="flex items-center gap-1.5 font-extrabold text-sm text-[var(--color-green-primary)] tracking-wide">
-                        <span className="w-2 h-2 rounded-full bg-[var(--color-green-primary)]" />
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--color-green-primary)] tracking-wide">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-green-primary)]" />
                         {order.orderId}
                       </div>
                       <span className="text-gray-300 hidden sm:inline">•</span>
-                      <span className="text-gray-500 font-medium flex items-center gap-1.5">
-                        <FaClock className="text-gray-400 text-[11px]" />
+                      <span className="text-gray-500 font-medium text-[11px] flex items-center gap-1">
+                        <FaClock className="text-gray-400 text-[10px]" />
                         Placed on {formatPrettyDateWithTime(order.createdAt)}
                       </span>
                     </div>
 
                     {/* Right: Payment Method, Payment Status & Order Status Badges */}
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       {/* Payment Method Badge */}
-                      <span className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-gray-100/90 text-gray-700 border border-gray-200/70 flex items-center gap-1">
+                      <span className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-gray-100/90 text-gray-700 border border-gray-200/70 flex items-center gap-1">
                         {paymentMethodStr === "COD" ? "💵" : "💳"} {paymentMethodLabel}
                       </span>
 
                       {/* Payment Status Pill */}
                       {order.paymentStatus && (
                         <span
-                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border flex items-center gap-1 ${
+                          className={`px-2 py-0.5 text-[10px] font-bold rounded-md border flex items-center gap-1 ${
                             isPaid
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                               : "bg-amber-50 text-amber-700 border-amber-200"
@@ -489,7 +489,7 @@ const OrderTab = () => {
 
                       {/* Main Order Status Badge */}
                       <span
-                        className={`px-3 py-1 text-xs font-bold rounded-lg border flex items-center gap-1.5 shadow-2xs ${statusConfig.badge}`}
+                        className={`px-2.5 py-0.5 text-[11px] font-bold rounded-md border flex items-center gap-1 shadow-2xs ${statusConfig.badge}`}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
                         {statusConfig.label}
@@ -497,12 +497,12 @@ const OrderTab = () => {
                     </div>
                   </div>
 
-                  {/* Card Main Body */}
-                  <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                  {/* Compact Card Main Body */}
+                  <div className="px-3.5 py-2.5 sm:py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
                     {/* Left: Product Thumbnail & Meta Details */}
-                    <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-                      {/* Product Thumbnail */}
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-50 overflow-hidden border border-gray-200/80 shrink-0 relative flex items-center justify-center shadow-xs group-hover:scale-102 transition-transform duration-300">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      {/* Compact Product Thumbnail */}
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gray-50 overflow-hidden border border-gray-200/80 shrink-0 relative flex items-center justify-center shadow-2xs group-hover:scale-102 transition-transform duration-200">
                         {order.items && order.items[0]?.productImage ? (
                           <img
                             src={formatImageUrl(order.items[0].productImage)}
@@ -513,24 +513,24 @@ const OrderTab = () => {
                             }}
                           />
                         ) : (
-                          <span className="text-2xl">🛍️</span>
+                          <span className="text-xl">🛍️</span>
                         )}
                         {order.items && order.items.length > 1 && (
-                          <span className="absolute bottom-1 right-1 bg-gray-900/85 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-md shadow-xs backdrop-blur-2xs">
-                            +{order.items.length - 1} more
+                          <span className="absolute bottom-0.5 right-0.5 bg-gray-900/85 text-white text-[9px] font-extrabold px-1 py-0.2 rounded shadow-xs">
+                            +{order.items.length - 1}
                           </span>
                         )}
                       </div>
 
-                      {/* Product Title & Info */}
-                      <div className="space-y-1.5 min-w-0 flex-1">
-                        <h4 className="font-bold text-sm sm:text-base text-gray-900 truncate group-hover:text-[var(--color-green-primary)] transition-colors">
+                      {/* Product Title & Compact Info */}
+                      <div className="space-y-0.5 min-w-0 flex-1">
+                        <h4 className="font-bold text-xs sm:text-sm text-gray-900 truncate group-hover:text-[var(--color-green-primary)] transition-colors">
                           {order.items && order.items[0]?.productName
                             ? order.items[0].productName
                             : "Product Item"}
                         </h4>
 
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-gray-500">
                           <span className="font-medium text-gray-600">
                             {totalItemCount} {totalItemCount > 1 ? "items" : "item"}
                           </span>
@@ -544,44 +544,38 @@ const OrderTab = () => {
                             <>
                               <span className="text-gray-300">•</span>
                               <span className="flex items-center gap-1 text-gray-500">
-                                <FaMapMarkerAlt className="text-gray-400 text-[10px]" />
+                                <FaMapMarkerAlt className="text-gray-400 text-[9px]" />
                                 {order.shippingAddress.city}
                               </span>
                             </>
                           )}
                         </div>
-
-                        {order.items && order.items.length > 1 && (
-                          <p className="text-[11px] text-gray-400 truncate max-w-sm sm:max-w-md">
-                            Also includes: {order.items.slice(1).map((i: any) => i.productName).join(", ")}
-                          </p>
-                        )}
                       </div>
                     </div>
 
-                    {/* Right: Price & Action Buttons */}
-                    <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center md:items-end lg:items-center justify-between md:justify-end gap-4 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
+                    {/* Right: Price & Compact Action Buttons */}
+                    <div className="flex flex-row items-center justify-between md:justify-end gap-3 sm:gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
                       {/* Price Section */}
                       <div className="text-left sm:text-right">
-                        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">
                           Total Amount
                         </span>
-                        <span className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+                        <span className="text-base sm:text-lg font-black text-gray-900 tracking-tight">
                           ৳{Number(order.totalAmount || order.subtotal || 0).toLocaleString()}
                         </span>
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                      <div className="flex items-center gap-2">
                         {/* Courier Tracking Link */}
                         {order.courierTrackingLink && (
                           <a
                             href={order.courierTrackingLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1 sm:flex-none px-3.5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs"
+                            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1 transition active:scale-95 shadow-2xs"
                           >
-                            <FaTruck className="text-blue-600" />
+                            <FaTruck className="text-blue-600 text-xs" />
                             <span>Track</span>
                           </a>
                         )}
@@ -591,11 +585,11 @@ const OrderTab = () => {
                           <button
                             onClick={() => handleRetryPayment(order)}
                             disabled={retryingOrderId === (order.id || order.rawOrderId)}
-                            className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
                           >
                             {retryingOrderId === (order.id || order.rawOrderId) ? (
                               <>
-                                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                 <span>Connecting...</span>
                               </>
                             ) : (
@@ -610,9 +604,9 @@ const OrderTab = () => {
                         {/* View Timeline & Details Button */}
                         <button
                           onClick={() => handleViewOrder(order)}
-                          className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-50 hover:bg-[var(--color-green-primary)] text-gray-700 hover:text-white border border-gray-200 hover:border-transparent font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-2xs hover:shadow-md active:scale-95 cursor-pointer"
+                          className="px-3 py-1.5 bg-gray-50 hover:bg-[var(--color-green-primary)] text-gray-700 hover:text-white border border-gray-200 hover:border-transparent font-bold text-xs rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer whitespace-nowrap"
                         >
-                          <FiEye className="text-sm" />
+                          <FiEye className="text-xs" />
                           <span>View Details</span>
                         </button>
                       </div>
