@@ -553,17 +553,20 @@ const OrderTab = () => {
                       </div>
                     </div>
 
-                    {/* Right: Price & Compact Action Buttons */}
-                    <div className="flex flex-row items-center justify-between md:justify-end gap-3 sm:gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
+                    {/* Right: Price & Harmonized Action Buttons */}
+                    <div className="flex flex-row items-center justify-between md:justify-end gap-3 sm:gap-3.5 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 shrink-0">
                       {/* Price Section */}
                       <div className="text-left sm:text-right">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">
+                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider block leading-none mb-1">
                           Total Amount
                         </span>
-                        <span className="text-base sm:text-lg font-black text-gray-900 tracking-tight">
+                        <span className="text-base sm:text-lg font-black text-gray-900 leading-none">
                           ৳{Number(order.totalAmount || order.subtotal || 0).toLocaleString()}
                         </span>
                       </div>
+
+                      {/* Subtle Vertical Divider */}
+                      <div className="h-7 w-px bg-gray-200 hidden sm:block" />
 
                       {/* Action Buttons */}
                       <div className="flex items-center gap-2">
@@ -573,9 +576,9 @@ const OrderTab = () => {
                             href={order.courierTrackingLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1 transition active:scale-95 shadow-2xs"
+                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs"
                           >
-                            <FaTruck className="text-blue-600 text-xs" />
+                            <FaTruck className="text-xs" />
                             <span>Track</span>
                           </a>
                         )}
@@ -585,7 +588,7 @@ const OrderTab = () => {
                           <button
                             onClick={() => handleRetryPayment(order)}
                             disabled={retryingOrderId === (order.id || order.rawOrderId)}
-                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 shadow-xs hover:shadow-md transition active:scale-95 cursor-pointer"
                           >
                             {retryingOrderId === (order.id || order.rawOrderId) ? (
                               <>
@@ -604,7 +607,7 @@ const OrderTab = () => {
                         {/* View Timeline & Details Button */}
                         <button
                           onClick={() => handleViewOrder(order)}
-                          className="px-3 py-1.5 bg-gray-50 hover:bg-[var(--color-green-primary)] text-gray-700 hover:text-white border border-gray-200 hover:border-transparent font-bold text-xs rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer whitespace-nowrap"
+                          className="px-3.5 py-1.5 bg-[var(--color-green-primary)] hover:opacity-90 text-white font-bold text-xs rounded-lg shadow-xs hover:shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
                         >
                           <FiEye className="text-xs" />
                           <span>View Details</span>
