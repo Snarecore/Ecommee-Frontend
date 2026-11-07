@@ -24,6 +24,7 @@ import {
   FaMoneyBillWave,
   FaMapMarkerAlt,
   FaPhoneAlt,
+  FaEnvelope,
   FaUser,
   FaStickyNote,
   FaExclamationTriangle,
@@ -74,6 +75,7 @@ const CheckoutView = () => {
   // Form State
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState((user as any)?.phone || "");
+  const [email, setEmail] = useState((user as any)?.email || "");
   const [address, setAddress] = useState((user as any)?.address || "");
   const [city, setCity] = useState((user as any)?.city || "Dhaka");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
@@ -88,6 +90,7 @@ const CheckoutView = () => {
       const u = user as any;
       if (u.name && !name) setName(u.name);
       if (u.phone && !phone) setPhone(u.phone);
+      if (u.email && !email) setEmail(u.email);
       if (u.address && !address) setAddress(u.address);
       if (u.city && !city) setCity(u.city);
     }
@@ -181,6 +184,10 @@ const CheckoutView = () => {
       showErrorToast("Please enter your phone number.");
       return;
     }
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email.trim())) {
+      showErrorToast("Please enter a valid email address to receive order updates.");
+      return;
+    }
     if (!address.trim()) {
       showErrorToast("Please enter your delivery address.");
       return;
@@ -250,20 +257,21 @@ const CheckoutView = () => {
         phone: phone.trim(),
         phoneNumber: phone.trim(),
         customerPhone: phone.trim(),
-        email: user?.email || "",
-        customerEmail: user?.email || "",
+        email: email.trim(),
+        customerEmail: email.trim(),
         address: address.trim(),
         couponCode: appliedCoupon?.couponCode || undefined,
         shippingAddress: {
           name: name.trim(),
           phone: phone.trim(),
+          email: email.trim(),
           address: address.trim(),
           city: city.trim() || "Dhaka"
         },
         user: {
           name: name.trim(),
           phone: phone.trim(),
-          email: user?.email || ""
+          email: email.trim()
         }
       };
 
@@ -516,6 +524,23 @@ const CheckoutView = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
                   />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                    <FaEnvelope className="text-gray-400" /> Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. yourname@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    * Order invoice &amp; all shipping status update notifications will be sent to this email address.
+                  </p>
                 </div>
 
                 <div className="sm:col-span-2">
