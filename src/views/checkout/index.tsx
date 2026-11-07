@@ -184,8 +184,8 @@ const CheckoutView = () => {
       showErrorToast("Please enter your phone number.");
       return;
     }
-    if (!email.trim() || !/\S+@\S+\.\S+/.test(email.trim())) {
-      showErrorToast("Please enter a valid email address to receive order updates.");
+    if (email.trim() && !/\S+@\S+\.\S+/.test(email.trim())) {
+      showErrorToast("Please enter a valid email address or leave it blank.");
       return;
     }
     if (!address.trim()) {
@@ -530,12 +530,11 @@ const CheckoutView = () => {
 
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                      <FaEnvelope className="text-gray-400" /> Email Address <span className="text-red-500">*</span>
+                      <FaEnvelope className="text-gray-400" /> Email Address <span className="text-gray-400 text-[10px] font-normal">(Optional)</span>
                     </label>
                     <input
                       type="email"
-                      required
-                      placeholder="e.g. yourname@example.com"
+                      placeholder="e.g. yourname@example.com (optional)"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
