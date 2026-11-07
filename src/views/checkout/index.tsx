@@ -487,21 +487,21 @@ const CheckoutView = () => {
           {/* Left Side: Step-by-Step Checkout Sections */}
           <div className="lg:col-span-8 space-y-6">
             {/* Section 1: Shipping & Delivery Information */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-100 mb-6">
-                <span className="w-8 h-8 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-sm">
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100 mb-4">
+                <span className="w-7 h-7 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-xs">
                   1
                 </span>
-                <h2 className="text-xl font-bold text-[var(--color-green-primary)] flex items-center gap-2">
+                <h2 className="text-lg font-bold text-[var(--color-green-primary)] flex items-center gap-2">
                   <FaMapMarkerAlt /> Delivery Information
                 </h2>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Line 1: 3 Input Fields (Full Name, Phone Number, Email Address) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
                       <FaUser className="text-gray-400" /> Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -510,12 +510,12 @@ const CheckoutView = () => {
                       placeholder="Enter your full name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
                       <FaPhoneAlt className="text-gray-400" /> Phone Number <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -524,12 +524,12 @@ const CheckoutView = () => {
                       placeholder="e.g. 01810000000"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
                       <FaEnvelope className="text-gray-400" /> Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -538,15 +538,15 @@ const CheckoutView = () => {
                       placeholder="e.g. yourname@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
                     />
                   </div>
                 </div>
 
                 {/* Line 2: 2 Input Fields (Full Delivery Address, City / District) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
                       Full Delivery Address <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -555,12 +555,12 @@ const CheckoutView = () => {
                       placeholder="House / Flat No, Road Name, Area details"
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
                       City / District <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -569,17 +569,10 @@ const CheckoutView = () => {
                       placeholder="e.g. Dhaka, Chittagong, Sylhet"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      * Entering &quot;Dhaka&quot; automatically sets delivery fee to Inside Dhaka (৳60). Other districts default to Outside Dhaka (৳120).
-                    </p>
                   </div>
                 </div>
-
-                <p className="text-xs text-gray-500 pt-0.5">
-                  * Order confirmation, invoice &amp; shipping status update notifications will be sent to this email address.
-                </p>
               </div>
             </div>
 
