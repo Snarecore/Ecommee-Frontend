@@ -837,6 +837,9 @@ const OrderTab = () => {
                     </h4>
                     <p className="font-semibold text-gray-800">{selectedOrder.shippingAddress.name}</p>
                     <p className="text-xs text-gray-600">{selectedOrder.shippingAddress.phone}</p>
+                    {selectedOrder.shippingAddress.email && (
+                      <p className="text-xs text-gray-600">{selectedOrder.shippingAddress.email}</p>
+                    )}
                     <p className="text-xs text-gray-600">{selectedOrder.shippingAddress.address}</p>
                     <p className="text-xs font-semibold text-gray-700">{selectedOrder.shippingAddress.city}</p>
                   </div>
