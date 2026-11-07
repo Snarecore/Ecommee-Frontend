@@ -485,7 +485,7 @@ const CheckoutView = () => {
 
         <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Side: Step-by-Step Checkout Sections */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-4">
             {/* Section 1: Shipping & Delivery Information */}
             <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
               <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100 mb-4">
@@ -576,51 +576,51 @@ const CheckoutView = () => {
             </div>
 
             {/* Section 2: Delivery Area & Method */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-100 mb-6">
-                <span className="w-8 h-8 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-sm">
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center gap-2.5 pb-2.5 border-b border-gray-100 mb-3.5">
+                <span className="w-7 h-7 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-xs">
                   2
                 </span>
-                <h2 className="text-xl font-bold text-[var(--color-green-primary)] flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-[var(--color-green-primary)] flex items-center gap-2">
                   <FaTruck /> Delivery Zone & Charge
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
-                  className={`p-4 rounded-xl border-2 transition-all ${
+                  className={`p-3.5 rounded-lg border-2 transition-all ${
                     deliveryZone === "inside_dhaka"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/40"
+                      ? "border-[var(--color-green-primary)] bg-teal-50/40 shadow-xs ring-1 ring-[var(--color-green-primary)]/20"
                       : "border-gray-200 opacity-60"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-800">Inside Dhaka</span>
-                    <span className="text-lg font-extrabold text-[var(--color-green-primary)]">৳60</span>
+                    <span className="font-bold text-gray-800 text-sm">Inside Dhaka</span>
+                    <span className="text-base font-extrabold text-[var(--color-green-primary)]">৳60</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Delivery within 24-48 hours</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Delivery within 24-48 hours</p>
                   {deliveryZone === "inside_dhaka" && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 mt-2 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                      <FaCheckCircle /> Auto-synced for Dhaka
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 mt-1.5 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <FaCheckCircle className="text-[10px]" /> Auto-synced for Dhaka
                     </span>
                   )}
                 </div>
 
                 <div
-                  className={`p-4 rounded-xl border-2 transition-all ${
+                  className={`p-3.5 rounded-lg border-2 transition-all ${
                     deliveryZone === "outside_dhaka"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/40"
+                      ? "border-[var(--color-green-primary)] bg-teal-50/40 shadow-xs ring-1 ring-[var(--color-green-primary)]/20"
                       : "border-gray-200 opacity-60"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-800">Outside Dhaka</span>
-                    <span className="text-lg font-extrabold text-[var(--color-green-primary)]">৳120</span>
+                    <span className="font-bold text-gray-800 text-sm">Outside Dhaka</span>
+                    <span className="text-base font-extrabold text-[var(--color-green-primary)]">৳120</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Delivery within 2-4 business days</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Delivery within 2-4 business days</p>
                   {deliveryZone === "outside_dhaka" && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 mt-2 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                      <FaCheckCircle /> Auto-synced for District
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 mt-1.5 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <FaCheckCircle className="text-[10px]" /> Auto-synced for District
                     </span>
                   )}
                 </div>
@@ -628,22 +628,22 @@ const CheckoutView = () => {
             </div>
 
             {/* Section 3: Payment Method Selection */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-6">
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                <span className="w-8 h-8 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-sm">
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm space-y-3.5">
+              <div className="flex items-center gap-2.5 pb-2.5 border-b border-gray-100">
+                <span className="w-7 h-7 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-xs">
                   3
                 </span>
-                <h2 className="text-xl font-bold text-[var(--color-green-primary)] flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-[var(--color-green-primary)] flex items-center gap-2">
                   <FaCreditCard /> Payment Method
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <label
                   onClick={() => setPaymentMethod("SSLCOMMERZ")}
-                  className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-3 transition-all ${
+                  className={`cursor-pointer p-3 rounded-lg border-2 flex items-start gap-2.5 transition-all ${
                     paymentMethod === "SSLCOMMERZ"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/30 shadow-sm"
+                      ? "border-[var(--color-green-primary)] bg-teal-50/40 shadow-xs ring-1 ring-[var(--color-green-primary)]/20"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -652,30 +652,29 @@ const CheckoutView = () => {
                     name="paymentMethod"
                     checked={paymentMethod === "SSLCOMMERZ"}
                     onChange={() => setPaymentMethod("SSLCOMMERZ")}
-                    className="mt-1 accent-[var(--color-green-primary)]"
+                    className="mt-0.5 accent-[var(--color-green-primary)] w-4 h-4 shrink-0"
                   />
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-800 flex items-center justify-between gap-1 flex-wrap">
-                      <span className="flex items-center gap-1.5 text-sm">
-                        <FaCreditCard className="text-pink-600" /> bKash / Nagad / Cards
-                      </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-1.5 flex-wrap">
+                      <FaCreditCard className="text-pink-600 shrink-0" />
+                      <span className="truncate">bKash / Nagad / Cards</span>
                     </div>
                     <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-                      <span className="text-[10px] bg-pink-100 text-pink-700 font-bold px-1.5 py-0.5 rounded">bKash</span>
-                      <span className="text-[10px] bg-orange-100 text-orange-700 font-bold px-1.5 py-0.5 rounded">Nagad</span>
-                      <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-1.5 py-0.5 rounded">Rocket</span>
+                      <span className="text-[9px] bg-pink-100 text-pink-700 font-bold px-1.5 py-0.5 rounded">bKash</span>
+                      <span className="text-[9px] bg-orange-100 text-orange-700 font-bold px-1.5 py-0.5 rounded">Nagad</span>
+                      <span className="text-[9px] bg-purple-100 text-purple-700 font-bold px-1.5 py-0.5 rounded">Rocket</span>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-2">
-                      Instant & secure checkout via SSLCommerz gateway.
+                    <p className="text-[11px] text-gray-500 mt-1 leading-snug">
+                      Instant &amp; secure checkout via SSLCommerz gateway.
                     </p>
                   </div>
                 </label>
 
                 <label
                   onClick={() => setPaymentMethod("COD")}
-                  className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-3 transition-all ${
+                  className={`cursor-pointer p-3 rounded-lg border-2 flex items-start gap-2.5 transition-all ${
                     paymentMethod === "COD"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/30 shadow-sm"
+                      ? "border-[var(--color-green-primary)] bg-teal-50/40 shadow-xs ring-1 ring-[var(--color-green-primary)]/20"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -684,23 +683,23 @@ const CheckoutView = () => {
                     name="paymentMethod"
                     checked={paymentMethod === "COD"}
                     onChange={() => setPaymentMethod("COD")}
-                    className="mt-1 accent-[var(--color-green-primary)]"
+                    className="mt-0.5 accent-[var(--color-green-primary)] w-4 h-4 shrink-0"
                   />
-                  <div>
-                    <div className="font-bold text-gray-800 flex items-center gap-2 text-sm">
-                      <FaMoneyBillWave className="text-emerald-600" /> Cash on Delivery (COD)
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-1.5">
+                      <FaMoneyBillWave className="text-emerald-600 shrink-0" /> Cash on Delivery (COD)
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-2">
-                      Pay with cash when your package is delivered to your doorstep.
+                    <p className="text-[11px] text-gray-500 mt-1.5 leading-snug">
+                      Pay with cash when package is delivered to your doorstep.
                     </p>
                   </div>
                 </label>
 
                 <label
                   onClick={() => setPaymentMethod("Online")}
-                  className={`cursor-pointer p-4 rounded-xl border-2 flex items-start gap-3 transition-all ${
+                  className={`cursor-pointer p-3 rounded-lg border-2 flex items-start gap-2.5 transition-all ${
                     paymentMethod === "Online"
-                      ? "border-[var(--color-green-primary)] bg-emerald-50/30 shadow-sm"
+                      ? "border-[var(--color-green-primary)] bg-teal-50/40 shadow-xs ring-1 ring-[var(--color-green-primary)]/20"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -709,13 +708,13 @@ const CheckoutView = () => {
                     name="paymentMethod"
                     checked={paymentMethod === "Online"}
                     onChange={() => setPaymentMethod("Online")}
-                    className="mt-1 accent-[var(--color-green-primary)]"
+                    className="mt-0.5 accent-[var(--color-green-primary)] w-4 h-4 shrink-0"
                   />
-                  <div>
-                    <div className="font-bold text-gray-800 flex items-center gap-2 text-sm">
-                      <FaCreditCard className="text-blue-600" /> Stripe Card
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-1.5">
+                      <FaCreditCard className="text-blue-600 shrink-0" /> Stripe Card
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-2">
+                    <p className="text-[11px] text-gray-500 mt-1.5 leading-snug">
                       International Credit or Debit Card payment via Stripe.
                     </p>
                   </div>
@@ -729,28 +728,28 @@ const CheckoutView = () => {
             </div>
 
             {/* Section 4: Special Instructions (Optional) */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-100 mb-4">
-                <span className="w-8 h-8 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-sm">
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center gap-2.5 pb-2.5 border-b border-gray-100 mb-3">
+                <span className="w-7 h-7 rounded-full bg-[var(--color-green-primary)] text-white font-bold flex items-center justify-center text-xs">
                   4
                 </span>
-                <h2 className="text-xl font-bold text-[var(--color-green-primary)] flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-[var(--color-green-primary)] flex items-center gap-2">
                   <FaStickyNote /> Special Delivery Notes (Optional)
                 </h2>
               </div>
               <textarea
-                rows={3}
+                rows={2}
                 placeholder="Any special instructions for the delivery rider? (e.g. Call before arrival, leave at gate)"
                 value={specialNote}
                 onChange={(e) => setSpecialNote(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)]"
+                className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm h-20 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
               ></textarea>
             </div>
           </div>
 
           {/* Right Side: Section 5 - Order Summary & Sticky Button */}
           <div className="lg:col-span-4">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg lg:sticky lg:top-24 space-y-6">
+            <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-md lg:sticky lg:top-24 space-y-5">
               <h3 className="text-xl font-bold text-[var(--color-green-primary)] border-b pb-4">
                 Order Summary ({cartItems.length} {cartItems.length === 1 ? "Item" : "Items"})
               </h3>
