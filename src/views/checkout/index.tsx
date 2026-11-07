@@ -32,40 +32,15 @@ import {
   FaLock
 } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "@/utils/toast-utils";
-import {
-  CardNumberElement,
-  CardExpiryElement,
-  CardCvcElement,
-  useElements,
-  useStripe
-} from "@stripe/react-stripe-js";
-
 import CouponInput from "@/component/coupon/CouponInput";
-
-const ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      fontSize: "15px",
-      color: "#1F2937",
-      fontFamily: "inherit",
-      "::placeholder": {
-        color: "#9CA3AF"
-      }
-    },
-    invalid: {
-      color: "#EF4444",
-      iconColor: "#EF4444"
-    }
-  }
-};
+import StripeCardSection, { StripeCardSectionRef } from "@/component/payment/StripeCardSection";
 
 const CheckoutView = () => {
   const router = useRouter();
   const user = useAtomValue(userAtom);
   const { cartItems, clearCart } = useCart();
   
-  const stripe = useStripe();
-  const elements = useElements();
+  const stripeCardRef = React.useRef<StripeCardSectionRef>(null);
 
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -215,15 +190,8 @@ const CheckoutView = () => {
 
     try {
       if (paymentMethod === "Online") {
-        if (!stripe || !elements) {
+        if (!stripeCardRef.current || !stripeCardRef.current.isReady()) {
           showErrorToast("Stripe payment gateway is initializing. Please try again in a moment.");
-          setIsSubmitting(false);
-          return;
-        }
-
-        const cardNumberElement = elements.getElement(CardNumberElement);
-        if (!cardNumberElement) {
-          showErrorToast("Please enter your credit/debit card details.");
           setIsSubmitting(false);
           return;
         }
@@ -338,23 +306,17 @@ const CheckoutView = () => {
           );
         }
 
-        const cardNumberElement = elements!.getElement(CardNumberElement);
-        if (!cardNumberElement) {
+        if (!stripeCardRef.current) {
           throw new Error("Card details missing. Please enter your card information.");
         }
 
-        const stripeResult = await stripe!.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: cardNumberElement,
-            billing_details: {
-              name: name.trim() || "Customer",
-              email: user?.email || undefined,
-              phone: phone.trim() || undefined,
-              address: {
-                line1: address.trim() || undefined,
-                city: city.trim() || undefined
-              }
-            }
+        const stripeResult = await stripeCardRef.current.confirmPayment(clientSecret, {
+          name: name.trim() || "Customer",
+          email: user?.email || undefined,
+          phone: phone.trim() || undefined,
+          address: {
+            line1: address.trim() || undefined,
+            city: city.trim() || undefined
           }
         });
 
@@ -736,44 +698,9 @@ const CheckoutView = () => {
                 </label>
               </div>
 
-              {/* Stripe Card Elements Section (Visible when Online is selected) */}
+              {/* Stripe Card Elements Section (Lazy-loaded only when Online is selected) */}
               {paymentMethod === "Online" && (
-                <div className="mt-4 p-5 rounded-2xl bg-gradient-to-r from-gray-50 to-blue-50/30 border border-blue-100 space-y-4 animate-fadeIn">
-                  <div className="flex items-center justify-between border-b pb-3">
-                    <h4 className="font-bold text-gray-800 text-sm flex items-center gap-2">
-                      <FaLock className="text-blue-600" /> Stripe Secure Card Payment
-                    </h4>
-                    <span className="text-xs text-gray-400 font-medium">256-bit SSL Encrypted</span>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">
-                      Card Number <span className="text-red-500">*</span>
-                    </label>
-                    <div className="bg-white border border-gray-300 rounded-xl p-3 shadow-xs focus-within:ring-2 focus-within:ring-[var(--color-green-primary)]">
-                      <CardNumberElement options={ELEMENT_OPTIONS} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
-                        Expiry Date <span className="text-red-500">*</span>
-                      </label>
-                      <div className="bg-white border border-gray-300 rounded-xl p-3 shadow-xs focus-within:ring-2 focus-within:ring-[var(--color-green-primary)]">
-                        <CardExpiryElement options={ELEMENT_OPTIONS} />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
-                        CVC / CVV <span className="text-red-500">*</span>
-                      </label>
-                      <div className="bg-white border border-gray-300 rounded-xl p-3 shadow-xs focus-within:ring-2 focus-within:ring-[var(--color-green-primary)]">
-                        <CardCvcElement options={ELEMENT_OPTIONS} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <StripeCardSection ref={stripeCardRef} />
               )}
             </div>
 
