@@ -380,16 +380,129 @@ const OrderTab = () => {
               const isDelivered = currentStatus === "Delivered";
               const isCancelled = currentStatus === "Cancelled";
 
+              const statusConfig = (() => {
+                switch (currentStatus as string) {
+                  case "Pending":
+                    return {
+                      badge: "bg-amber-50 text-amber-800 border-amber-200/90",
+                      dot: "bg-amber-500 animate-pulse",
+                      label: "Pending Approval"
+                    };
+                  case "Order Placed":
+                    return {
+                      badge: "bg-emerald-50 text-emerald-800 border-emerald-200/90",
+                      dot: "bg-emerald-500",
+                      label: "Order Placed"
+                    };
+                  case "Processing":
+                  case "Packaging":
+                    return {
+                      badge: "bg-blue-50 text-blue-800 border-blue-200/90",
+                      dot: "bg-blue-500 animate-pulse",
+                      label: currentStatus
+                    };
+                  case "Shipped":
+                    return {
+                      badge: "bg-indigo-50 text-indigo-800 border-indigo-200/90",
+                      dot: "bg-indigo-500",
+                      label: "Shipped"
+                    };
+                  case "Delivered":
+                    return {
+                      badge: "bg-teal-50 text-teal-800 border-teal-200/90",
+                      dot: "bg-teal-500",
+                      label: "Delivered"
+                    };
+                  case "Cancelled":
+                  case "Rejected":
+                    return {
+                      badge: "bg-rose-50 text-rose-800 border-rose-200/90",
+                      dot: "bg-rose-500",
+                      label: currentStatus === "Rejected" ? "Rejected" : "Cancelled"
+                    };
+                  default:
+                    return {
+                      badge: "bg-gray-50 text-gray-700 border-gray-200",
+                      dot: "bg-gray-400",
+                      label: currentStatus
+                    };
+                }
+              })();
+
+              const totalItemCount = order.items && order.items.length > 0
+                ? order.items.reduce((sum: number, it: any) => sum + (Number(it.quantity) || 1), 0)
+                : 1;
+
+              const paymentMethodStr = (order.paymentMethod || "COD").toUpperCase();
+              const paymentMethodLabel =
+                paymentMethodStr === "COD"
+                  ? "Cash on Delivery"
+                  : paymentMethodStr === "SSLCOMMERZ"
+                  ? "bKash / Nagad"
+                  : paymentMethodStr === "ONLINE" || paymentMethodStr === "STRIPE"
+                  ? "Stripe Card"
+                  : order.paymentMethod || "COD";
+
+              const paymentStatusStr = (order.paymentStatus || "").toLowerCase();
+              const isPaid = paymentStatusStr === "paid";
+
               return (
                 <div
                   key={order.id}
                   id={`order-card-${order.id || order.rawOrderId || order.orderId}`}
-                  className="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 space-y-4"
+                  className="bg-white rounded-2xl border border-gray-200/90 hover:border-[var(--color-green-primary)]/40 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col group"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 min-w-0">
-                      {/* Product Thumbnail on the Left */}
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gray-100 overflow-hidden border border-gray-200 shrink-0 relative flex items-center justify-center shadow-xs">
+                  {/* Card Header Strip */}
+                  <div className="bg-gradient-to-r from-gray-50/90 via-slate-50/50 to-white px-5 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    {/* Left: Order ID & Date */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-1.5 font-extrabold text-sm text-[var(--color-green-primary)] tracking-wide">
+                        <span className="w-2 h-2 rounded-full bg-[var(--color-green-primary)]" />
+                        {order.orderId}
+                      </div>
+                      <span className="text-gray-300 hidden sm:inline">•</span>
+                      <span className="text-gray-500 font-medium flex items-center gap-1.5">
+                        <FaClock className="text-gray-400 text-[11px]" />
+                        Placed on {formatPrettyDateWithTime(order.createdAt)}
+                      </span>
+                    </div>
+
+                    {/* Right: Payment Method, Payment Status & Order Status Badges */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Payment Method Badge */}
+                      <span className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-gray-100/90 text-gray-700 border border-gray-200/70 flex items-center gap-1">
+                        {paymentMethodStr === "COD" ? "💵" : "💳"} {paymentMethodLabel}
+                      </span>
+
+                      {/* Payment Status Pill */}
+                      {order.paymentStatus && (
+                        <span
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border flex items-center gap-1 ${
+                            isPaid
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {isPaid ? "✓ Paid" : "⏳ Unpaid"}
+                        </span>
+                      )}
+
+                      {/* Main Order Status Badge */}
+                      <span
+                        className={`px-3 py-1 text-xs font-bold rounded-lg border flex items-center gap-1.5 shadow-2xs ${statusConfig.badge}`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+                        {statusConfig.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card Main Body */}
+                  <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                    {/* Left: Product Thumbnail & Meta Details */}
+                    <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
+                      {/* Product Thumbnail */}
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-50 overflow-hidden border border-gray-200/80 shrink-0 relative flex items-center justify-center shadow-xs group-hover:scale-102 transition-transform duration-300">
                         {order.items && order.items[0]?.productImage ? (
                           <img
                             src={formatImageUrl(order.items[0].productImage)}
@@ -400,91 +513,109 @@ const OrderTab = () => {
                             }}
                           />
                         ) : (
-                          <span className="text-xl">🛍️</span>
+                          <span className="text-2xl">🛍️</span>
                         )}
                         {order.items && order.items.length > 1 && (
-                          <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full shadow">
-                            +{order.items.length - 1}
+                          <span className="absolute bottom-1 right-1 bg-gray-900/85 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-md shadow-xs backdrop-blur-2xs">
+                            +{order.items.length - 1} more
                           </span>
                         )}
                       </div>
 
-                      <div className="space-y-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                          <span className="font-extrabold text-base sm:text-lg text-[var(--color-green-primary)]">
-                            {order.orderId}
+                      {/* Product Title & Info */}
+                      <div className="space-y-1.5 min-w-0 flex-1">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900 truncate group-hover:text-[var(--color-green-primary)] transition-colors">
+                          {order.items && order.items[0]?.productName
+                            ? order.items[0].productName
+                            : "Product Item"}
+                        </h4>
+
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                          <span className="font-medium text-gray-600">
+                            {totalItemCount} {totalItemCount > 1 ? "items" : "item"}
                           </span>
-                          <span
-                            className={`px-3 py-0.5 text-xs font-bold rounded-full ${
-                              currentStatus === "Pending"
-                                ? "bg-amber-100 text-amber-800"
-                                : currentStatus === "Rejected" || isCancelled
-                                ? "bg-red-100 text-red-800"
-                                : isDelivered || currentStatus === "Order Placed"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {currentStatus === "Pending" ? "Pending Approval" : currentStatus}
-                          </span>
+                          {order.items?.[0]?.quantity && (
+                            <>
+                              <span className="text-gray-300">•</span>
+                              <span>Qty: {order.items[0].quantity}</span>
+                            </>
+                          )}
+                          {order.shippingAddress?.city && (
+                            <>
+                              <span className="text-gray-300">•</span>
+                              <span className="flex items-center gap-1 text-gray-500">
+                                <FaMapMarkerAlt className="text-gray-400 text-[10px]" />
+                                {order.shippingAddress.city}
+                              </span>
+                            </>
+                          )}
                         </div>
-                        <p className="text-xs text-gray-500">
-                          Placed on {formatPrettyDateWithTime(order.createdAt)}
-                        </p>
-                        {order.items && order.items[0]?.productName && (
-                          <p className="text-xs font-medium text-gray-700 truncate max-w-xs sm:max-w-md">
-                            {order.items[0].productName}
+
+                        {order.items && order.items.length > 1 && (
+                          <p className="text-[11px] text-gray-400 truncate max-w-sm sm:max-w-md">
+                            Also includes: {order.items.slice(1).map((i: any) => i.productName).join(", ")}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4">
-                      <div>
-                        <span className="text-xs text-gray-400 block">Total Amount</span>
-                        <span className="text-lg font-extrabold text-gray-900">
-                          ৳{order.totalAmount || order.subtotal || 0}
+                    {/* Right: Price & Action Buttons */}
+                    <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center md:items-end lg:items-center justify-between md:justify-end gap-4 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
+                      {/* Price Section */}
+                      <div className="text-left sm:text-right">
+                        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">
+                          Total Amount
+                        </span>
+                        <span className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+                          ৳{Number(order.totalAmount || order.subtotal || 0).toLocaleString()}
                         </span>
                       </div>
 
-                      {/* Courier External Tracking Button (If link attached) */}
-                      {order.courierTrackingLink && (
-                        <a
-                          href={order.courierTrackingLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-sm transition"
-                        >
-                          <FaTruck /> 🚚 Track Delivery
-                        </a>
-                      )}
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                        {/* Courier Tracking Link */}
+                        {order.courierTrackingLink && (
+                          <a
+                            href={order.courierTrackingLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 sm:flex-none px-3.5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs"
+                          >
+                            <FaTruck className="text-blue-600" />
+                            <span>Track</span>
+                          </a>
+                        )}
 
-                      {/* Secure Payment Retry CTA */}
-                      {isOrderEligibleForPaymentRetry(order) && (
+                        {/* Pay Now Button */}
+                        {isOrderEligibleForPaymentRetry(order) && (
+                          <button
+                            onClick={() => handleRetryPayment(order)}
+                            disabled={retryingOrderId === (order.id || order.rawOrderId)}
+                            className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                          >
+                            {retryingOrderId === (order.id || order.rawOrderId) ? (
+                              <>
+                                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <span>Connecting...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FaCreditCard className="text-white text-xs" />
+                                <span>Pay Now</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+
+                        {/* View Timeline & Details Button */}
                         <button
-                          onClick={() => handleRetryPayment(order)}
-                          disabled={retryingOrderId === (order.id || order.rawOrderId)}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                          onClick={() => handleViewOrder(order)}
+                          className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-50 hover:bg-[var(--color-green-primary)] text-gray-700 hover:text-white border border-gray-200 hover:border-transparent font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-2xs hover:shadow-md active:scale-95 cursor-pointer"
                         >
-                          {retryingOrderId === (order.id || order.rawOrderId) ? (
-                            <>
-                              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              Connecting...
-                            </>
-                          ) : (
-                            <>
-                              <FaCreditCard /> Pay Now
-                            </>
-                          )}
+                          <FiEye className="text-sm" />
+                          <span>View Details</span>
                         </button>
-                      )}
-
-                      <button
-                        onClick={() => handleViewOrder(order)}
-                        className="px-5 py-2 bg-[var(--color-green-primary)] text-white font-bold text-xs rounded-xl hover:opacity-90 transition cursor-pointer flex items-center gap-1.5 shadow-sm"
-                      >
-                        <FiEye /> View Timeline & Details
-                      </button>
+                      </div>
                     </div>
                   </div>
                 </div>
