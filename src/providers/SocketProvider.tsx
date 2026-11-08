@@ -6,6 +6,7 @@ import { useAtomValue } from 'jotai';
 import { userAtom } from '../store/user-store';
 import { useQueryClient } from '@tanstack/react-query';
 import { SocketCommand, SocketEvent } from '../types/socket.types';
+import { getSocketUrl } from '@/config/env';
 
 interface SocketContextType {
     socket: Socket | null;
@@ -34,16 +35,6 @@ const SocketContext = createContext<SocketContextType>({
 });
 
 export const useSocket = () => useContext(SocketContext);
-
-const getSocketUrl = (): string => {
-    const raw = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-    try {
-        const url = new URL(raw);
-        return `${url.protocol}//${url.host}`;
-    } catch {
-        return 'http://localhost:5000';
-    }
-};
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAtomValue(userAtom);

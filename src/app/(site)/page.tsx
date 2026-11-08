@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Home from "@/views/home/Home";
+import { getApiBaseUrl } from "@/config/env";
 
 export const metadata: Metadata = {
   title: "Fashion Time | Online Shopping for Clothing & Fashion",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 export const revalidate = 300; // ISR: 5 minutes cache
 
 async function getHomePageData() {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
+  const baseUrl = getApiBaseUrl();
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s timeout for fast response

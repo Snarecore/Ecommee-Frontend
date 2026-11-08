@@ -10,6 +10,7 @@ import { getFirebaseAuth, isFirebaseConfigured } from "../config/firebase";
 import { User } from "../store/user-store";
 import { setCookie } from "../utils/cookie-utils";
 import apiConfig from "../config/api.json";
+import { getApiBaseUrl } from "@/config/env";
 
 export interface FirebaseAuthResult {
   success: boolean;
@@ -56,7 +57,7 @@ export const mapFirebaseError = (error: any): { message: string; isWarning: bool
  * Otherwise creates a standard customer session.
  */
 const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string): Promise<User> => {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || (apiConfig as any)?.baseUrl || "http://localhost:5000/api/v1/").replace(/\/$/, "");
+  const baseUrl = getApiBaseUrl();
 
   const payload = {
     email: firebaseUser.email || "",

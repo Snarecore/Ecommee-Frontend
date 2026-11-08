@@ -1,3 +1,5 @@
+import { getBackendOrigin } from "@/config/env";
+
 type DiscountType = "NONE" | "PERCENT" | "PERCENTAGE" | "FLAT" | string;
 
 export function finalPrice({
@@ -53,17 +55,10 @@ export function formatImageUrl(url?: string | null | any): string {
         }
     }
 
-    // Determine backend origin from environment variable
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/";
-    let apiOrigin = "";
-    try {
-        const u = new URL(apiBaseUrl);
-        apiOrigin = u.origin;
-    } catch {
-        apiOrigin = "";
-    }
+    // Determine backend origin from authoritative environment config
+    const apiOrigin = getBackendOrigin();
 
-    // Replace localhost server host in production if backend is hosted remotely
+    // Replace legacy localhost server host in production if backend is hosted remotely
     if (trimmed.startsWith("http://localhost:5000") || trimmed.startsWith("http://127.0.0.1:5000")) {
         if (apiOrigin && !apiOrigin.includes("localhost")) {
             trimmed = trimmed.replace(/^http:\/\/(localhost|127\.0\.0\.1):5000/, apiOrigin);

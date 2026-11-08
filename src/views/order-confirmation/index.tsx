@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getOrderByIdFromService, Order } from "@/utils/order-service";
 import {
   FaCheckCircle,
@@ -15,15 +15,17 @@ import {
   FaClock,
   FaTimesCircle,
   FaExclamationTriangle,
-  FaSyncAlt
+  FaSyncAlt,
+  FaShoppingCart
 } from "react-icons/fa";
 import { getOrderCreatedAt } from "@/utils/order-service";
 
 import { getData, postData } from "@/services/api-service";
 import { getUserToken } from "@/hooks/useApi";
 import { formatImageUrl } from "@/utils/product-utils";
-import { showErrorToast } from "@/utils/toast-utils";
+import { showErrorToast, showSuccessToast } from "@/utils/toast-utils";
 import { isOrderEligibleForPaymentRetry } from "@/utils/payment-retry.utils";
+import { useCart } from "@/hooks/useCart";
 
 import { useSocket } from "@/hooks/useSocket";
 import { SocketEvent, OrderStatusUpdatedPayload } from "@/types/socket.types";
@@ -33,11 +35,14 @@ interface OrderConfirmationViewProps {
 }
 
 const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }) => {
+  const router = useRouter();
+  const { restoreCart } = useCart();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPolling, setIsPolling] = useState(true);
   const [isManualChecking, setIsManualChecking] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   const searchParams = useSearchParams();
   const paymentParam = searchParams?.get("payment") || "";
@@ -188,6 +193,56 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
     }
   };
 
+  // Authoritative Backend Cart Recovery Handler (Zero LocalStorage dependency)
+  const handleRestoreAndEditCart = async () => {
+    if (!order || isRestoring) return;
+
+    try {
+      setIsRestoring(true);
+      const token = getUserToken();
+      const targetId = (order as any).rawOrderId || order.orderId || order.id;
+
+      // Extract guest recovery access token from sessionStorage if present
+      let guestToken: string | null = null;
+      if (typeof window !== "undefined") {
+        guestToken =
+          sessionStorage.getItem(`guest_order_token_${targetId}`) ||
+          (order.orderId ? sessionStorage.getItem(`guest_order_token_${order.orderId}`) : null) ||
+          (order.id ? sessionStorage.getItem(`guest_order_token_${order.id}`) : null);
+      }
+
+      const headers: Record<string, string> = {};
+      if (guestToken) {
+        headers["x-guest-order-token"] = guestToken;
+      }
+
+      const res: any = await postData({
+        url: `orders/${targetId}/restore-cart`,
+        token: token || undefined,
+        headers,
+        body: {}
+      });
+
+      if (res?.error) {
+        showErrorToast(res?.message || "Failed to restore items to cart");
+        return;
+      }
+
+      const payload = res?.data || res;
+      if (payload && Array.isArray(payload.items) && payload.items.length > 0) {
+        restoreCart(payload.items);
+        showSuccessToast("Cart restored! You can now adjust items and checkout again.");
+        router.push("/cart");
+      } else {
+        showErrorToast(res?.message || "No restorable items found for this order");
+      }
+    } catch (err: any) {
+      showErrorToast(err?.message || "Could not restore cart at this time");
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -229,11 +284,8 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           {/* Priority 1: Verified PAID status */}
           {isPaid ? (
             <>
-              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-4xl shadow-inner">
-                <FaCheckCircle />
-              </div>
               <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
-                Order Placed & Payment Verified! 🎉
+                Order Placed & Payment Verified!
               </h1>
               <p className="text-gray-600 mt-2 max-w-lg mx-auto">
                 Thank you for shopping with us. Your online payment has been confirmed by SSLCommerz and your order is now being processed.
@@ -297,6 +349,22 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
                     </>
                   )}
                 </button>
+                <button
+                  onClick={handleRestoreAndEditCart}
+                  disabled={isRestoring}
+                  className="w-full sm:w-auto px-6 py-3 bg-white border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 disabled:opacity-50 font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm transition cursor-pointer"
+                >
+                  {isRestoring ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                      Restoring Cart...
+                    </>
+                  ) : (
+                    <>
+                      <FaShoppingCart /> Restore Cart &amp; Edit Items
+                    </>
+                  )}
+                </button>
               </div>
             </>
           ) : isRejected ? (
@@ -323,6 +391,24 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
                   )}
                 </div>
               )}
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={handleRestoreAndEditCart}
+                  disabled={isRestoring}
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
+                >
+                  {isRestoring ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Restoring Cart...
+                    </>
+                  ) : (
+                    <>
+                      <FaShoppingCart /> Restore Items to Cart
+                    </>
+                  )}
+                </button>
+              </div>
             </>
           ) : isPending ? (
             /* Priority 5: Standard COD / Offline Pending Approval */
@@ -340,11 +426,8 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           ) : (
             /* Standard fallback */
             <>
-              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-4xl">
-                <FaCheckCircle />
-              </div>
               <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
-                Order Confirmed! 🎉
+                Order Confirmed!
               </h1>
               <p className="text-gray-600 mt-2">
                 Thank you for shopping with us. Your order has been placed and is now being prepared.

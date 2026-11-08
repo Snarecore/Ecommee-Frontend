@@ -1,13 +1,7 @@
 import { GetDataProps, PostDataProps, PatchDataProps, DeleteDataProps, FormDataProps } from "../models/api-models";
 import apiConfig from "../config/api.json";
 import { getCookie, setCookie } from "../utils/cookie-utils";
-
-const getApiBaseUrl = (): string => {
-    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (envUrl && envUrl !== "undefined") return envUrl;
-    if ((apiConfig as any)?.baseUrl) return (apiConfig as any).baseUrl;
-    return "http://localhost:5000/api/v1/";
-};
+import { getApiBaseUrl } from "@/config/env";
 
 export type ApiErrorResponse = { error: boolean; status?: number; message: string };
 
@@ -115,43 +109,43 @@ async function apiRequest<T>(
 
 // Public APIs (products, categories, homepage) → cached by default
 // User-specific APIs (profile, orders, cart) → pass noCache: true
-export async function getData<T>({ url, token, noCache }: GetDataProps): Promise<T | ApiErrorResponse> {
-    const headers: HeadersInit = { "Content-Type": "application/json" };
+export async function getData<T>({ url, token, noCache, headers: customHeaders }: GetDataProps): Promise<T | ApiErrorResponse> {
+    const headers: Record<string, string> = { "Content-Type": "application/json", ...(customHeaders || {}) };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "GET" }, false, noCache ? "no-store" : "default");
 }
 
-export async function postData<T>({ url, token, body }: PostDataProps): Promise<T | ApiErrorResponse> {
-    const headers: HeadersInit = { "Content-Type": "application/json" };
+export async function postData<T>({ url, token, body, headers: customHeaders }: PostDataProps): Promise<T | ApiErrorResponse> {
+    const headers: Record<string, string> = { "Content-Type": "application/json", ...(customHeaders || {}) };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "POST", body: JSON.stringify(body) });
 }
 
-export async function patchData<T>({ url, token, body }: PatchDataProps): Promise<T | ApiErrorResponse> {
-    const headers: HeadersInit = { "Content-Type": "application/json" };
+export async function patchData<T>({ url, token, body, headers: customHeaders }: PatchDataProps): Promise<T | ApiErrorResponse> {
+    const headers: Record<string, string> = { "Content-Type": "application/json", ...(customHeaders || {}) };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "PATCH", body: JSON.stringify(body) });
 }
 
-export async function deleteData<T>({ url, token }: DeleteDataProps): Promise<T | { error: boolean; message: string }> {
-    const headers: HeadersInit = { "Content-Type": "application/json" };
+export async function deleteData<T>({ url, token, headers: customHeaders }: DeleteDataProps): Promise<T | { error: boolean; message: string }> {
+    const headers: Record<string, string> = { "Content-Type": "application/json", ...(customHeaders || {}) };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "DELETE" });
 }
 
-export async function postFormData<T>({ url, token, body }: FormDataProps): Promise<T | { error: boolean; message: string }> {
-    const headers: HeadersInit = {};
+export async function postFormData<T>({ url, token, body, headers: customHeaders }: FormDataProps): Promise<T | { error: boolean; message: string }> {
+    const headers: Record<string, string> = { ...(customHeaders || {}) };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "POST", body });
 }
 
-export async function patchFormData<T>({ url, token, body }: FormDataProps): Promise<T | { error: boolean; message: string }> {
-    const headers: HeadersInit = {};
+export async function patchFormData<T>({ url, token, body, headers: customHeaders }: FormDataProps): Promise<T | { error: boolean; message: string }> {
+    const headers: Record<string, string> = { ...(customHeaders || {}) };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return apiRequest<T>(url, { headers, method: "PATCH", body });

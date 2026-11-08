@@ -4,11 +4,12 @@ import { userAtom, User, userLoadedAtom, authStatusAtom, persistUserSession } fr
 import { getCookie } from "../utils/cookie-utils";
 import { getFirebaseAuth } from "../config/firebase";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { getApiBaseUrl } from "@/config/env";
 
 const syncFirebaseWithBackend = async (fbUser: FirebaseUser): Promise<User | null> => {
     try {
         const idToken = await fbUser.getIdToken(true);
-        const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
+        const baseUrl = getApiBaseUrl();
         const res = await fetch(`${baseUrl}/auth/firebase-login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -79,7 +80,7 @@ const AppInitializer = () => {
         }
 
         const fetchSession = async () => {
-            const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
+            const baseUrl = getApiBaseUrl();
 
             try {
                 // 1. Check active session via HttpOnly cookie

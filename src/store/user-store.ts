@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 import { deleteCookie, setCookie, getCookie } from "../utils/cookie-utils";
 import { logoutFirebaseUser } from "../services/firebase-auth.service";
+import { getApiBaseUrlWithTrailingSlash } from "@/config/env";
 
 export interface User {
     id?: string;
@@ -67,7 +68,7 @@ export const persistUserSession = (user: User | null) => {
 
 export const logoutUserAtom = atom(null, (get, set, action?: any) => {
     logoutFirebaseUser().catch(() => null);
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/"}auth/logout`, {
+    fetch(`${getApiBaseUrlWithTrailingSlash()}auth/logout`, {
         method: "POST",
         credentials: "include"
     }).catch(() => null);

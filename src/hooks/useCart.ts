@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { Product } from "../interface/product.interface";
-import { cartAtom, cartCounterAtom } from "../store/cart-store";
+import { cartAtom, cartCounterAtom, CartItem } from "../store/cart-store";
 import { showSuccessToast, showErrorToast } from "../utils/toast-utils";
 import { isProductOutOfStock, isSizeOutOfStock } from "../utils/stock-utils";
 
@@ -84,6 +84,95 @@ const useCart = () => {
 		setCartItems([]);
 	};
 
+	const restoreCart = (
+		incomingItems: CartItem[],
+		mode: 'merge' | 'replace' = 'merge'
+	): { addedCount: number; droppedCount: number; adjustedCount: number } => {
+		// 1. Sanitize and aggregate incoming items by stable variant identity
+		const aggregatedIncoming = new Map<string, CartItem>();
+		let droppedCount = 0;
+		let adjustedCount = 0;
+
+		for (const item of incomingItems) {
+			const liveStock = Number.isInteger(item.availableStock) && (item.availableStock ?? 0) > 0 ? item.availableStock! : 0;
+			if (liveStock <= 0) {
+				droppedCount++;
+				continue; // Skip out-of-stock incoming items
+			}
+
+			const variantKey = item.variantId || `${item.id}:${item.selectedSize || ''}:${item.selectedColor || ''}`;
+			const safeQty = Number.isInteger(item.quantity) && item.quantity >= 1 ? item.quantity : 1;
+
+			if (aggregatedIncoming.has(variantKey)) {
+				const existing = aggregatedIncoming.get(variantKey)!;
+				const newCombined = existing.quantity + safeQty;
+				if (newCombined > liveStock) {
+					adjustedCount++;
+					existing.quantity = liveStock;
+				} else {
+					existing.quantity = newCombined;
+				}
+			} else {
+				const finalQty = Math.min(safeQty, liveStock);
+				if (finalQty < safeQty) adjustedCount++;
+				aggregatedIncoming.set(variantKey, {
+					...item,
+					quantity: finalQty,
+					availableStock: liveStock
+				});
+			}
+		}
+
+		const validatedIncomingList = Array.from(aggregatedIncoming.values());
+
+		if (mode === 'replace') {
+			setCartItems(validatedIncomingList);
+			return { addedCount: validatedIncomingList.length, droppedCount, adjustedCount };
+		}
+
+		// 2. Smart Merge into current cart:
+		const merged = [...cartItems];
+
+		for (const incoming of validatedIncomingList) {
+			const incomingKey = incoming.variantId || `${incoming.id}:${incoming.selectedSize || ''}:${incoming.selectedColor || ''}`;
+			const existingIndex = merged.findIndex(
+				(item) => (item.variantId || `${item.id}:${item.selectedSize || ''}:${item.selectedColor || ''}`) === incomingKey
+			);
+
+			const maxStock = incoming.availableStock!;
+
+			if (existingIndex > -1) {
+				const currentItem = merged[existingIndex];
+				const currentQty = Number.isInteger(currentItem.quantity) && currentItem.quantity >= 1 ? currentItem.quantity : 1;
+				// Real Stock Cap
+				const combinedQty = currentQty + incoming.quantity;
+				const finalQty = Math.min(combinedQty, maxStock);
+				if (finalQty < combinedQty) adjustedCount++;
+
+				merged[existingIndex] = {
+					...currentItem,
+					price: incoming.price, // Re-sync live catalog price
+					quantity: Math.max(1, finalQty),
+					availableStock: maxStock
+				};
+			} else {
+				merged.push(incoming);
+			}
+		}
+
+		// 3. Final normalization of existing cart items: remove any items with stock <= 0
+		const finalCartList = merged.filter((item) => {
+			if (item.availableStock !== undefined && item.availableStock <= 0) {
+				droppedCount++;
+				return false;
+			}
+			return true;
+		});
+
+		setCartItems(finalCartList);
+		return { addedCount: validatedIncomingList.length, droppedCount, adjustedCount };
+	};
+
 	return {
 		cartItems,
 		cartItemCount,
@@ -93,8 +182,10 @@ const useCart = () => {
 		increaseQuantity,
 		decreaseQuantity,
 		calculateTotalPrice,
-		clearCart
+		clearCart,
+		restoreCart
 	};
 };
 
+export { useCart };
 export default useCart;

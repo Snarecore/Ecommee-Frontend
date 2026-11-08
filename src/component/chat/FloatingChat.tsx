@@ -22,6 +22,7 @@ import { RiCustomerService2Fill } from 'react-icons/ri';
 import { IoMdClose } from 'react-icons/io';
 import { useSocket } from '@/hooks/useSocket';
 import { SocketEvent, MessageCreatedPayload } from '@/types/socket.types';
+import { getApiBaseUrlWithTrailingSlash } from '@/config/env';
 
 interface Message {
     id: string;
@@ -33,7 +34,7 @@ interface Message {
     createdAt: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api/v1/';
+const BASE_URL = getApiBaseUrlWithTrailingSlash();
 
 // Detect if content is an image URL
 const isImageUrl = (text: string) => {

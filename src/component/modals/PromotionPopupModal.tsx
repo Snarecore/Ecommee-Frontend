@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import apiConfig from "../../config/api.json";
+import { getApiBaseUrl } from "@/config/env";
 
 interface PopupData {
     id: string;
@@ -16,13 +17,6 @@ interface PopupData {
     endDate?: string;
     isActive?: boolean;
 }
-
-const getApiBaseUrl = (): string => {
-    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (envUrl && envUrl !== "undefined") return envUrl;
-    if ((apiConfig as any)?.baseUrl) return (apiConfig as any).baseUrl;
-    return "http://localhost:5000/api/v1/";
-};
 
 const PromotionPopupModal: React.FC = () => {
     const [popup, setPopup] = useState<PopupData | null>(null);
@@ -37,7 +31,7 @@ const PromotionPopupModal: React.FC = () => {
 
         const fetchActivePopup = async () => {
             try {
-                const baseUrl = getApiBaseUrl().replace(/\/$/, "");
+                const baseUrl = getApiBaseUrl();
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 2000);
 

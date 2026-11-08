@@ -5,6 +5,9 @@ import { Product } from "../interface/product.interface";
 export interface CartItem extends Product {
 	quantity: number;
 	selectedSize?: string;
+	selectedColor?: string;
+	variantId?: string;
+	availableStock?: number;
 }
 
 export const cartAtom = atomWithStorage<CartItem[]>("cart", [], createJSONStorage(), { getOnInit: false });

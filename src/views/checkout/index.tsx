@@ -293,6 +293,18 @@ const CheckoutView = () => {
         throw new Error("Order was not accepted by server. Please try again.");
       }
 
+      // Preserve guest access token in session storage for guest recovery access
+      if (typeof window !== "undefined" && createdOrderData?.guestAccessToken) {
+        try {
+          if (createdOrderData.orderId) {
+            sessionStorage.setItem(`guest_order_token_${createdOrderData.orderId}`, createdOrderData.guestAccessToken);
+          }
+          if (createdOrderId) {
+            sessionStorage.setItem(`guest_order_token_${createdOrderId}`, createdOrderData.guestAccessToken);
+          }
+        } catch {}
+      }
+
       // 2. Stripe Payment Lifecycle (Order-First Flow)
       if (paymentMethod === "Online") {
         const stripeInitRes: any = await postData({
@@ -373,7 +385,8 @@ const CheckoutView = () => {
               customerName: name.trim(),
               customerPhone: phone.trim(),
               customerAddress: address.trim(),
-              customerCity: city.trim()
+              customerCity: city.trim(),
+              frontendCallbackUrl: typeof window !== "undefined" ? window.location.origin : undefined
             }
           });
 

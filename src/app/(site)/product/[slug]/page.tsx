@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Product from "@/views/product";
+import { getApiBaseUrl } from "@/config/env";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 async function getProductData(slug: string) {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
+  const baseUrl = getApiBaseUrl();
   try {
     const res = await fetch(`${baseUrl}/site/product/${slug}`, { next: { revalidate: 60 } });
     if (res.ok) {

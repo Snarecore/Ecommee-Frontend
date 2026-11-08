@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AllCategories from "@/views/all-categories";
+import { getApiBaseUrl } from "@/config/env";
 
 export const revalidate = 120; // ISR: 2 minutes cache
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 async function getCategoriesContent() {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1/").replace(/\/$/, "");
+  const baseUrl = getApiBaseUrl();
   try {
     const res = await fetch(`${baseUrl}/site/home`, { next: { revalidate: 120 } });
     if (res.ok) {
