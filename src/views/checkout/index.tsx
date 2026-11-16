@@ -35,6 +35,9 @@ import {
 import { showErrorToast, showSuccessToast } from "@/utils/toast-utils";
 import CouponInput from "@/component/coupon/CouponInput";
 import StripeCardSection, { StripeCardSectionRef } from "@/component/payment/StripeCardSection";
+import { PhoneOtpModal } from "@/component/checkout/PhoneOtpModal";
+import { CheckoutVerificationService } from "@/services/checkout-verification.service";
+import { getGuestOrderHeaders } from "@/utils/guest-order-token";
 
 const CheckoutView = () => {
   const router = useRouter();
@@ -45,6 +48,8 @@ const CheckoutView = () => {
 
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [verifiedPhoneRecord, setVerifiedPhoneRecord] = useState<{ verificationId: string; phone: string } | null>(null);
 
   const [appliedCoupon, setAppliedCoupon] = useState<{
     couponCode: string;
@@ -83,6 +88,17 @@ const CheckoutView = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [requireOtp, setRequireOtp] = useState<boolean>(true);
+
+  useEffect(() => {
+    CheckoutVerificationService.getConfig()
+      .then((cfg) => {
+        if (cfg && typeof cfg.requireCheckoutOtp === 'boolean') {
+          setRequireOtp(cfg.requireCheckoutOtp);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Sync user info if loaded later
   useEffect(() => {
@@ -171,29 +187,10 @@ const CheckoutView = () => {
   const couponDiscount = serverCalculation?.discountAmount ?? (appliedCoupon ? appliedCoupon.discountAmount : 0);
   const grandTotal = serverCalculation?.totalAmount ?? Math.max(0, cartSubtotal + deliveryCharge - couponDiscount);
 
-  // Handle Form Submission
-  const handlePlaceOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPaymentError(null);
-
-    if (!name.trim()) {
-      showErrorToast("Please enter your full name.");
-      return;
-    }
-    if (!phone.trim()) {
-      showErrorToast("Please enter your phone number.");
-      return;
-    }
-    if (email.trim() && !/\S+@\S+\.\S+/.test(email.trim())) {
-      showErrorToast("Please enter a valid email address or leave it blank.");
-      return;
-    }
-    if (!address.trim()) {
-      showErrorToast("Please enter your delivery address.");
-      return;
-    }
-
+  // Execute order submission
+  const executeOrderSubmission = async (overrideVerificationId?: string) => {
     setIsSubmitting(true);
+    setPaymentError(null);
 
     try {
       if (paymentMethod === "Online") {
@@ -246,7 +243,6 @@ const CheckoutView = () => {
           size: item.selectedSize || (item as any).size || undefined
         })),
         products: backendProducts,
-        currency: "usd",
         paymentIntentId: paymentMethod === "COD" ? "COD" : paymentMethod === "SSLCOMMERZ" ? "SSLCOMMERZ" : "PENDING_STRIPE",
         totalAmount: grandTotal,
         subtotal: cartSubtotal,
@@ -261,6 +257,7 @@ const CheckoutView = () => {
         customerEmail: email.trim(),
         address: address.trim(),
         couponCode: appliedCoupon?.couponCode || undefined,
+        verificationId: overrideVerificationId || verifiedPhoneRecord?.verificationId || undefined,
         shippingAddress: {
           name: name.trim(),
           phone: phone.trim(),
@@ -305,11 +302,25 @@ const CheckoutView = () => {
         } catch {}
       }
 
+      // Preserve guest account claim token in session storage for 1-click registration
+      if (typeof window !== "undefined" && createdOrderData?.accountClaimToken) {
+        try {
+          sessionStorage.setItem("accountClaimToken", createdOrderData.accountClaimToken);
+          if (createdOrderData.orderId) {
+            sessionStorage.setItem(`guest_claim_token_${createdOrderData.orderId}`, createdOrderData.accountClaimToken);
+          }
+          if (createdOrderId) {
+            sessionStorage.setItem(`guest_claim_token_${createdOrderId}`, createdOrderData.accountClaimToken);
+          }
+        } catch {}
+      }
+
       // 2. Stripe Payment Lifecycle (Order-First Flow)
       if (paymentMethod === "Online") {
         const stripeInitRes: any = await postData({
           url: "payments/stripe/init",
           token,
+          headers: getGuestOrderHeaders(createdOrderId),
           body: {
             orderId: createdOrderId
           }
@@ -380,6 +391,7 @@ const CheckoutView = () => {
           const initRes: any = await postData({
             url: "payments/sslcommerz/init",
             token,
+            headers: getGuestOrderHeaders(createdOrderId),
             body: {
               orderId: createdOrderId,
               customerName: name.trim(),
@@ -427,6 +439,36 @@ const CheckoutView = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Handle Form Submission
+  const handlePlaceOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaymentError(null);
+
+    if (!name.trim()) {
+      showErrorToast("Please enter your full name.");
+      return;
+    }
+    if (!phone.trim()) {
+      showErrorToast("Please enter your phone number.");
+      return;
+    }
+    if (email.trim() && !/\S+@\S+\.\S+/.test(email.trim())) {
+      showErrorToast("Please enter a valid email address or leave it blank.");
+      return;
+    }
+    if (!address.trim()) {
+      showErrorToast("Please enter your delivery address.");
+      return;
+    }
+
+    if (requireOtp && !verifiedPhoneRecord) {
+      setIsOtpModalOpen(true);
+      return;
+    }
+
+    await executeOrderSubmission(verifiedPhoneRecord?.verificationId);
   };
 
   if (!isMounted) {
@@ -536,9 +578,31 @@ const CheckoutView = () => {
                       required
                       placeholder="e.g. 01810000000"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => {
+                        setPhone(e.target.value);
+                        setVerifiedPhoneRecord(null);
+                      }}
                       className="w-full border border-gray-200 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-green-primary)] transition"
                     />
+                    {verifiedPhoneRecord ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded mt-1 border border-emerald-200">
+                        <FaCheckCircle className="text-[10px]" /> Verified Number
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!phone.trim()) {
+                            showErrorToast("Please enter your phone number first.");
+                            return;
+                          }
+                          setIsOtpModalOpen(true);
+                        }}
+                        className="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold underline mt-1 block cursor-pointer"
+                      >
+                        Verify with OTP
+                      </button>
+                    )}
                   </div>
 
                   <div>
@@ -868,6 +932,16 @@ const CheckoutView = () => {
           </div>
         </form>
       </div>
+
+      <PhoneOtpModal
+        isOpen={isOtpModalOpen}
+        onClose={() => setIsOtpModalOpen(false)}
+        rawPhone={phone}
+        onVerified={(vId, vPhone) => {
+          setVerifiedPhoneRecord({ verificationId: vId, phone: vPhone });
+          executeOrderSubmission(vId);
+        }}
+      />
     </div>
   );
 };

@@ -7,7 +7,7 @@ import {
   UserCredential
 } from "firebase/auth";
 import { getFirebaseAuth, isFirebaseConfigured } from "../config/firebase";
-import { User } from "../store/user-store";
+import { User, stripAuthTokens } from "../store/user-store";
 import { setCookie } from "../utils/cookie-utils";
 import apiConfig from "../config/api.json";
 import { getApiBaseUrl } from "@/config/env";
@@ -16,7 +16,6 @@ export interface FirebaseAuthResult {
   success: boolean;
   user?: User;
   firebaseUser?: FirebaseUser;
-  token?: string;
   error?: string;
   code?: string;
 }
@@ -82,15 +81,11 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
     if (response.ok) {
       const data = await response.json();
       const serverUser = data?.data?.user || data?.data || data?.user;
-      const serverToken = data?.data?.accessToken || data?.accessToken || data?.data?.token || data?.token;
-      const serverRefreshToken = data?.data?.refreshToken || data?.refreshToken;
 
       if (serverUser && typeof serverUser === "object") {
         return {
           role: "customer",
-          ...serverUser,
-          token: serverToken || idToken,
-          refreshToken: serverRefreshToken,
+          ...stripAuthTokens(serverUser),
           provider: "google"
         };
       }
@@ -108,7 +103,6 @@ const syncUserWithBackend = async (firebaseUser: FirebaseUser, idToken: string):
     email: payload.email,
     photoURL: payload.photoURL,
     role: "customer",
-    token: idToken,
     provider: "google"
   };
 };
@@ -158,8 +152,7 @@ export const loginWithGoogle = async (): Promise<FirebaseAuthResult> => {
     return {
       success: true,
       user: fullUserData,
-      firebaseUser,
-      token: idToken
+      firebaseUser
     };
   } catch (error: any) {
     const { message, isWarning } = mapFirebaseError(error);

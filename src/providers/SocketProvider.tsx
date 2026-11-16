@@ -7,6 +7,14 @@ import { userAtom } from '../store/user-store';
 import { useQueryClient } from '@tanstack/react-query';
 import { SocketCommand, SocketEvent } from '../types/socket.types';
 import { getSocketUrl } from '@/config/env';
+import { getData } from '../services/api-service';
+
+// The access token is an httpOnly cookie that may not reach the socket host, so
+// ask the API (cookie-authenticated) for a short-lived socket-only token instead.
+const fetchSocketToken = async (): Promise<string | undefined> => {
+    const res: any = await getData({ url: 'auth/socket-token', noCache: true });
+    return res?.data?.token || undefined;
+};
 
 interface SocketContextType {
     socket: Socket | null;
@@ -55,8 +63,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
-            auth: {
-                token: (user as any)?.token || (user as any)?.accessToken || undefined
+            // Called on every (re)connect, so an expired socket token is replaced
+            auth: (cb) => {
+                if (!user?.id) return cb({});
+                fetchSocketToken()
+                    .then((token) => cb(token ? { token } : {}))
+                    .catch(() => cb({}));
             }
         });
 
@@ -90,7 +102,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             socketRef.current = null;
             setIsConnected(false);
         };
-    }, [user?.id, (user as any)?.token, queryClient]);
+    }, [user?.id, queryClient]);
 
     const joinConversation = (conversationId: string) => {
         if (!conversationId) return;

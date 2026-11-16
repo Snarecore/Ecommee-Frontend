@@ -15,7 +15,7 @@ const OverViewCardWithCurrency = ({
 				{children}
 			</div>
 			<div>
-				<p className="text-lg font-bold">${title}</p>
+				<p className="text-lg font-bold">৳{title}</p>
 				<p className="text-[14px] text-[#646B72]">{subTitle}</p>
 			</div>
 		</div>

@@ -28,6 +28,16 @@ export type MinimalProduct = {
   export const stripHtml = (html?: string) =>
     (html ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
   
+  // JSON.stringify leaves "<" as-is, so product text containing "</script>" could
+  // break out of the <script type="application/ld+json"> tag. Escape it as unicode.
+  export const serializeJsonLd = (data: unknown) =>
+    JSON.stringify(data)
+      .replace(/</g, "\\u003c")
+      .replace(/>/g, "\\u003e")
+      .replace(/&/g, "\\u0026")
+      .replace(/\u2028/g, "\\u2028")
+      .replace(/\u2029/g, "\\u2029");
+
   export const money = (n?: number | string) => {
     if (n === undefined || n === null) return "0.00";
     const num = typeof n === "string" ? Number(n) : n;
@@ -69,7 +79,7 @@ export type MinimalProduct = {
       offers: {
         "@type": "Offer",
         url: here,
-        priceCurrency: p.currency || "USD",
+        priceCurrency: p.currency || "BDT",
         price: money(p.price),
         availability: "https://schema.org/InStock",     
         itemCondition: "https://schema.org/NewCondition", 

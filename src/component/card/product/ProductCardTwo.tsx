@@ -158,11 +158,11 @@ const ProductCardTwo: React.FC<Props> = ({ product }) => {
                         <div className="flex items-baseline gap-1.5 mb-1.5">
                             {hasDiscount ? (
                                 <>
-                                    <span className="text-sm sm:text-[15px] font-bold text-neutral-900">${calculatedPrice.toFixed(2)}</span>
-                                    <span className="text-[10px] sm:text-[11px] text-neutral-400 line-through">${original.toFixed(2)}</span>
+                                    <span className="text-sm sm:text-[15px] font-bold text-neutral-900">৳{calculatedPrice.toFixed(2)}</span>
+                                    <span className="text-[10px] sm:text-[11px] text-neutral-400 line-through">৳{original.toFixed(2)}</span>
                                 </>
                             ) : (
-                                <span className="text-sm sm:text-[15px] font-bold text-neutral-900">${original.toFixed(2)}</span>
+                                <span className="text-sm sm:text-[15px] font-bold text-neutral-900">৳{original.toFixed(2)}</span>
                             )}
                         </div>
 

@@ -58,4 +58,23 @@ export const signInWithGoogle = async () => {
   return await signInWithPopup(currentAuth, currentProvider);
 };
 
+/**
+ * Firebase Auth Instance for Checkout Phone OTP Verification.
+ * Connects directly to the primary Firebase app instance for maximum reCAPTCHA & Identity Toolkit stability.
+ */
+export const getCheckoutPhoneAuth = (): Auth | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const defaultInstance = getFirebaseAuth();
+    if (defaultInstance?.auth) {
+      return defaultInstance.auth;
+    }
+    const currentApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    return getAuth(currentApp);
+  } catch {
+    return null;
+  }
+};
+
+
 export { app, auth, googleProvider };

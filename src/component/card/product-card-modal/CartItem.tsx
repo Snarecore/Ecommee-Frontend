@@ -71,7 +71,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium text-gray-800 truncate">{item.name}</p>
                                         <p className="text-[var(--color-primary)] font-semibold mt-0.5">
-                                            ${(item.price * item.quantity).toFixed(2)}
+                                            ৳{(item.price * item.quantity).toFixed(2)}
                                         </p>
                                         <div className="flex items-center gap-2 mt-2">
                                             <button
@@ -105,7 +105,7 @@ const CartItem: React.FC<CartItemProps> = ({ isOpen, onClose, title }) => {
             {/* <div className="p-6 border-t border-gray-100 bg-white">
                 <div className="flex justify-between items-center mb-4">
                     <span className="text-gray-600 font-medium">Subtotal:</span>
-                    <span className="text-xl font-bold text-[var(--color-primary)]">${totalPrice.toFixed(2)}</span>
+                    <span className="text-xl font-bold text-[var(--color-primary)]">৳{totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="space-y-2">
                     <button className="w-full bg-[var(--color-primary)] text-white font-medium py-2.5 rounded-lg hover:bg-[var(--color-primary)]/90 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30">

@@ -29,7 +29,6 @@ export function middleware(request: NextRequest) {
 
   const protectedPaths = [
     '/customer-dashboard',
-    '/checkout',
     '/wallet',
     '/chat',
   ];
@@ -88,8 +87,6 @@ export const config = {
   matcher: [
     '/customer-dashboard',
     '/customer-dashboard/:path*',
-    '/checkout',
-    '/checkout/:path*',
     '/wallet',
     '/wallet/:path*',
     '/chat',

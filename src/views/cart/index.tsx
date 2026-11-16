@@ -13,7 +13,6 @@ import EmptyComponent from "../../component/empty-component";
 import ProductCardSkeletonOne from "../../component/skeleton/ProductCardSkeletonOne";
 import { FaAngleRight } from "react-icons/fa6";
 import { HiOutlineShoppingBag } from "react-icons/hi";
-import StripeCheckout from "../../component/payment/StripeCheckout";
 import Modal from "../../component/modals/Modal";
 import { useAtomValue } from "jotai";
 import { userAtom } from "../../store/user-store";
@@ -32,7 +31,6 @@ const MyCart = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
   const user = useAtomValue(userAtom);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   const {
     cartItems,
@@ -211,11 +209,11 @@ const MyCart = () => {
                               {/* Mobile Price */}
                               <div className="mt-1.5 flex items-baseline gap-2 md:hidden">
                                 <span className="text-base font-bold text-neutral-900">
-                                  ${lineSubtotal.toFixed(2)}
+                                  ৳{lineSubtotal.toFixed(2)}
                                 </span>
                                 {hasDiscount && (
                                   <span className="text-xs text-neutral-400 line-through">
-                                    ${(original * (item.quantity ?? 1)).toFixed(2)}
+                                    ৳{(original * (item.quantity ?? 1)).toFixed(2)}
                                   </span>
                                 )}
                               </div>
@@ -226,11 +224,11 @@ const MyCart = () => {
                           <div className="hidden md:block col-span-2 text-center text-sm font-semibold text-neutral-700">
                             {hasDiscount ? (
                               <div className="flex flex-col items-center">
-                                <span className="text-base font-bold text-neutral-900">${unitPrice.toFixed(2)}</span>
-                                <span className="text-xs text-neutral-400 line-through">${original.toFixed(2)}</span>
+                                <span className="text-base font-bold text-neutral-900">৳{unitPrice.toFixed(2)}</span>
+                                <span className="text-xs text-neutral-400 line-through">৳{original.toFixed(2)}</span>
                               </div>
                             ) : (
-                              <span className="text-base font-bold text-neutral-900">${unitPrice.toFixed(2)}</span>
+                              <span className="text-base font-bold text-neutral-900">৳{unitPrice.toFixed(2)}</span>
                             )}
                           </div>
 
@@ -267,7 +265,7 @@ const MyCart = () => {
                           {/* Line Subtotal (Desktop) & Delete */}
                           <div className="hidden md:flex col-span-2 flex-col items-center justify-center gap-1">
                             <span className="font-bold text-base text-[var(--color-green-primary)]">
-                              ${lineSubtotal.toFixed(2)}
+                              ৳{lineSubtotal.toFixed(2)}
                             </span>
                             <button
                               onClick={() => removeFromCart(item)}
@@ -302,13 +300,13 @@ const MyCart = () => {
                   <div className="space-y-2.5 text-sm text-neutral-600 mb-4">
                     <div className="flex justify-between items-center">
                       <span>Subtotal ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})</span>
-                      <span className="font-semibold text-neutral-900">${cartSubtotal.toFixed(2)}</span>
+                      <span className="font-semibold text-neutral-900">৳{cartSubtotal.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-center text-base sm:text-lg font-bold text-neutral-900 pt-3 border-t border-neutral-100">
                     <span>Total</span>
-                    <span className="text-[var(--color-green-primary)] text-lg sm:text-xl font-bold">${cartSubtotal.toFixed(2)}</span>
+                    <span className="text-[var(--color-green-primary)] text-lg sm:text-xl font-bold">৳{cartSubtotal.toFixed(2)}</span>
                   </div>
 
                   {(() => {
@@ -323,10 +321,6 @@ const MyCart = () => {
                           disabled={isDisabled}
                           onClick={() => {
                             if (isDisabled) return;
-                            if (!user) {
-                              setShowLoginRequiredModal(true);
-                              return;
-                            }
                             router.push("/checkout");
                           }}
                           className={`mt-6 w-full py-3.5 px-4 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md ${
@@ -368,22 +362,6 @@ const MyCart = () => {
                   <span>Back to Shop</span>
                 </Link>
               </div>
-
-              {/* Payment Modal */}
-              <Modal
-                isOpen={showPaymentForm}
-                onClose={() => setShowPaymentForm(false)}
-                title="Complete Your Payment"
-              >
-                <StripeCheckout
-                  products={cartItems}
-                  onSuccess={() => {
-                    clearCart();
-                    setShowPaymentForm(false);
-                    router.push("/success");
-                  }}
-                />
-              </Modal>
 
               {/* Login Required Modal */}
               <Modal

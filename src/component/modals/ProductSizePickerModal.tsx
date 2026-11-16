@@ -127,11 +127,11 @@ const ProductSizePickerModal: React.FC<ProductSizePickerModalProps> = ({
                         </h3>
                         <div className="flex items-baseline gap-1.5">
                             <span className="text-base font-bold text-neutral-900">
-                                ${calculatedPrice.toFixed(2)}
+                                ৳{calculatedPrice.toFixed(2)}
                             </span>
                             {hasDiscount && (
                                 <span className="text-xs text-neutral-400 line-through">
-                                    ${original.toFixed(2)}
+                                    ৳{original.toFixed(2)}
                                 </span>
                             )}
                         </div>

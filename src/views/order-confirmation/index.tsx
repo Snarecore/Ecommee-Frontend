@@ -26,6 +26,10 @@ import { formatImageUrl } from "@/utils/product-utils";
 import { showErrorToast, showSuccessToast } from "@/utils/toast-utils";
 import { isOrderEligibleForPaymentRetry } from "@/utils/payment-retry.utils";
 import { useCart } from "@/hooks/useCart";
+import { useAtomValue, useSetAtom } from "jotai";
+import { userAtom, persistUserSession, stripAuthTokens } from "@/store/user-store";
+import { getGuestOrderHeaders } from "@/utils/guest-order-token";
+import { CheckoutVerificationService } from "@/services/checkout-verification.service";
 
 import { useSocket } from "@/hooks/useSocket";
 import { SocketEvent, OrderStatusUpdatedPayload } from "@/types/socket.types";
@@ -37,12 +41,58 @@ interface OrderConfirmationViewProps {
 const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }) => {
   const router = useRouter();
   const { restoreCart } = useCart();
+  const user = useAtomValue(userAtom);
+  const setUser = useSetAtom(userAtom);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPolling, setIsPolling] = useState(true);
   const [isManualChecking, setIsManualChecking] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+
+  // Guest Account Claim State
+  const [claimToken, setClaimToken] = useState<string | null>(null);
+  const [claimPassword, setClaimPassword] = useState("");
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [isClaimed, setIsClaimed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = sessionStorage.getItem("accountClaimToken")
+        || (orderId ? sessionStorage.getItem(`guest_claim_token_${orderId}`) : null);
+      if (token) setClaimToken(token);
+    }
+  }, [orderId]);
+
+  const handleClaimAccount = async () => {
+    if (!claimToken || claimPassword.length < 6) return;
+    try {
+      setIsClaiming(true);
+      const res = await CheckoutVerificationService.claimGuestAccount({
+        claimToken,
+        password: claimPassword
+      });
+      if (res && ((res as any).accessToken || res.success || (res as any).user)) {
+        showSuccessToast("Account created successfully! You are now logged in.");
+        setIsClaimed(true);
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("accountClaimToken");
+          if (orderId) sessionStorage.removeItem(`guest_claim_token_${orderId}`);
+        }
+        if ((res as any).user) {
+          const userObj = stripAuthTokens({ ...(res as any).user });
+          persistUserSession(userObj);
+          setUser(userObj);
+        }
+      } else {
+        showErrorToast(res?.message || "Failed to create account.");
+      }
+    } catch (err: any) {
+      showErrorToast(err?.message || "Error claiming account.");
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   const searchParams = useSearchParams();
   const paymentParam = searchParams?.get("payment") || "";
@@ -57,7 +107,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
 
     try {
       const token = getUserToken();
-      const res: any = await getData({ url: `orders/${orderId}`, token, noCache: true });
+      const res: any = await getData({ url: `orders/${orderId}`, token, noCache: true, headers: getGuestOrderHeaders(orderId) });
       const apiOrder = res?.data || res;
       if (apiOrder && !apiOrder.error && (apiOrder.id || apiOrder.orderId)) {
         setOrder(apiOrder);
@@ -97,7 +147,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
 
       try {
         const token = getUserToken();
-        const res: any = await getData({ url: `orders/${orderId}`, token, noCache: true });
+        const res: any = await getData({ url: `orders/${orderId}`, token, noCache: true, headers: getGuestOrderHeaders(orderId) });
         const refreshed = res?.data || res;
         if (refreshed && refreshed.paymentStatus === "Paid") {
           if (isMounted) {
@@ -172,6 +222,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
       const res: any = await postData({
         url: `payments/order/${targetId}/retry`,
         token,
+        headers: getGuestOrderHeaders(targetId, order.orderId, order.id),
         body: {}
       });
 
@@ -465,7 +516,14 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
             {order.shippingAddress ? (
               <div className="text-sm space-y-1 text-gray-600">
                 <p className="font-bold text-gray-800 text-base">{order.shippingAddress.name}</p>
-                <p className="flex items-center gap-2">📞 {order.shippingAddress.phone}</p>
+                <p className="flex items-center gap-2">
+                  <span>📞 {order.shippingAddress.phone}</span>
+                  {(order as any).isPhoneVerified && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <FaCheckCircle className="text-[9px]" /> Verified
+                    </span>
+                  )}
+                </p>
                 {order.shippingAddress.email && (
                   <p className="flex items-center gap-2">✉️ {order.shippingAddress.email}</p>
                 )}
@@ -598,10 +656,43 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           </div>
         </div>
 
+        {/* Guest Account Claim Card */}
+        {claimToken && !user && !isClaimed && (
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-5 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+              <FaShieldAlt className="text-emerald-600" />
+              <span>Save Your Account & Track Easily</span>
+            </div>
+            <p className="text-xs text-emerald-700">
+              Set a password now to create an account for your verified phone number. You can log in anytime to view your complete order history!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <input
+                type="password"
+                placeholder="Enter password (min 6 characters)"
+                value={claimPassword}
+                onChange={(e) => setClaimPassword(e.target.value)}
+                className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+              />
+              <button
+                onClick={handleClaimAccount}
+                disabled={isClaiming || claimPassword.length < 6}
+                className="px-6 py-2.5 text-xs font-semibold rounded-xl bg-[var(--color-green-primary)] text-white hover:opacity-95 transition disabled:opacity-50 shrink-0"
+              >
+                {isClaiming ? "Saving..." : "Save Account"}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
           <Link
-            href="/customer-dashboard"
+            href={
+              user
+                ? "/customer-dashboard"
+                : `/track-order?orderId=${encodeURIComponent(order.orderId || order.id || "")}&phone=${encodeURIComponent(order.shippingAddress?.phone || (order as any).phone || "")}`
+            }
             className="w-full sm:w-1/2 py-3.5 bg-[var(--color-green-primary)] text-white text-center font-bold rounded-full shadow-md hover:opacity-95 transition"
           >
             Track Order Progress 🚚

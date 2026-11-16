@@ -39,6 +39,14 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  // Proxy the API through this origin so the backend's httpOnly auth cookies are
+  // first-party. Set BACKEND_API_URL (e.g. https://backend.example.com/api/v1) and
+  // NEXT_PUBLIC_API_BASE_URL=/api/v1 to enable it.
+  async rewrites() {
+    const backendUrl = process.env.BACKEND_API_URL?.trim().replace(/\/+$/, "");
+    if (!backendUrl) return [];
+    return [{ source: "/api/v1/:path*", destination: `${backendUrl}/:path*` }];
+  },
   serverExternalPackages: ["isomorphic-dompurify", "jsdom", "html-encoding-sniffer", "@exodus/bytes"],
 };
 

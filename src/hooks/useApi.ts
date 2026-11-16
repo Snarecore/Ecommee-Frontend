@@ -1,7 +1,6 @@
 import { useMutation, UseMutationResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteData, getData, patchData, postData, postFormData, patchFormData } from "../services/api-service";
 import { showErrorToast, showSuccessToast } from "../utils/toast-utils";
-import { getCookie } from "../utils/cookie-utils";
 
 interface ApiResponse<T> {
     data: T;
@@ -86,17 +85,9 @@ const handleErrorMessage = (error: unknown) => {
     }
 };
 
-export const getUserToken = (): string => {
-    if (typeof window === 'undefined') return '';
-    try {
-        const stored = getCookie("user") || sessionStorage.getItem("user") || localStorage.getItem("user");
-        if (stored) {
-            const user = typeof stored === 'string' ? JSON.parse(stored) : stored;
-            return user?.token || user?.accessToken || user?.data?.accessToken || user?.data?.token || '';
-        }
-    } catch {}
-    return '';
-};
+// The session rides on the backend's httpOnly cookies (sent via credentials: "include"),
+// so there is no JS-readable bearer token. Kept so existing call sites stay unchanged.
+export const getUserToken = (): string => '';
 
 export const useAPI = () => {
     const queryClient = useQueryClient();

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { deleteCookie, setCookie, getCookie } from "../utils/cookie-utils";
+import { deleteCookie, setCookie } from "../utils/cookie-utils";
 import { logoutFirebaseUser } from "../services/firebase-auth.service";
 import { getApiBaseUrlWithTrailingSlash } from "@/config/env";
 
@@ -13,9 +13,24 @@ export interface User {
     username?: string;
     email?: string;
     role?: string;
-    token?: string;
     [key: string]: any;
 }
+
+// Auth tokens live only in httpOnly cookies set by the backend. Never keep them in
+// JS-readable storage, so an XSS bug cannot steal the session.
+const AUTH_TOKEN_KEYS = ["token", "accessToken", "refreshToken", "idToken"];
+const LEGACY_TOKEN_COOKIES = ["accessToken", "cloth_customer_access", "cloth_admin_access"];
+
+export const stripAuthTokens = <T extends User | null>(user: T): T => {
+    if (!user || typeof user !== "object") return user;
+    const clean: User = { ...user };
+    for (const key of AUTH_TOKEN_KEYS) delete clean[key];
+    if (clean.data && typeof clean.data === "object") {
+        clean.data = { ...clean.data };
+        for (const key of AUTH_TOKEN_KEYS) delete clean.data[key];
+    }
+    return clean as T;
+};
 
 export const getUserDisplayName = (user: User | null): string => {
     if (!user) return "";
@@ -35,30 +50,21 @@ export const authStatusAtom = atom<AuthStatus>("loading");
 
 export const persistUserSession = (user: User | null) => {
     if (typeof window === "undefined") return;
+    // Clears tokens older builds wrote from JS. Browsers ignore this for the
+    // backend's httpOnly cookies of the same name, so the real session survives.
+    LEGACY_TOKEN_COOKIES.forEach(deleteCookie);
+
     if (user) {
         try {
-            const userJson = JSON.stringify(user);
+            const userJson = JSON.stringify(stripAuthTokens(user));
             setCookie("user", userJson, 30);
             try {
                 localStorage.setItem("user", userJson);
                 sessionStorage.setItem("user", userJson);
             } catch {}
-
-            const token = user.token || (user as any).accessToken;
-            if (token) {
-                setCookie("accessToken", token, 30);
-                setCookie("cloth_customer_access", token, 30);
-                const role = String(user.role || "").toLowerCase();
-                if (role === "admin" || role === "superadmin" || role === "super_admin") {
-                    setCookie("cloth_admin_access", token, 30);
-                }
-            }
         } catch {}
     } else {
         deleteCookie("user");
-        deleteCookie("accessToken");
-        deleteCookie("cloth_customer_access");
-        deleteCookie("cloth_admin_access");
         try {
             localStorage.removeItem("user");
             sessionStorage.removeItem("user");

@@ -79,15 +79,15 @@ const ProductCategoryCardTwo: React.FC<Props> = ({ product }) => {
                             {hasDiscount ? (
                                 <>
                                     <span className="text-base font-bold text-neutral-900">
-                                        ${calculatedPrice.toFixed(2)}
+                                        ৳{calculatedPrice.toFixed(2)}
                                     </span>
                                     <span className="text-xs text-neutral-400 line-through">
-                                        ${original.toFixed(2)}
+                                        ৳{original.toFixed(2)}
                                     </span>
                                 </>
                             ) : (
                                 <span className="text-base font-bold text-neutral-900">
-                                    ${original.toFixed(2)}
+                                    ৳{original.toFixed(2)}
                                 </span>
                             )}
                         </div>

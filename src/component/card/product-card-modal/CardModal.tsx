@@ -138,9 +138,9 @@ const PriceFilter = () => {
 
             <div className="mt-4 flex items-center text-gray-700 text-sm">
                 <span>Price: </span>
-                <span className="ml-1 font-semibold">${Math.round(minPrice)}</span>
+                <span className="ml-1 font-semibold">৳{Math.round(minPrice)}</span>
                 <span className="mx-1">-</span>
-                <span className="font-semibold">${Math.round(maxPrice)}</span>
+                <span className="font-semibold">৳{Math.round(maxPrice)}</span>
             </div>
         </div>
     );

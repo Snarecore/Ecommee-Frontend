@@ -24,7 +24,7 @@ import { useAtomValue } from "jotai";
 import Modal from "../../component/modals/Modal";
 import userImage from "../../assets/user.png"
 import { formatPrettyDateWithTime } from "../../utils/date-utils";
-import { buildOrganizationJsonLd, buildProductJsonLd, stripHtml } from "../../utils/jsonld-utils";
+import { buildOrganizationJsonLd, buildProductJsonLd, serializeJsonLd, stripHtml } from "../../utils/jsonld-utils";
 import CommentsSection from "./component/CommentsSection";
 import SimilarProducts from "./component/SimilarProducts";
 import { finalPrice, formatImageUrl } from "../../utils/product-utils";
@@ -364,12 +364,12 @@ const Product = ({ initialData }: ProductProps) => {
             {product && (
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(buildProductJsonLd(product)) }}
+                    dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildProductJsonLd(product)) }}
                 />
             )}
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd()) }}
+                dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildOrganizationJsonLd()) }}
             />
 
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">

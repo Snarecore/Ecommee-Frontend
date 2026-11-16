@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { userAtom, User, userLoadedAtom, authStatusAtom, persistUserSession } from "../store/user-store";
+import { userAtom, User, userLoadedAtom, authStatusAtom, persistUserSession, stripAuthTokens } from "../store/user-store";
 import { getCookie } from "../utils/cookie-utils";
 import { getFirebaseAuth } from "../config/firebase";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
@@ -35,7 +35,6 @@ const syncFirebaseWithBackend = async (fbUser: FirebaseUser): Promise<User | nul
                     email: serverUser.email || fbUser.email || "",
                     role: serverUser.role || "customer",
                     photoURL: fbUser.photoURL || serverUser.photoURL || "",
-                    token: data?.data?.accessToken || data?.accessToken || idToken,
                     provider: "google"
                 };
                 return safeUser;
@@ -72,7 +71,10 @@ const AppInitializer = () => {
                 if (rawUser) {
                     const parsed = typeof rawUser === "string" ? JSON.parse(rawUser.startsWith("%") ? decodeURIComponent(rawUser) : rawUser) : rawUser;
                     if (parsed && (parsed.id || parsed._id || parsed.email)) {
-                        setUser(parsed);
+                        // Older builds cached the token here; rewrite the cache without it
+                        const cleanUser = stripAuthTokens(parsed as User);
+                        persistUserSession(cleanUser);
+                        setUser(cleanUser);
                         setAuthStatus("authenticated");
                     }
                 }
@@ -101,8 +103,7 @@ const AppInitializer = () => {
                             fullName: userData.fullName || userData.name,
                             email: userData.email,
                             role: userData.role || "customer",
-                            photoURL: userData.photoURL || "",
-                            token: userData.token || userData.accessToken
+                            photoURL: userData.photoURL || ""
                         };
                         setUser(safeUser);
                         persistUserSession(safeUser);
@@ -128,8 +129,7 @@ const AppInitializer = () => {
                                     fullName: refUser.fullName || refUser.name,
                                     email: refUser.email,
                                     role: refUser.role || "customer",
-                                    photoURL: refUser.photoURL || "",
-                                    token: refData?.accessToken || refData?.data?.accessToken
+                                    photoURL: refUser.photoURL || ""
                                 };
                                 setUser(safeUser);
                                 persistUserSession(safeUser);

@@ -183,16 +183,16 @@ const ProductCardOne: React.FC<Props> = ({ product }) => {
                             {hasDiscount ? (
                                 <>
                                     <span className="text-sm sm:text-[15px] font-bold text-neutral-900">
-                                        ${calculatedPrice.toFixed(2)}
+                                        ৳{calculatedPrice.toFixed(2)}
                                     </span>
 
                                     <span className="text-[10px] sm:text-[11px] text-neutral-400 line-through">
-                                        ${original.toFixed(2)}
+                                        ৳{original.toFixed(2)}
                                     </span>
                                 </>
                             ) : (
                                 <span className="text-sm sm:text-[15px] font-bold text-neutral-900">
-                                    ${original.toFixed(2)}
+                                    ৳{original.toFixed(2)}
                                 </span>
                             )}
                         </div>

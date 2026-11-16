@@ -69,7 +69,7 @@ const Login = () => {
     }, [searchParams, router, setUser]);
 
     useEffect(() => {
-        if (searchParams?.get("reset") !== "true" && authStatus === "authenticated" && user && (user.token || user.id || user._id || user.email)) {
+        if (searchParams?.get("reset") !== "true" && authStatus === "authenticated" && user && (user.id || user._id || user.email)) {
             router.push(targetFrom === "/login" ? "/" : targetFrom);
         }
     }, [authStatus, user, router, targetFrom, searchParams]);
@@ -145,8 +145,6 @@ const Login = () => {
             if (result?.success && result.data) {
                 const resData: any = result.data;
                 const unpackedUser = resData?.data?.user || resData?.data?.data?.user || resData?.user || resData?.data;
-                const token = resData?.data?.accessToken || resData?.accessToken || resData?.data?.token || resData?.token;
-                const refreshToken = resData?.data?.refreshToken || resData?.refreshToken;
 
                 if (unpackedUser && typeof unpackedUser === 'object') {
                     const safeUserData: User = {
@@ -155,8 +153,7 @@ const Login = () => {
                         fullName: unpackedUser.fullName || unpackedUser.name,
                         email: unpackedUser.email,
                         role: unpackedUser.role || 'customer',
-                        photoURL: unpackedUser.photoURL || '',
-                        token: token
+                        photoURL: unpackedUser.photoURL || ''
                     };
                     persistUserSession(safeUserData);
                     setUser(safeUserData);
@@ -194,8 +191,7 @@ const Login = () => {
                     fullName: result.user.fullName || result.user.name,
                     email: result.user.email,
                     role: result.user.role || 'customer',
-                    photoURL: result.user.photoURL || '',
-                    token: result.token || result.user.token
+                    photoURL: result.user.photoURL || ''
                 };
                 persistUserSession(safeUserData);
                 setUser(safeUserData);

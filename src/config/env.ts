@@ -1,10 +1,22 @@
 
 const stripTrailingSlash = (url: string): string => url.replace(/\/+$/, "");
 
+const isAbsoluteUrl = (url: string): boolean => /^https?:\/\//i.test(url);
+
 export const getApiBaseUrl = (): string => {
     const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (envUrl && envUrl.trim() && envUrl !== "undefined") {
-        return stripTrailingSlash(envUrl.trim());
+        const url = stripTrailingSlash(envUrl.trim());
+        // A relative URL (e.g. "/api/v1") goes through the Next.js proxy in next.config.ts,
+        // which keeps the httpOnly auth cookies first-party. Server-side code cannot fetch a
+        // relative URL, so it calls the backend directly.
+        if (isAbsoluteUrl(url) || typeof window !== "undefined") {
+            return url;
+        }
+        const backendUrl = process.env.BACKEND_API_URL;
+        if (backendUrl && backendUrl.trim()) {
+            return stripTrailingSlash(backendUrl.trim());
+        }
     }
 
     if (process.env.NODE_ENV === "production") {
