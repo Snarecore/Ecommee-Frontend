@@ -84,6 +84,9 @@ export interface Order {
   courierName?: string;
   trackingId?: string;
   courierTrackingLink?: string;
+  /** Customer-facing courier status, e.g. "In transit" (from the live Steadfast shipment). */
+  courierStatusLabel?: string;
+  courierStatusUpdatedAt?: string;
 
   acceptedAt?: string;
   acceptedBy?: string;

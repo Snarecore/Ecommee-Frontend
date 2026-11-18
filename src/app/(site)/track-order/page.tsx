@@ -209,7 +209,15 @@ function TrackOrderContent() {
                                     </span>
                                     {orderData.trackingId && (
                                         <p className="text-gray-600 font-mono mt-0.5">
-                                            Consignment ID: {orderData.trackingId}
+                                            Tracking ID: {orderData.trackingId}
+                                        </p>
+                                    )}
+                                    {orderData.shipment?.statusLabel && (
+                                        <p className="text-emerald-800 mt-1">
+                                            Courier status: <span className="font-semibold">{orderData.shipment.statusLabel}</span>
+                                            {orderData.shipment.updatedAt && (
+                                                <span className="text-gray-500"> · updated {new Date(orderData.shipment.updatedAt).toLocaleString()}</span>
+                                            )}
                                         </p>
                                     )}
                                 </div>

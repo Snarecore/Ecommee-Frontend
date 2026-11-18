@@ -257,6 +257,8 @@ const OrderTab = () => {
       courierName: apiOrd.courierName,
       trackingId: apiOrd.trackingId,
       courierTrackingLink: apiOrd.courierTrackingLink,
+      courierStatusLabel: apiOrd.shipment?.statusLabel,
+      courierStatusUpdatedAt: apiOrd.shipment?.updatedAt,
       rejectionReason: apiOrd.rejectionReason,
       rejectionMessage: apiOrd.rejectionMessage,
       couponCode: apiOrd.couponCode,
@@ -813,6 +815,17 @@ const OrderTab = () => {
                         </>
                       )}
                     </p>
+                    {selectedOrder.courierStatusLabel && (
+                      <p className="text-xs text-emerald-800 mt-1">
+                        Courier status: <strong>{selectedOrder.courierStatusLabel}</strong>
+                        {selectedOrder.courierStatusUpdatedAt && (
+                          <span className="text-gray-500">
+                            {" "}
+                            · updated {new Date(selectedOrder.courierStatusUpdatedAt).toLocaleString()}
+                          </span>
+                        )}
+                      </p>
+                    )}
                     <p className="text-[11px] text-gray-500 mt-1">
                       Track your shipment through our delivery partner.
                     </p>
