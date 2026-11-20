@@ -324,8 +324,9 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
   const isPaid = order.paymentStatus === "Paid";
   const isUnderReview = order.paymentStatus === "Review Required" || order.paymentStatus === "Processing";
   const isRetryEligible = isOrderEligibleForPaymentRetry(order);
-  const isPending = order.orderStatus === "Pending";
-  const isRejected = order.orderStatus === "Rejected";
+  const currentStatus = (order as any).status || order.orderStatus;
+  const isPending = currentStatus === "Pending";
+  const isRejected = currentStatus === "Rejected";
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
@@ -556,7 +557,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
                     ? "Pending Approval"
                     : isRejected
                     ? "Rejected"
-                    : order.orderStatus || "Order Placed"}
+                    : currentStatus || "Order Placed"}
                 </span>
               </div>
               <div className="flex justify-between items-center">

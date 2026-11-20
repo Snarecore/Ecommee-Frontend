@@ -570,9 +570,9 @@ const OrderTab = () => {
                       {/* Action Buttons */}
                       <div className="flex items-center gap-2">
                         {/* Courier Tracking Link */}
-                        {order.courierTrackingLink && (
+                        {(order.courierTrackingLink || order.trackingId) && (
                           <a
-                            href={order.courierTrackingLink}
+                            href={order.courierTrackingLink || `https://steadfast.com.bd/t/${order.trackingId}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs"
@@ -800,14 +800,14 @@ const OrderTab = () => {
               )}
 
               {/* Courier Tracking Partner Card */}
-              {selectedOrder.courierTrackingLink && (
+              {(selectedOrder.courierTrackingLink || selectedOrder.trackingId) && (
                 <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
                   <div>
                     <h4 className="font-extrabold text-emerald-900 flex items-center gap-2">
                       <FaTruck className="text-emerald-600" /> Delivery Partner Tracking
                     </h4>
                     <p className="text-xs text-emerald-700 mt-0.5">
-                      Courier: <strong>{selectedOrder.courierName || "Courier Partner"}</strong>
+                      Courier: <strong>{selectedOrder.courierName || "Steadfast Courier"}</strong>
                       {selectedOrder.trackingId && (
                         <>
                           {" "}
@@ -831,7 +831,7 @@ const OrderTab = () => {
                     </p>
                   </div>
                   <a
-                    href={selectedOrder.courierTrackingLink}
+                    href={selectedOrder.courierTrackingLink || `https://steadfast.com.bd/t/${selectedOrder.trackingId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm transition shrink-0"

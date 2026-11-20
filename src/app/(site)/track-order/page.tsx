@@ -201,29 +201,29 @@ function TrackOrderContent() {
                         </div>
 
                         {/* Courier Details Card */}
-                        {orderData.courierName && (
+                        {(orderData.courierName || orderData.trackingId || orderData.shipment) && (
                             <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                                 <div>
                                     <span className="font-semibold text-emerald-900 block">
-                                        Courier: {orderData.courierName}
+                                        Courier: {orderData.courierName || orderData.shipment?.provider || 'Steadfast'}
                                     </span>
-                                    {orderData.trackingId && (
+                                    {(orderData.trackingId || orderData.shipment?.trackingCode) && (
                                         <p className="text-gray-600 font-mono mt-0.5">
-                                            Tracking ID: {orderData.trackingId}
+                                            Tracking ID: {orderData.trackingId || orderData.shipment?.trackingCode}
                                         </p>
                                     )}
-                                    {orderData.shipment?.statusLabel && (
+                                    {(orderData.shipment?.statusLabel || orderData.shipment?.status) && (
                                         <p className="text-emerald-800 mt-1">
-                                            Courier status: <span className="font-semibold">{orderData.shipment.statusLabel}</span>
+                                            Courier status: <span className="font-semibold">{orderData.shipment.statusLabel || orderData.shipment.status}</span>
                                             {orderData.shipment.updatedAt && (
                                                 <span className="text-gray-500"> · updated {new Date(orderData.shipment.updatedAt).toLocaleString()}</span>
                                             )}
                                         </p>
                                     )}
                                 </div>
-                                {orderData.courierTrackingLink && (
+                                {(orderData.courierTrackingLink || (orderData.trackingId ? `https://steadfast.com.bd/t/${orderData.trackingId}` : null)) && (
                                     <a
-                                        href={orderData.courierTrackingLink}
+                                        href={orderData.courierTrackingLink || `https://steadfast.com.bd/t/${orderData.trackingId}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition"
