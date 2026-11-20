@@ -15,6 +15,7 @@ export interface Product {
     productImages: { imageUrl: string }[];
     summary: string;
     description: string;
+    videoUrl?: string;
     discountType: DiscountType;
     discountAmount?: number;
     quantity?: number;

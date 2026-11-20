@@ -76,3 +76,22 @@ export function formatImageUrl(url?: string | null | any): string {
 
     return trimmed;
 }
+
+export function getYouTubeEmbedUrl(url?: string | null): string | null {
+    if (!url || typeof url !== "string") return null;
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = trimmed.match(regExp);
+    if (match && match[1]) {
+        return `https://www.youtube-nocookie.com/embed/${match[1]}?rel=0`;
+    }
+    return null;
+}
+
+export function isDirectVideoFile(url?: string | null): boolean {
+    if (!url || typeof url !== "string") return false;
+    const clean = url.trim().toLowerCase().split("?")[0];
+    return clean.endsWith(".mp4") || clean.endsWith(".webm") || clean.endsWith(".ogg") || clean.endsWith(".mov");
+}
+

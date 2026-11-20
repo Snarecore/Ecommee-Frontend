@@ -13,7 +13,7 @@ import { IoIosArrowDown, IoMdStar } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 import { FaHeart, FaRegHeart, FaRegMessage, FaStar, FaRegStar } from "react-icons/fa6";
 import { FiShoppingCart, FiShoppingBag } from "react-icons/fi";
-import { FaPencilAlt, FaStarHalfAlt } from "react-icons/fa";
+import { FaPencilAlt, FaStarHalfAlt, FaYoutube, FaPlay } from "react-icons/fa";
 //@ts-ignore
 import 'swiper/css';
 import useWishlist from "../../hooks/useWishlist";
@@ -27,7 +27,7 @@ import { formatPrettyDateWithTime } from "../../utils/date-utils";
 import { buildOrganizationJsonLd, buildProductJsonLd, serializeJsonLd, stripHtml } from "../../utils/jsonld-utils";
 import CommentsSection from "./component/CommentsSection";
 import SimilarProducts from "./component/SimilarProducts";
-import { finalPrice, formatImageUrl } from "../../utils/product-utils";
+import { finalPrice, formatImageUrl, getYouTubeEmbedUrl, isDirectVideoFile } from "../../utils/product-utils";
 import { getProductSizes, isSizeOutOfStock, isProductOutOfStock, getSizeStockQuantity } from "../../utils/stock-utils";
 import { useSocket } from "../../hooks/useSocket";
 import { SocketEvent, StockUpdatedPayload } from "../../types/socket.types";
@@ -100,7 +100,7 @@ const Product = ({ initialData }: ProductProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showMessageForm, setShowMessageForm] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<"description" | "ratings" | "reviews">("description");
+    const [activeTab, setActiveTab] = useState<"description" | "video" | "ratings" | "reviews">("description");
     const [rating, setRating] = useState(0);
     const user = useAtomValue(userAtom);
     const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
@@ -433,12 +433,27 @@ const Product = ({ initialData }: ProductProps) => {
                                         <Image src={formatImageUrl(image.imageUrl)} alt={`${product?.name || 'Product'} - ${index + 1}`} className="w-full h-full object-cover" width={500} height={500} />
                                     </button>
                                 ))}
+                                {product?.videoUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setActiveTab("video");
+                                            const el = document.getElementById("product-tabs-section");
+                                            if (el) el.scrollIntoView({ behavior: "smooth" });
+                                        }}
+                                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden border-2 transition cursor-pointer flex flex-col items-center justify-center bg-red-50 hover:bg-red-100 ${activeTab === "video" ? "border-red-600 shadow-sm" : "border-red-200"}`}
+                                        title="Watch Product Video"
+                                    >
+                                        <FaPlay className="text-red-600 text-lg sm:text-xl ml-0.5" />
+                                        <span className="text-[10px] font-bold text-red-600 mt-1 uppercase tracking-tight">Video</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
                         <div className="w-full lg:w-[56%] text-left sm:text-left">
                             <p className="text-[var(--color-black-primary)]">{product?.mainCategoryName}</p>
                             <p className="text-2xl sm:text-3xl font-bold text-[var(--color-black-primary)] mb-4">{product?.name}</p>
-                            <div className="flex items-center gap-8 mb-4">
+                            <div className="flex items-center gap-4 sm:gap-8 flex-wrap mb-4">
                                 <div className="flex items-center gap-2">
                                     <div className="flex justify-center text-yellow-500">
                                         {[...Array(5)].map((_, idx) => {
@@ -468,6 +483,20 @@ const Product = ({ initialData }: ProductProps) => {
                                         setShowReviewModal(true);
                                     }
                                 }} className="flex items-center gap-2 text-[var(--color-black-primary)] cursor-pointer"><span><FaPencilAlt size={14} /></span> Add your ratings</button>
+
+                                {product?.videoUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setActiveTab("video");
+                                            const el = document.getElementById("product-tabs-section");
+                                            if (el) el.scrollIntoView({ behavior: "smooth" });
+                                        }}
+                                        className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-full border border-red-200 cursor-pointer transition shadow-xs"
+                                    >
+                                        <FaYoutube size={16} /> Watch Video
+                                    </button>
+                                )}
                             </div>
                             <p className="text-2xl sm:text-3xl font-bold text-[var(--color-black-primary)] mb-4">
                                 {hasDiscount ? (
@@ -744,17 +773,22 @@ const Product = ({ initialData }: ProductProps) => {
                         </Modal>
                     </div>
 
-                    <div className="flex items-center justify-center border-b border-gray-300 mt-1 sm:mt-12 mb-6 gap-12">
-                        {["description", "ratings", "reviews"].map((tab) => (
+                    <div id="product-tabs-section" className="flex items-center justify-center border-b border-gray-300 mt-1 sm:mt-12 mb-6 gap-6 sm:gap-12 flex-wrap">
+                        {[
+                            { key: "description", label: "Description" },
+                            ...(product?.videoUrl ? [{ key: "video", label: "Video" }] : []),
+                            { key: "ratings", label: "Ratings" },
+                            { key: "reviews", label: "Reviews" },
+                        ].map((t) => (
                             <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab as "description" | "ratings" | "reviews")}
-                                className={`pb-2 text-sm sm:text-xl font-bold capitalize cursor-pointer transition-all duration-300 ${activeTab === tab
+                                key={t.key}
+                                onClick={() => setActiveTab(t.key as "description" | "video" | "ratings" | "reviews")}
+                                className={`pb-2 text-sm sm:text-xl font-bold capitalize cursor-pointer transition-all duration-300 ${activeTab === t.key
                                     ? "border-b-2 border-[var(--color-black-primary)] text-[var(--color-black-primary)]"
                                     : "border-b-2 border-transparent text-gray-500 "
                                     }`}
                             >
-                                {tab}
+                                {t.label}
                             </button>
                         ))}
                     </div>
@@ -764,6 +798,47 @@ const Product = ({ initialData }: ProductProps) => {
                             <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(product?.description) }} />
                         </div>
                     )}
+
+                    {activeTab === "video" && product?.videoUrl && (() => {
+                        const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
+                        const isDirectVideo = isDirectVideoFile(product.videoUrl);
+
+                        return (
+                            <div className="w-full flex flex-col items-center justify-center py-6 px-2">
+                                {embedUrl ? (
+                                    <div className="w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-black">
+                                        <iframe
+                                            className="w-full h-full"
+                                            src={embedUrl}
+                                            title={product?.name || "Product Video"}
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        />
+                                    </div>
+                                ) : isDirectVideo ? (
+                                    <div className="w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-black">
+                                        <video
+                                            controls
+                                            src={product.videoUrl}
+                                            className="w-full h-full"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="p-8 text-center bg-gray-50 rounded-2xl border border-gray-200 max-w-md w-full">
+                                        <p className="text-gray-800 font-semibold mb-4 text-base">Watch the product video:</p>
+                                        <a
+                                            href={product.videoUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition"
+                                        >
+                                            <FaYoutube className="text-xl" /> Open Video Link &rarr;
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                     {activeTab === "ratings" && (
                         <div className="flex flex-col gap-8 p-6">
