@@ -329,10 +329,10 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
   const isRejected = currentStatus === "Rejected";
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6">
+      <div className="max-w-3xl mx-auto space-y-4">
         {/* Dynamic Header Card */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-md text-center">
+        <div className="bg-white rounded-xl p-5 sm:p-6 border border-gray-100 shadow-sm text-center">
           {/* Priority 1: Verified PAID status */}
           {isPaid ? (
             <>
@@ -465,30 +465,27 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           ) : isPending ? (
             /* Priority 5: Standard COD / Offline Pending Approval */
             <>
-              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600 text-4xl">
-                <FaClock />
-              </div>
-              <h1 className="text-3xl font-extrabold text-amber-700">
+              <h1 className="text-2xl font-extrabold text-amber-700">
                 Order Received
               </h1>
-              <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+              <p className="text-gray-600 mt-1 max-w-lg mx-auto text-xs sm:text-sm">
                 Your order has been successfully submitted and is currently waiting for admin approval.
               </p>
               {isOrderEligibleForPaymentRetry(order, { allowCod: true }) && (
-                <div className="mt-5 flex justify-center">
+                <div className="mt-3.5 flex justify-center">
                   <button
                     onClick={handleRetryPayment}
                     disabled={isRetrying}
-                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-sm transition cursor-pointer"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm rounded-lg flex items-center gap-1.5 shadow-xs hover:shadow-sm transition active:scale-95 cursor-pointer"
                   >
                     {isRetrying ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Connecting to Gateway...
                       </>
                     ) : (
                       <>
-                        <FaCreditCard /> Pay Online Now (bKash / Card)
+                        <FaCreditCard className="text-xs" /> Pay Online Now (bKash / Card)
                       </>
                     )}
                   </button>
@@ -498,45 +495,45 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           ) : (
             /* Standard fallback */
             <>
-              <h1 className="text-3xl font-extrabold text-[var(--color-green-primary)]">
+              <h1 className="text-2xl font-extrabold text-[var(--color-green-primary)]">
                 Order Confirmed!
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 mt-1 text-xs sm:text-sm">
                 Thank you for shopping with us. Your order has been placed and is now being prepared.
               </p>
             </>
           )}
 
-          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 text-sm bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div className="mt-3.5 inline-flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs bg-gray-50/80 py-2 px-4 rounded-xl border border-gray-100">
             <div>
-              <span className="text-gray-400 block text-xs">Order ID</span>
-              <strong className="font-extrabold text-gray-800 text-base">
+              <span className="text-gray-400 block text-[11px]">Order ID</span>
+              <strong className="font-extrabold text-gray-800 text-sm">
                 {order.orderId || `#${(order as any).id?.slice(0, 8)}`}
               </strong>
             </div>
-            <div className="h-8 w-px bg-gray-200 hidden sm:block" />
+            <div className="h-6 w-px bg-gray-200 hidden sm:block" />
             <div>
-              <span className="text-gray-400 block text-xs">Order Date</span>
+              <span className="text-gray-400 block text-[11px]">Order Date</span>
               <strong className="font-semibold text-gray-700">{getOrderCreatedAt(order)}</strong>
             </div>
-            <div className="h-8 w-px bg-gray-200 hidden sm:block" />
+            <div className="h-6 w-px bg-gray-200 hidden sm:block" />
             <div>
-              <span className="text-gray-400 block text-xs">Payment Method</span>
+              <span className="text-gray-400 block text-[11px]">Payment Method</span>
               <strong className="font-semibold text-gray-700">{order.paymentMethod || "COD"}</strong>
             </div>
           </div>
         </div>
 
         {/* Order Status & Shipping Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Shipping Address */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-3">
-            <h3 className="font-bold text-gray-800 text-base flex items-center gap-2 border-b pb-3">
+          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-2.5">
+            <h3 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2 border-b pb-2">
               <FaMapMarkerAlt className="text-[var(--color-green-primary)]" /> Shipping Address
             </h3>
             {order.shippingAddress ? (
-              <div className="text-sm space-y-1 text-gray-600">
-                <p className="font-bold text-gray-800 text-base">{order.shippingAddress.name}</p>
+              <div className="text-xs sm:text-sm space-y-1 text-gray-600">
+                <p className="font-bold text-gray-800 text-sm sm:text-base">{order.shippingAddress.name}</p>
                 <p className="flex items-center gap-2">
                   <span>📞 {order.shippingAddress.phone}</span>
                   {(order as any).isPhoneVerified && (
@@ -557,8 +554,8 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
           </div>
 
           {/* Payment & Delivery Summary */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-3">
-            <h3 className="font-bold text-gray-800 text-base flex items-center gap-2 border-b pb-3">
+          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-2.5">
+            <h3 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2 border-b pb-2">
               <FaTruck className="text-[var(--color-green-primary)]" /> Delivery & Status
             </h3>
             <div className="text-sm space-y-2.5 text-gray-600">
@@ -610,8 +607,8 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
         </div>
 
         {/* Ordered Items Table */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
-          <h3 className="font-bold text-gray-800 text-base flex items-center gap-2 border-b pb-3">
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-xs space-y-3">
+          <h3 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2 border-b pb-2">
             <FaShoppingBag className="text-[var(--color-green-primary)]" /> Ordered Products
           </h3>
 
