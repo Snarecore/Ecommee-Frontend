@@ -323,7 +323,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
   // Authoritative State Machine Evaluation
   const isPaid = order.paymentStatus === "Paid";
   const isUnderReview = order.paymentStatus === "Review Required" || order.paymentStatus === "Processing";
-  const isRetryEligible = isOrderEligibleForPaymentRetry(order);
+  const isRetryEligible = isOrderEligibleForPaymentRetry(order, { allowCod: false });
   const currentStatus = (order as any).status || order.orderStatus;
   const isPending = currentStatus === "Pending";
   const isRejected = currentStatus === "Rejected";
@@ -474,6 +474,26 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
               <p className="text-gray-600 mt-2 max-w-lg mx-auto">
                 Your order has been successfully submitted and is currently waiting for admin approval.
               </p>
+              {isOrderEligibleForPaymentRetry(order, { allowCod: true }) && (
+                <div className="mt-5 flex justify-center">
+                  <button
+                    onClick={handleRetryPayment}
+                    disabled={isRetrying}
+                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-sm transition cursor-pointer"
+                  >
+                    {isRetrying ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Connecting to Gateway...
+                      </>
+                    ) : (
+                      <>
+                        <FaCreditCard /> Pay Online Now (bKash / Card)
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             /* Standard fallback */

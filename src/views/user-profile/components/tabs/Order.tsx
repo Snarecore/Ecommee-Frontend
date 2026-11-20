@@ -897,7 +897,7 @@ const OrderTab = () => {
                             </>
                           ) : (
                             <>
-                              <FaCreditCard /> Pay Now (SSLCommerz)
+                              <FaCreditCard /> Pay Online (bKash / Card)
                             </>
                           )}
                         </button>
