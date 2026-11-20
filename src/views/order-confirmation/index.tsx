@@ -468,8 +468,8 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
               <h1 className="text-2xl font-extrabold text-amber-700">
                 Order Received
               </h1>
-              <p className="text-gray-600 mt-1 max-w-lg mx-auto text-xs sm:text-sm">
-                Your order has been successfully submitted and is currently waiting for admin approval.
+              <p className="text-gray-600 mt-1 max-w-2xl mx-auto text-xs sm:text-sm">
+                Your order is submitted and waiting for admin approval.
               </p>
               {isOrderEligibleForPaymentRetry(order, { allowCod: true }) && (
                 <div className="mt-3.5 flex justify-center">
@@ -713,7 +713,7 @@ const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({ orderId }
             }
             className="w-full sm:w-1/2 py-3.5 bg-[var(--color-green-primary)] text-white text-center font-bold rounded-full shadow-md hover:opacity-95 transition"
           >
-            Track Order Progress 🚚
+            Track Order Progress
           </Link>
           <Link
             href="/shop"
