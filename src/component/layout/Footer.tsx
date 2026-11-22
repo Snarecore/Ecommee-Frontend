@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useAtom } from "jotai";
 import { headerFooterAtom, socialLinksAtom, nestedCategoriesAtom } from "../../store/global-store";
 import { MainCategory } from "../../interface/nested-category.interface";
-import sslCommerzBanner from "../../assets/sslcommerz-banner.png";
 
 import { 
     FaFacebookF, 
@@ -229,15 +228,29 @@ const Footer = () => {
                 {/* SSLCommerz Payment Gateway Banner */}
                 <div className="border-t border-slate-800/80 pt-8 pb-6">
                     <div className="w-full flex justify-center">
-                        <div className="w-full max-w-5xl bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-200/20 overflow-hidden flex items-center justify-center">
-                            <Image 
-                                src={sslCommerzBanner} 
+                        <a 
+                            href="https://www.sslcommerz.com" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block w-full max-w-5xl bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-200/20 overflow-hidden cursor-pointer hover:opacity-95 transition-opacity"
+                            title="SSLCOMMERZ - Verified Payment Gateway"
+                        >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img 
+                                src={headerFooterData?.paymentBanner || "https://res.cloudinary.com/dps0qdamq/image/upload/v1795371802/payment-gateways/sslcommerz-verified-banner.png"} 
                                 alt="SSLCOMMERZ Verified Payment Gateway - Pay With Cards, Mobile Banking & Net Banking" 
-                                className="w-full h-auto object-contain max-h-24 sm:max-h-28"
+                                className="w-full h-auto object-contain max-h-24 sm:max-h-28 mx-auto"
                                 width={1024}
                                 height={142}
+                                loading="lazy"
+                                onError={(e) => {
+                                    const target = e.currentTarget;
+                                    if (target.src !== "/sslcommerz-banner.png") {
+                                        target.src = "/sslcommerz-banner.png";
+                                    }
+                                }}
                             />
-                        </div>
+                        </a>
                     </div>
                 </div>
 

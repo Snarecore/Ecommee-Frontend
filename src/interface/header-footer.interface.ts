@@ -21,4 +21,5 @@ export interface HeaderFooter {
     primaryColor?: string;
     secondaryColor?: string;
     themeConfig?: any;
+    paymentBanner?: string;
 }
