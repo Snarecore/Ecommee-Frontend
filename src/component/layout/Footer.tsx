@@ -230,12 +230,12 @@ const Footer = () => {
                     <div className="w-full bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-200/20 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
-                            src={headerFooterData?.paymentBanner || "https://res.cloudinary.com/dps0qdamq/image/upload/v1795373422/payment-gateways/sslcommerz-verified-banner-2x.png"} 
+                            src={headerFooterData?.paymentBanner || "https://res.cloudinary.com/dps0qdamq/image/upload/v1795374499/payment-gateways/sslcommerz-official-banner-hd.png"} 
                             alt="SSLCOMMERZ Verified Payment Gateway - Pay With Cards, Mobile Banking & Net Banking" 
                             className="w-full h-auto object-contain block mx-auto select-none"
                             style={{ imageRendering: '-webkit-optimize-contrast' }}
-                            width={2048}
-                            height={284}
+                            width={2200}
+                            height={246}
                             loading="eager"
                             onError={(e) => {
                                 const target = e.currentTarget;
