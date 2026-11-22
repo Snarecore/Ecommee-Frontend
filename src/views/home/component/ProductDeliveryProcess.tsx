@@ -8,38 +8,68 @@ import {
   FiHome 
 } from 'react-icons/fi';
 
-const deliverySteps = [
-  {
-    step: '01',
-    title: 'Order & Verification',
-    description: 'Instant order confirmation with real-time digital invoice & tracking ID generated.',
-    icon: FiCheckCircle,
-    highlight: 'Instant Confirmation',
-  },
-  {
-    step: '02',
-    title: 'Quality Check & Packing',
-    description: 'Rigorous 3-tier fabric & seam inspection, hygienic steam press, and eco-friendly packaging.',
-    icon: FiPackage,
-    highlight: '100% Inspected',
-  },
-  {
-    step: '03',
-    title: 'Express Dispatch & Transit',
-    description: 'Dispatched through trusted premier courier networks with live SMS updates and route tracking.',
-    icon: FiTruck,
-    highlight: '24-48h Fast Dispatch',
-  },
-  {
-    step: '04',
-    title: 'Doorstep Delivery & Trial',
-    description: 'Safe contactless or COD handover at your doorstep with 30 days hassle-free exchange & returns.',
-    icon: FiHome,
-    highlight: '30-Day Easy Returns',
-  },
-];
+interface ProductDeliveryProcessProps {
+  contentData?: {
+    isDeliveryProcessVisible?: boolean;
+    deliveryProcessBadge?: string;
+    deliveryProcessTitle?: string;
+    deliveryProcessDescription?: string;
+    deliveryStepOneTitle?: string;
+    deliveryStepOneHighlight?: string;
+    deliveryStepOneDescription?: string;
+    deliveryStepTwoTitle?: string;
+    deliveryStepTwoHighlight?: string;
+    deliveryStepTwoDescription?: string;
+    deliveryStepThreeTitle?: string;
+    deliveryStepThreeHighlight?: string;
+    deliveryStepThreeDescription?: string;
+    deliveryStepFourTitle?: string;
+    deliveryStepFourHighlight?: string;
+    deliveryStepFourDescription?: string;
+  };
+}
 
-const ProductDeliveryProcess: React.FC = () => {
+const ProductDeliveryProcess: React.FC<ProductDeliveryProcessProps> = ({ contentData }) => {
+  // If explicitly disabled from CMS, hide the section
+  if (contentData?.isDeliveryProcessVisible === false) {
+    return null;
+  }
+
+  const badge = contentData?.deliveryProcessBadge || "Seamless Fulfillment Journey";
+  const title = contentData?.deliveryProcessTitle || "How Your Order Reaches Your Doorstep";
+  const description = contentData?.deliveryProcessDescription;
+
+  const steps = [
+    {
+      step: '01',
+      title: contentData?.deliveryStepOneTitle || 'Order & Verification',
+      highlight: contentData?.deliveryStepOneHighlight || 'Instant Confirmation',
+      description: contentData?.deliveryStepOneDescription || 'Instant order confirmation with real-time digital invoice & tracking ID generated.',
+      icon: FiCheckCircle,
+    },
+    {
+      step: '02',
+      title: contentData?.deliveryStepTwoTitle || 'Quality Check & Packing',
+      highlight: contentData?.deliveryStepTwoHighlight || '100% Inspected',
+      description: contentData?.deliveryStepTwoDescription || 'Rigorous 3-tier fabric & seam inspection, hygienic steam press, and eco-friendly packaging.',
+      icon: FiPackage,
+    },
+    {
+      step: '03',
+      title: contentData?.deliveryStepThreeTitle || 'Express Dispatch & Transit',
+      highlight: contentData?.deliveryStepThreeHighlight || '24-48h Fast Dispatch',
+      description: contentData?.deliveryStepThreeDescription || 'Dispatched through trusted premier courier networks with live SMS updates and route tracking.',
+      icon: FiTruck,
+    },
+    {
+      step: '04',
+      title: contentData?.deliveryStepFourTitle || 'Doorstep Delivery & Trial',
+      highlight: contentData?.deliveryStepFourHighlight || '7-Day Easy Returns',
+      description: contentData?.deliveryStepFourDescription || 'Safe contactless or COD handover at your doorstep with 7 days hassle-free exchange & returns.',
+      icon: FiHome,
+    },
+  ];
+
   return (
     <section className="px-4 sm:px-6 my-10 sm:my-14" aria-label="Product Delivery Process">
       <div className="max-w-screen-2xl mx-auto">
@@ -59,11 +89,16 @@ const ProductDeliveryProcess: React.FC = () => {
           {/* Section Header */}
           <div className="relative text-center max-w-3xl mx-auto mb-10 md:mb-12">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-[#218DAE]/10 text-[#218DAE] dark:bg-[#218DAE]/20 dark:text-[#3FA5C7] mb-3">
-              Seamless Fulfillment Journey
+              {badge}
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
-              How Your Order Reaches Your Doorstep
+              {title}
             </h2>
+            {description && (
+              <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                {description}
+              </p>
+            )}
           </div>
 
           {/* 4-Step Process Timeline */}
@@ -74,7 +109,7 @@ const ProductDeliveryProcess: React.FC = () => {
               aria-hidden="true"
             />
 
-            {deliverySteps.map((item) => {
+            {steps.map((item) => {
               const Icon = item.icon;
               return (
                 <div 

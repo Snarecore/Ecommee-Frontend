@@ -45,8 +45,8 @@ const Home = ({ initialData }: HomeProps) => {
 			{/* Commented out original BecomeSeller banner section as requested */}
 			{/* <BecomeSeller contentData={response?.contentData} /> */}
 
-			{/* New Clean & Elegant Product Delivery Process Section */}
-			<ProductDeliveryProcess />
+			{/* Dynamic Product Delivery Process Section */}
+			<ProductDeliveryProcess contentData={response?.contentData} />
 		</div>
 	);
 }
