@@ -5,11 +5,7 @@ import Link from "next/link";
 import { useAtom } from "jotai";
 import { headerFooterAtom, socialLinksAtom, nestedCategoriesAtom } from "../../store/global-store";
 import { MainCategory } from "../../interface/nested-category.interface";
-import visaCard from "../../assets/visaCard.svg";
-import mastardCard from "../../assets/masterCard.svg";
-import americanCard from "../../assets/dls-logo-bluebox-solid.svg";
-import discoveLog from "../../assets/discover-logo.png";
-import paypal from "../../assets/paypal-svgrepo-com.svg";
+import sslCommerzBanner from "../../assets/sslcommerz-banner.png";
 
 import { 
     FaFacebookF, 
@@ -59,7 +55,7 @@ const Footer = () => {
     const [nestedCategories] = useAtom(nestedCategoriesAtom);
     const mainCategories = (nestedCategories ?? []) as unknown as MainCategory[];
 
-    const contactEmail = "majba.web@gmail.com";
+    const contactEmail = "majba9399@gmail.com";
     const contactPhone = "01317020309";
     const contactAddress = headerFooterData?.contactAddress || "30 N Gould St Ste R, Sheridan, WY 82801, USA";
 
@@ -230,20 +226,29 @@ const Footer = () => {
 
                 </div>
 
-                {/* Bottom Bar: Copyright & Payment Icons */}
-                <div className="border-t border-slate-800/80 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-slate-400 text-center md:text-left">
-                        {headerFooterData?.copyrightText || "© 2025 Bazaar Bound / Fashion Time. All rights reserved."}
-                    </p>
-
-                    <div className="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800/80 flex-wrap justify-center">
-                        <span className="text-[11px] font-medium text-slate-400 mr-1 hidden sm:inline">We Accept:</span>
-                        <Image src={visaCard} alt="Visa" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
-                        <Image src={mastardCard} alt="Mastercard" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
-                        <Image src={americanCard} alt="American Express" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
-                        <Image src={discoveLog} alt="Discover" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={45} height={24} />
-                        <Image src={paypal} alt="Paypal" className="h-6 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" width={40} height={24} />
+                {/* SSLCommerz Payment Gateway Banner */}
+                <div className="border-t border-slate-800/80 pt-8 pb-6">
+                    <div className="w-full flex justify-center">
+                        <div className="w-full max-w-5xl bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-200/20 overflow-hidden flex items-center justify-center">
+                            <Image 
+                                src={sslCommerzBanner} 
+                                alt="SSLCOMMERZ Verified Payment Gateway - Pay With Cards, Mobile Banking & Net Banking" 
+                                className="w-full h-auto object-contain max-h-24 sm:max-h-28"
+                                width={1024}
+                                height={142}
+                            />
+                        </div>
                     </div>
+                </div>
+
+                {/* Bottom Bar: Copyright */}
+                <div className="pt-4 border-t border-slate-800/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                    <p className="text-center sm:text-left">
+                        {headerFooterData?.copyrightText || "© 2025 Fashion Time. All rights reserved."}
+                    </p>
+                    <p className="text-center sm:text-right text-[11px] text-slate-400">
+                        100% Secure &amp; Encrypted Payments Powered by <span className="text-slate-300 font-semibold">SSLCOMMERZ</span>
+                    </p>
                 </div>
             </footer>
         </div>
