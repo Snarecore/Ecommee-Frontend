@@ -6,6 +6,7 @@ import ProductCategory from '../../component/product-category';
 import { useAPI } from '../../hooks/useApi';
 import apiConfig from "../../config/api.json";
 import BecomeSeller from './component/BecomeSeller';
+import ProductDeliveryProcess from './component/ProductDeliveryProcess';
 import ProductSectionOne from './component/ProductSectionOne';
 import ProductSectionTwo from './component/ProductSectionTwo';
 import ProductSectionThree from './component/ProductSectionThree';
@@ -41,7 +42,11 @@ const Home = ({ initialData }: HomeProps) => {
 			<ProductSectionFour productList={response?.sectionFourProducts} contentData={response?.contentData} />
 			<ProductSectionFive productList={response?.sectionFiveProducts} contentData={response?.contentData} />
 			<ProductSectionSix productList={response?.sectionSixProducts} contentData={response?.contentData} />
-			<BecomeSeller contentData={response?.contentData} />
+			{/* Commented out original BecomeSeller banner section as requested */}
+			{/* <BecomeSeller contentData={response?.contentData} /> */}
+
+			{/* New Clean & Elegant Product Delivery Process Section */}
+			<ProductDeliveryProcess />
 		</div>
 	);
 }
