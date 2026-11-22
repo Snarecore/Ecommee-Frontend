@@ -88,7 +88,7 @@ const Footer = () => {
             {/* Ambient Background Gradient Accent */}
             <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl pointer-events-none" />
 
-            <footer className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <footer className="max-w-screen-2xl mx-auto px-4 sm:px-6 relative z-10">
                 {/* Main Grid Layout */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-8 lg:gap-10 pb-12">
                     
@@ -227,30 +227,23 @@ const Footer = () => {
 
                 {/* SSLCommerz Payment Gateway Banner */}
                 <div className="border-t border-slate-800/80 pt-8 pb-6">
-                    <div className="w-full flex justify-center">
-                        <a 
-                            href="https://www.sslcommerz.com" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block w-full max-w-5xl bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-200/20 overflow-hidden cursor-pointer hover:opacity-95 transition-opacity"
-                            title="SSLCOMMERZ - Verified Payment Gateway"
-                        >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img 
-                                src={headerFooterData?.paymentBanner || "https://res.cloudinary.com/dps0qdamq/image/upload/v1795371802/payment-gateways/sslcommerz-verified-banner.png"} 
-                                alt="SSLCOMMERZ Verified Payment Gateway - Pay With Cards, Mobile Banking & Net Banking" 
-                                className="w-full h-auto object-contain max-h-24 sm:max-h-28 mx-auto"
-                                width={1024}
-                                height={142}
-                                loading="lazy"
-                                onError={(e) => {
-                                    const target = e.currentTarget;
-                                    if (target.src !== "/sslcommerz-banner.png") {
-                                        target.src = "/sslcommerz-banner.png";
-                                    }
-                                }}
-                            />
-                        </a>
+                    <div className="w-full bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-200/20 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                            src={headerFooterData?.paymentBanner || "https://res.cloudinary.com/dps0qdamq/image/upload/v1795373422/payment-gateways/sslcommerz-verified-banner-2x.png"} 
+                            alt="SSLCOMMERZ Verified Payment Gateway - Pay With Cards, Mobile Banking & Net Banking" 
+                            className="w-full h-auto object-contain block mx-auto select-none"
+                            style={{ imageRendering: '-webkit-optimize-contrast' }}
+                            width={2048}
+                            height={284}
+                            loading="eager"
+                            onError={(e) => {
+                                const target = e.currentTarget;
+                                if (target.src !== "/sslcommerz-banner.png") {
+                                    target.src = "/sslcommerz-banner.png";
+                                }
+                            }}
+                        />
                     </div>
                 </div>
 
