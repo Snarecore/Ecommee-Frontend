@@ -37,7 +37,6 @@ const ProductDeliveryProcess: React.FC<ProductDeliveryProcessProps> = ({ content
 
   const badge = contentData?.deliveryProcessBadge || "Seamless Fulfillment Journey";
   const title = contentData?.deliveryProcessTitle || "How Your Order Reaches Your Doorstep";
-  const description = contentData?.deliveryProcessDescription;
 
   const steps = [
     {
@@ -94,11 +93,6 @@ const ProductDeliveryProcess: React.FC<ProductDeliveryProcessProps> = ({ content
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
               {title}
             </h2>
-            {description && (
-              <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-                {description}
-              </p>
-            )}
           </div>
 
           {/* 4-Step Process Timeline */}
