@@ -38,6 +38,12 @@ import StripeCardSection, { StripeCardSectionRef } from "@/component/payment/Str
 import { PhoneOtpModal } from "@/component/checkout/PhoneOtpModal";
 import { CheckoutVerificationService } from "@/services/checkout-verification.service";
 import { getGuestOrderHeaders } from "@/utils/guest-order-token";
+import {
+  getOrCreateCheckoutSessionToken,
+  clearCheckoutSessionToken,
+  trackCheckoutDraft,
+  flushCheckoutDraft
+} from "@/services/incomplete-checkout.service";
 
 const CheckoutView = () => {
   const router = useRouter();
@@ -187,6 +193,23 @@ const CheckoutView = () => {
   const couponDiscount = serverCalculation?.discountAmount ?? (appliedCoupon ? appliedCoupon.discountAmount : 0);
   const grandTotal = serverCalculation?.totalAmount ?? Math.max(0, cartSubtotal + deliveryCharge - couponDiscount);
 
+  // Debounced Incomplete Checkout Tracking
+  useEffect(() => {
+    if (!isMounted || cartItems.length === 0 || orderSubmitted) return;
+    trackCheckoutDraft({
+      name,
+      phone,
+      email,
+      address,
+      city,
+      items: cartItems.map((it) => ({
+        productId: it.id,
+        variantId: it.selectedSize || undefined,
+        quantity: it.quantity ?? 1
+      }))
+    });
+  }, [name, phone, email, address, city, cartItems, isMounted, orderSubmitted]);
+
   // Execute order submission
   const executeOrderSubmission = async (overrideVerificationId?: string) => {
     setIsSubmitting(true);
@@ -269,7 +292,8 @@ const CheckoutView = () => {
           name: name.trim(),
           phone: phone.trim(),
           email: email.trim()
-        }
+        },
+        checkoutSessionToken: getOrCreateCheckoutSessionToken()
       };
 
       // 1. Order-First: Pre-create order and reserve stock first
@@ -419,6 +443,7 @@ const CheckoutView = () => {
       // 4. Cash on Delivery (COD) Flow
       setOrderSubmitted(true);
       clearCart();
+      clearCheckoutSessionToken();
 
       // Instantly notify admin dashboard tabs if open
       if (typeof window !== "undefined" && "BroadcastChannel" in window) {
