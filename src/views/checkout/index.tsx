@@ -272,6 +272,7 @@ const CheckoutView = () => {
         deliveryCharge,
         specialNote: specialNote.trim(),
         name: name.trim(),
+        userId: user?.id || user?._id || undefined,
         customerName: name.trim(),
         phone: phone.trim(),
         phoneNumber: phone.trim(),
@@ -418,6 +419,7 @@ const CheckoutView = () => {
             headers: getGuestOrderHeaders(createdOrderId),
             body: {
               orderId: createdOrderId,
+              userId: user?.id || user?._id || undefined,
               customerName: name.trim(),
               customerPhone: phone.trim(),
               customerAddress: address.trim(),
