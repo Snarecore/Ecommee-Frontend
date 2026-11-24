@@ -67,11 +67,11 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
     queryKey: ["notifications", userId],
     queryFn: () => fetchNotificationsApi(userId),
     enabled: Boolean(user && !isCheckoutPage),
-    // Resilient Real-Time: When socket is connected, poll rarely (60s) as backup;
+    // Resilient Real-Time: When socket is connected, poll periodically (25s) as backup;
     // When socket is disconnected (e.g. serverless or network glitch), poll every 15s.
-    refetchInterval: isConnected ? 60000 : 15000,
+    refetchInterval: isConnected ? 25000 : 15000,
     refetchOnWindowFocus: true,
-    staleTime: 1000 * 10,
+    staleTime: 1000 * 5,
     gcTime: 1000 * 60 * 10,
     retry: false
   });
@@ -105,14 +105,22 @@ const NotificationDropdown: React.FC<Props> = ({ variant = "light" }) => {
 
     const handleUpdate = () => {
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
     };
 
     socket.on(SocketEvent.ORDER_STATUS_UPDATED, handleUpdate);
+    socket.on(SocketEvent.ORDER_CREATED, handleUpdate);
+    socket.on("user_notification", handleUpdate);
+    socket.on("notification", handleUpdate);
 
     return () => {
       socket.off(SocketEvent.ORDER_STATUS_UPDATED, handleUpdate);
+      socket.off(SocketEvent.ORDER_CREATED, handleUpdate);
+      socket.off("user_notification", handleUpdate);
+      socket.off("notification", handleUpdate);
     };
-  }, [socket, refetch]);
+  }, [socket, refetch, queryClient]);
 
   // Sound Chime Alert on brand new unread notifications
   useEffect(() => {

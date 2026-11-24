@@ -40,7 +40,7 @@ export const fetchNotificationsApi = async (userId?: string): Promise<{
   // Invoke backend notifications endpoint (works via HttpOnly cookie or bearer token)
   if (notifUrl) {
     try {
-      const res: any = await getData({ url: notifUrl, token: token || undefined });
+      const res: any = await getData({ url: notifUrl, token: token || undefined, noCache: true });
       if (res && !res.error) {
         const payload = res.data || res;
         const list = Array.isArray(payload.notifications)

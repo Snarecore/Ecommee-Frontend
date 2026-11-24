@@ -65,7 +65,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             reconnectionDelayMax: 5000,
             // Called on every (re)connect, so an expired socket token is replaced
             auth: (cb) => {
-                if (!user?.id) return cb({});
+                if (!user?.id && !user?._id) return cb({});
                 fetchSocketToken()
                     .then((token) => cb(token ? { token } : {}))
                     .catch(() => cb({}));
